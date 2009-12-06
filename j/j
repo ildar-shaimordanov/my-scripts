@@ -1,0 +1,307 @@
+#!/bin/sh
+
+
+# *******************************************************
+#
+# This batch-script automates actions with Java
+# Usage is very simple:
+# Call this one within your batch script with defined 
+# arguments. Arguments can be found from this help.
+#
+# *******************************************************
+
+
+help()
+{
+	cat<<HELP
+Java Helper Batch Script
+Copyright (c) 2007-2009 by Ildar Shaimordanov ildar.shaimordanov^@hp.com
+
+SYNOPSIS
+    J arguments
+
+ARGUMENTS
+    J -H
+    J --HELP
+    J HELP
+
+        Prints this help page.
+
+
+    J CLASSPATH classpath
+
+        The argument specifies a path to be added to the existing CLASSPATH.
+        If the classpath is not specified the current CLASSPATH is clean.
+
+
+    J JDK jdk
+
+        The argument specifies the path to the JDK, 
+        i.e. "C:\Program Files\Java\jdk1.5.0_11".
+        You should specify a location of specific JDK only.
+        Do not include path to the "bin" folder or 
+        full pathname of executable files.
+
+
+    J PROJECT project
+
+        Creates the project paths in the currect folder.
+        You can specifies project as DOS/Unix/Java notation.
+
+
+    J EDITOR editor
+
+        Sets the system name or the full pathname for the editor.
+        The default editor is the standard Windows Notepad.
+
+
+    J EDIT class
+
+        Runs the specified editor with the fully qualified class 
+        as filename (without extension) to edit.
+
+
+    J MAKE class
+
+        The argument specifies the fully qualified class name 
+        of the source file without extension to be compiled.
+
+
+    J RUN class
+
+        The argument specifies the fully qualified class name 
+        of the binary file without extension to be executed.
+
+
+    J JAR jarfile list
+
+        Compiles the "jarfile" from the specified a list of classes 
+        delimited by whitespace and listed within quotes.
+
+
+    J CLEAR
+
+        Clears environment namespace from variables created by J script.
+        This is good practice to clear a working place after yourself.
+
+HELP
+}
+
+
+set JSRCPATH=src
+set JBINPATH=bin
+
+
+case "$(echo "$1" | tr a-z A-Z)" in
+CLASSPATH)
+	# **********************************************
+	#
+	# Define CLASSPATH
+	# Example:
+	# J CLASSPATH value
+	#
+	if [ "$2" = "" ]
+	then
+		CLASSPATH=
+	else
+		CLASSPATH=$CLASSPATH:$2
+	fi
+	;;
+
+JDK)
+	# **********************************************
+	#
+	# Define path to the JDK
+	# Example:
+	# J JDK /opt/j2sdk1.4.2_14
+	#
+	JJDKPATH=$2
+	;;
+
+PROJECT)
+	# **********************************************
+	#
+	# Create new project at the current folder
+	# Project name = path.to.the.project
+	# Folder name  = path\to\the\project
+	# Example:
+	# J PROJECT path.to.the.project
+	#
+	if [ -n "$2" ]
+	then
+		J=$(echo "$2" | tr '\\.' /)
+	fi
+
+	mkdir "$JBINPATH"
+	mkdir "$JBINPATH\$J"
+
+	cat<<MAKER >jmake.sh
+#!/bim/sh
+
+
+# This batch file is the wrapper that serve to simplify working with java files.
+# There are some commands that should be modified befor start this scenario.
+# Found lines containing "STUB" patterns and replace them with the appropriate values.
+# You can remove optional commands and leave essential ones only (mandatory and recommended).
+
+
+# MANDATORY
+# It specifies the path of the JDK location.
+# You HAVE TO replace "STUB" with the valid path of the JDK location.
+j jdk "STUB"
+
+
+# RECOMMENDED
+# You can define additional libraries here
+j classpath 
+
+
+# OPTIONAL
+# Compile of the files.
+# Replace the "STUB" pattern with the valid filename of the compiled class.
+j make "STUB" 
+
+
+# OPTIONAL
+# Runs of file.
+# Replace the "STUB" pattern with the valid filename of the executed class.
+j run "STUB" "%%*"
+
+
+# OPTIONAL
+# Creates JAR file.
+# Replace the "STUB" pattern with the valid filename of the JAR.
+# After the JAR file you can specify files that should be placed into JAR file.
+# By default all files from the bin\ folder will be placed into JAR file.
+j jar "STUB" 
+
+
+# RECOMMENDED
+# Clear global variables.
+j clear
+MAKER
+
+cat<<FIN
+****************************************************************
+
+The project had been created.
+
+Open and modify the 'jmake.sh' scenario.
+Follow for comments within this file.
+
+****************************************************************
+FIN
+	;;
+
+EDITOR)
+	# **********************************************
+	#
+	# Sets the default editor for java files
+	# Example:
+	# J EDITOR notepad
+	#
+	JEDITOR=$2
+	;;
+
+EDIT)
+	# **********************************************
+	#
+	# Edit specified class
+	# Source filename = path\to\the\class.java
+	# Example:
+	# J EDIT path.to.the.class
+	#
+	J=$(echo "$2" | tr '\\.' /).java
+
+	if [ -n "$JEDITOR" ]
+	then
+		JEDITOR=vi
+	fi
+
+	$JEDITOR "$PWD/$JSRCPATH/$J"
+	;;
+
+MAKE)
+	# **********************************************
+	#
+	# Compile the class
+	# Source filename = path\to\the\class.java
+	# Example:
+	# J MAKE path.to.the.class [options]
+	#
+	J=$(echo "$2" | tr '\\.' /).java
+
+	$JJDKPATH/bin/javac -d "$JBINPATH" "$JSRCPATH/$J" "$3"
+	;;
+
+RUN)
+	# **********************************************
+	#
+	# Execute the class
+	# Destination class = path.to.the.class
+	# Example:
+	# J RUN path.to.the.class [options]
+	#
+	J=$(echo "$2" | tr '\\\/' .)
+
+	cd "$JBINPATH"
+
+	$JJDKPATH/bin/java "$J" "$3"
+	;;
+
+JAR)
+	# **********************************************
+	#
+	# Create the JAR file for the bin\ folder
+	# Example:
+	# J JAR jar_file.jar file1 file2 ...
+	#
+	J=$3
+
+	if [ -z "$J" ]
+	then
+		J=.
+	fi
+
+	if [ "$J" -ne "." ]
+	then
+		J=$(echo "$J" | tr '\\.' / | sed -e 's/\\class$/.class/')
+	fi
+
+	cd "$JBINPATH"
+
+	if [ -f ..\MANIFEST.MF ]
+	then
+		$JJDKPATH/bin/jar -cvfm ..\$2 ..\MANIFEST.MF "$J"
+	else
+		$JJDKPATH/bin/jar -cvf  ..\$2                "$J"
+	fi
+
+	cd ..
+	;;
+
+CLEAR)
+	# **********************************************
+	#
+	# Empty global variables
+	# Example:
+	# J CLEAR
+	#
+	JBINPATH=
+	JSRCPATH=
+	JJDKPATH=
+	JEDITOR=
+	;;
+
+*)
+	help
+	;;
+esac
+
+
+# **********************************************
+#
+# Empty any temporary variables
+#
+J=
+
