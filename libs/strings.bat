@@ -19,6 +19,24 @@ endlocal && set %~1=%strlen%
 goto :EOF
 
 
+:: Estimates and returns the string value
+::
+:: @param  name
+:: @param  string
+:str_len
+if "%~2" == "" (
+    set %~1=0
+    goto :EOF
+)
+
+echo.%~2>"%TEMP%\%~n0.txt"
+for /f %%a in ( "%TEMP%\%~n0.txt" ) do (
+    set /a %~1=%%~za-2
+    del "%%a"
+)
+goto :EOF
+
+
 :: Repeats the input string N times
 ::
 :: @param  name
