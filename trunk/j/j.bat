@@ -19,73 +19,73 @@ goto START
 
 
 :HELP
-echo Java Helper Batch Script
-echo Copyright ^(c^) 2007-2009 by Ildar Shaimordanov ildar.shaimordanov^@hp.com
+echo.Java Helper Batch Script
+echo.Copyright ^(c^) 2007-2009 by Ildar Shaimordanov ildar.shaimordanov^@hp.com
 echo.
-echo Usage:
-echo     [CALL] J arguments
+echo.Usage:
+echo.    [CALL] J arguments
 echo.
-echo J /?
-echo J HELP
+echo.J /?
+echo.J HELP
 echo.
-echo     Prints this help page.
-echo.
-echo.
-echo J CLASSPATH classpath
-echo.
-echo     The argument specifies a path to be added to the existing CLASSPATH.
-echo     If the classpath is not specified the current CLASSPATH is clean.
+echo.    Prints this help page.
 echo.
 echo.
-echo J JDK jdk
+echo.J CLASSPATH classpath
 echo.
-echo     The argument specifies the path to the JDK, 
-echo     i.e. "C:\Program Files\Java\jdk1.5.0_11".
-echo     You should specify a location of specific JDK only.
-echo     Do not include path to the "bin" folder or 
-echo     full pathname of executable files.
+echo.    The argument specifies a path to be added to the existing CLASSPATH.
+echo.    If the classpath is not specified the current CLASSPATH is clean.
 echo.
 echo.
-echo J PROJECT project
+echo.J JDK jdk
 echo.
-echo     Creates the project paths in the currect folder.
-echo     You can specifies project as DOS/Unix/Java notation.
-echo.
-echo.
-echo J EDITOR editor
-echo.
-echo     Sets the system name or the full pathname for the editor.
-echo     The default editor is the standard Windows Notepad.
+echo.    The argument specifies the path to the JDK, 
+echo.    i.e. "C:\Program Files\Java\jdk1.5.0_11".
+echo.    You should specify a location of specific JDK only.
+echo.    Do not include path to the "bin" folder or 
+echo.    full pathname of executable files.
 echo.
 echo.
-echo J EDIT class
+echo.J PROJECT project
 echo.
-echo     Runs the specified editor with the fully qualified class 
-echo     as filename (without extension) to edit.
-echo.
-echo.
-echo J MAKE class
-echo.
-echo     The argument specifies the fully qualified class name 
-echo     of the source file without extension to be compiled.
+echo.    Creates the project paths in the currect folder.
+echo.    You can specifies project as DOS/Unix/Java notation.
 echo.
 echo.
-echo J RUN class
+echo.J EDITOR editor
 echo.
-echo     The argument specifies the fully qualified class name 
-echo     of the binary file without extension to be executed.
-echo.
-echo.
-echo J JAR jarfile list
-echo.
-echo     Compiles the "jarfile" from the specified a list of classes 
-echo     delimited by whitespace and listed within quotes.
+echo.    Sets the system name or the full pathname for the editor.
+echo.    The default editor is the standard Windows Notepad.
 echo.
 echo.
-echo J CLEAR
+echo.J EDIT class
 echo.
-echo     Clears environment namespace from variables created by J script.
-echo     This is good practice to clear a working place after yourself.
+echo.    Runs the specified editor with the fully qualified class 
+echo.    as filename (without extension) to edit.
+echo.
+echo.
+echo.J MAKE class
+echo.
+echo.    The argument specifies the fully qualified class name 
+echo.    of the source file without extension to be compiled.
+echo.
+echo.
+echo.J RUN class
+echo.
+echo.    The argument specifies the fully qualified class name 
+echo.    of the binary file without extension to be executed.
+echo.
+echo.
+echo.J JAR jarfile list
+echo.
+echo.    Compiles the "jarfile" from the specified a list of classes 
+echo.    delimited by whitespace and listed within quotes.
+echo.
+echo.
+echo.J CLEAR
+echo.
+echo.    Clears environment namespace from variables created by J script.
+echo.    This is good practice to clear a working place after yourself.
 echo.
 
 goto STOP
@@ -160,61 +160,61 @@ md "%JSRCPATH%\%J%" 2>nul
 
 call :project2>jmake.bat
 
-echo ****************************************************************
+echo.****************************************************************
 echo.
-echo The project had been created.
+echo.The project had been created.
 echo.
-echo Open and modify the "jmake.bat" scenario.
-echo Follow for comments within this file.
+echo.Open and modify the "jmake.bat" scenario.
+echo.Follow for comments within this file.
 echo.
-echo ****************************************************************
+echo.****************************************************************
 
 goto STOP
 
 :project2
-echo @echo off
+echo.@echo off
 echo.
 echo.
-echo rem This batch file is the wrapper that serve to simplify working with java files.
-echo rem There are some commands that should be modified befor start this scenario.
-echo rem Found lines containing "STUB" patterns and replace them with the appropriate values.
-echo rem You can remove optional commands and leave essential ones only (mandatory and recommended).
+echo.rem This batch file is the wrapper that serve to simplify working with java files.
+echo.rem There are some commands that should be modified befor start this scenario.
+echo.rem Found lines containing "STUB" patterns and replace them with the appropriate values.
+echo.rem You can remove optional commands and leave essential ones only (mandatory and recommended).
 echo.
 echo.
-echo rem MANDATORY
-echo rem It specifies the path of the JDK location.
-echo rem You HAVE TO replace "STUB" with the valid path of the JDK location.
-echo call j jdk "STUB"
+echo.rem MANDATORY
+echo.rem It specifies the path of the JDK location.
+echo.rem You HAVE TO replace "STUB" with the valid path of the JDK location.
+echo.call j jdk "STUB"
 echo.
 echo.
-echo rem RECOMMENDED
-echo rem You can define additional libraries here
-echo call j classpath 
+echo.rem RECOMMENDED
+echo.rem You can define additional libraries here
+echo.call j classpath 
 echo.
 echo.
-echo rem OPTIONAL
-echo rem Compile of the files.
-echo rem Replace the "STUB" pattern with the valid filename of the compiled class.
-echo call j make "STUB" 
+echo.rem OPTIONAL
+echo.rem Compile of the files.
+echo.rem Replace the "STUB" pattern with the valid filename of the compiled class.
+echo.call j make "STUB" 
 echo.
 echo.
-echo rem OPTIONAL
-echo rem Runs of file.
-echo rem Replace the "STUB" pattern with the valid filename of the executed class.
-echo call j run "STUB" "%%*"
+echo.rem OPTIONAL
+echo.rem Runs of file.
+echo.rem Replace the "STUB" pattern with the valid filename of the executed class.
+echo.call j run "STUB" "%%*"
 echo.
 echo.
-echo rem OPTIONAL
-echo rem Creates JAR file.
-echo rem Replace the "STUB" pattern with the valid filename of the JAR.
-echo rem After the JAR file you can specify files that should be placed into JAR file.
-echo rem By default all files from the bin\ folder will be placed into JAR file.
-echo call j jar "STUB" 
+echo.rem OPTIONAL
+echo.rem Creates JAR file.
+echo.rem Replace the "STUB" pattern with the valid filename of the JAR.
+echo.rem After the JAR file you can specify files that should be placed into JAR file.
+echo.rem By default all files from the bin\ folder will be placed into JAR file.
+echo.call j jar "STUB" 
 echo.
 echo.
-echo rem RECOMMENDED
-echo rem Clear global variables.
-echo call j clear
+echo.rem RECOMMENDED
+echo.rem Clear global variables.
+echo.call j clear
 
 goto :EOF
 
