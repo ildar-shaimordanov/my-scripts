@@ -41,30 +41,60 @@ for /f %%a in ( "%TEMP%\%~n0.txt" ) do (
 goto :EOF
 
 
-:: Repeats the input string N times
+:: Repeats the input string LENGTH times
+::
+:: @usage  call :str_repeat NAME LENGTH STRING
 ::
 :: @param  name
 :: @param  number
 :: @param  string
 :str_repeat
-setlocal
+setlocal enabledelayedexpansion
 
-set str=
-set str_n=%~2
-set str_c=%~3
+set R=
+set N=
 
-:str_repeat_1
-if %str_n% leq 0 goto str_repeat_2
-set str=%str%%str_c%
-set /a str_n-=1
-goto str_repeat_1
+set /a N=%~2 2>nul
 
-:str_repeat_2
-endlocal && set %~1=%str%
+if not defined N goto str_repeat_break
+if %N% leq 0 goto str_repeat_break
+
+set R=%~3
+
+if not defined R goto str_repeat_break
+
+call :str_len K "%R%"
+
+set /a L=1
+set /a N=%N%-1
+
+:str_repeat_continue
+if %N% leq 0 goto str_repeat_break
+
+if %N% leq %L% (
+	set /a M=%N% * %K%
+	call :str_repeat_part
+	set R=%R%!Q!
+	goto str_repeat_break
+)
+
+set /a N=%N% - %L%
+set R=%R%%R%
+set /a L*=2
+goto str_repeat_continue
+
+:str_repeat_break
+endlocal && set %~1=%R%
+exit /b 0
+
+:str_repeat_part
+set Q=!R:~-%M%!
 goto :EOF
 
 
 :: Creates a random alfanumeric string with specified length
+::
+:: @usage  call :str_rnd NAME LENGTH
 ::
 :: @param  name
 :: @param  length
@@ -94,6 +124,8 @@ goto :EOF
 
 
 :: Extract the first matching to a pattern
+::
+:: @usage  call :subpath NAME PATTERN PATH [FLAGS]
 ::
 :: @param  String  variable name
 :: @param  String  pattern
