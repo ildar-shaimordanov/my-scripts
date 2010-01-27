@@ -41,9 +41,9 @@ for /f %%a in ( "%TEMP%\%~n0.txt" ) do (
 goto :EOF
 
 
-:: Repeats the input string LENGTH times
+:: Repeats the INPUT string MULTIPLIER times
 ::
-:: @usage  call :str_repeat NAME LENGTH STRING
+:: @usage  call :str_repeat NAME MULTIPLIER INPUT
 ::
 :: @param  name
 :: @param  number

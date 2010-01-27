@@ -20,17 +20,19 @@ setlocal enabledelayedexpansion
 
 set tempname_p=%~3
 
-:: 2. Set default path to %TEMP%
+rem 2. Set default path to %TEMP%
 if not defined tempname_p (
     set tempname_p=%TEMP%
 )
 
-:: 3. Check the path existance
+rem 3. Check the path existance
 dir /ad "%tempname_p%">nul 2>nul
 if errorlevel 1 (
     endlocal
     exit /b 3
 )
+
+rem 4. Construct the target
 
 if "%~2" == "" (
     rem 4.1. Set the default template
