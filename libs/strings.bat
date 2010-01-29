@@ -72,10 +72,10 @@ set /a N=%N%-1
 if %N% leq 0 goto str_repeat_break
 
 if %N% leq %L% (
-	set /a M=%N% * %K%
-	call :str_repeat_part
-	set R=%R%!Q!
-	goto str_repeat_break
+    set /a M=%N% * %K%
+    call :str_repeat_remainder
+    set R=%R%!Q!
+    goto str_repeat_break
 )
 
 set /a N=%N% - %L%
@@ -87,7 +87,7 @@ goto str_repeat_continue
 endlocal && set %~1=%R%
 exit /b 0
 
-:str_repeat_part
+:str_repeat_remainder
 set Q=!R:~-%M%!
 goto :EOF
 
@@ -106,7 +106,7 @@ set str_rnd_s=
 set /a str_rnd_i=%~2
 
 if not defined str_rnd_i (
-	goto str_rnd_2
+    goto str_rnd_2
 )
 
 set str_rnd_c=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
