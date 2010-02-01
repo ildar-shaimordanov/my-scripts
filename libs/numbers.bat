@@ -11,12 +11,11 @@
 ::
 :: @return ERRORLEVEL
 :is_number
-setlocal
-
 if "%~1" == "" (
-    endlocal
     exit /b 1
 )
+
+setlocal
 
 set /a number_var=%~1 2>nul
 
@@ -30,18 +29,22 @@ if %~1 neq %number_var% (
     exit /b 2
 )
 
-if "%~2" == "" goto is_number_1
+call :is_number "%~2"
+if errorlevel 1 goto is_number_1
 if %number_var% lss %~2 (
     endlocal
     exit /b 3
 )
+:is_number_1
 
-if "%~3" == "" goto is_number_1
+call :is_number "%~3"
+if errorlevel 1 goto is_number_2
 if %number_var% gtr %~3 (
     endlocal
     exit /b 4
 )
+:is_number_2
 
-:is_number_1
 endlocal
-goto :EOF
+exit /b 0
+
