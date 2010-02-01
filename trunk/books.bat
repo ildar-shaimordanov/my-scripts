@@ -9,18 +9,19 @@ set getoptions_help=book_help
 call :getoptions %*
 if defined getoptions_exit goto end_script
 
+set book_1=%opts_/1%
+set book_N=%opts_/N%
+set book_D=%opts_/D%
+
 :: Fix non-numeric values
-set /a book_1=%opts_/1% 2>nul
-set /a book_N=%opts_/n% 2>nul
-set /a book_D=%opts_/d% 2>nul
+call :is_number "%book_1%" 1
+if errorlevel 1 set book_1=1
 
-if not defined book_1 set book_1=0
-if not defined book_N set book_N=0
-if not defined book_D set book_D=0
+call :is_number "%book_N%" "%book_1%"
+if errorlevel 1 set book_N=1000
 
-if %book_1% lss 1        set book_1=1
-if %book_N% lss %book_1% set book_N=1000
-if %book_D% lss 4        set book_D=40
+call :is_number "%book_D%" 4
+if errorlevel 1 set book_D=4
 
 :: Fix /D option as divided by 4 exactly
 set /a book_D_R="%book_D% %% 4"

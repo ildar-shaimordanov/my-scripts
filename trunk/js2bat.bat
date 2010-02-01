@@ -1,5 +1,5 @@
 @set @x=0 /*
-@ cscript /nologo /e:javascript "%0" %*
+@ cscript /nologo /e:javascript "%~dpnx0" %*
 @goto:eof */
 
 // Display the minimal usage screen
@@ -25,7 +25,7 @@ var args = WScript.Arguments.Named('A')
 
 var prolog = [
     '@set @x=0 /*', 
-    ['@', host, args, '/e:javascript "%0" %*'].join(' '), 
+    ['@', host, args, '/e:javascript "%~dpnx0" %*'].join(' '), 
     '@goto:eof */', 
     ''
 ].join('\n');
