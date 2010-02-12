@@ -8,15 +8,15 @@
 setlocal
 
 if "%CD:~-1%" == "\" (
-	set pwd=%CD%
+    set pwd=%CD%
 ) else (
-	set pwd=%CD%\
+    set pwd=%CD%\
 )
 
 if "%~1" == "" (
-	echo.%pwd%
-	endlocal
-	goto :EOF
+    echo.%pwd%
+    endlocal
+    goto :EOF
 )
 
 endlocal && set %~1=%pwd%
