@@ -5,7 +5,7 @@
 :dirname
 setlocal
 
-call :parse_filename d1 d2 d3 d4 "%~1"
+call :parse_filename_0 d1 d2 d3 d4 "%~dpnx1"
 set d=%d1%%d2%
 
 goto basename_0
@@ -18,7 +18,7 @@ goto basename_0
 :basename
 setlocal
 
-call :parse_filename d1 d2 d3 d4 "%~1"
+call :parse_filename_0 d1 d2 d3 d4 "%~dpnx1"
 set d=%d3%%d4%
 
 :basename_0
@@ -62,6 +62,7 @@ if "%p:~-1%" == "\" (
 	if "%p:~-2,-1%" == ":" (
 		goto parse_filename_1
 	)
+
 	endlocal && call :parse_filename_0 "%~1" "%~2" "%~3" "%~4" "%p:~0,-1%"
 	goto :EOF
 )
