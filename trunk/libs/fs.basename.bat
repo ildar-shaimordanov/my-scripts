@@ -23,10 +23,10 @@ set d=%d3%%d4%
 
 :basename_0
 if "%~2" == "" (
-	echo.%d%
+    echo.%d%
 
-	endlocal
-	goto :EOF
+    endlocal
+    goto :EOF
 )
 
 endlocal && set %~2=%d%
@@ -48,23 +48,23 @@ goto :EOF
 
 :parse_filename_0
 if "%~5" == "" (
-	call :parse_filename_0 "%~1" "%~2" "%~3" "%~4" "."
-	goto :EOF
+    call :parse_filename_0 "%~1" "%~2" "%~3" "%~4" "."
+    goto :EOF
 )
 
 setlocal
 
 set p=%~5
 if "%p:~-1%" == "\" (
-	if "%p:~-2,-1%" == "" (
-		goto parse_filename_1
-	)
-	if "%p:~-2,-1%" == ":" (
-		goto parse_filename_1
-	)
+    if "%p:~-2,-1%" == "" (
+        goto parse_filename_1
+    )
+    if "%p:~-2,-1%" == ":" (
+        goto parse_filename_1
+    )
 
-	endlocal && call :parse_filename_0 "%~1" "%~2" "%~3" "%~4" "%p:~0,-1%"
-	goto :EOF
+    endlocal && call :parse_filename_0 "%~1" "%~2" "%~3" "%~4" "%p:~0,-1%"
+    goto :EOF
 )
 
 :parse_filename_1
