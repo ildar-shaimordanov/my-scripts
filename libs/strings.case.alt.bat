@@ -97,20 +97,47 @@ if "%~3" == "" (
 	goto :EOF
 )
 
+if not defined tr__%~1 (
+	call :translate_loadtable
+)
+
 setlocal enabledelayedexpansion
 
 set s_o=%~3
 if "%~4" == "" (
-    for /f "usebackq tokens=3,4" %%a in ( `findstr /b "::: %~1" "%~dpnx0"` ) do (
-        set s_o=!s_o:%%~a=%%~b!
-    )
+	for /f "usebackq tokens=2,3 delims== " %%a in ( `set tr_%~1` ) do (
+		set s_o=!s_o:%%~a=%%~b!
+	)
 ) else (
-    for /f "usebackq tokens=3,4" %%a in ( `findstr /b "::: %~1" "%~dpnx0"` ) do (
-        set s_o=!s_o:%%~b=%%~a!
-    )
+	for /f "usebackq tokens=2,3 delims== " %%a in ( `set tr_%~1` ) do (
+		set s_o=!s_o:%%~b=%%~a!
+	)
 )
 
 endlocal && set %~2=%s_o%
+goto :EOF
+
+
+:: Reads all translation tables and load them to variables like tr_NAME_NN and tr__NAME
+:: where NAME is the name of the appropriate table, NN is a number of variable.
+:translate_loadtable
+setlocal enabledelayedexpansion
+
+set tr_c=0
+set tr_s=endlocal
+set tr_g=
+
+for /f "usebackq tokens=2,3,4" %%a in ( `findstr /b ":::" "%~dpnx0"` ) do (
+	if not defined tr_%%a (
+		set tr_g=!tr_g!^&^&set tr__%%a=1
+	)
+
+	set /a tr_c+=1
+	set tr_s=!tr_s!^&^&set tr_%%a_!tr_c!=%%b %%c
+)
+
+%tr_s%%tr_g%
+
 goto :EOF
 
 
