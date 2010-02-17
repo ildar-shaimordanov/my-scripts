@@ -56,38 +56,38 @@ set N=
 
 set /a N=%~2 2>nul
 
-if not defined N goto str_repeat_break
-if %N% leq 0 goto str_repeat_break
+if not defined N goto str_repeat_2
+if %N% leq 0 goto str_repeat_2
 
 set R=%~3
 
-if not defined R goto str_repeat_break
+if not defined R goto str_repeat_2
 
 call :str_len K "%R%"
 
 set /a L=1
 set /a N=%N%-1
 
-:str_repeat_continue
-if %N% leq 0 goto str_repeat_break
+:str_repeat_1
+if %N% leq 0 goto str_repeat_2
 
 if %N% leq %L% (
     set /a M=%N% * %K%
-    call :str_repeat_remainder
+    call :str_repeat_3
     set R=%R%!Q!
-    goto str_repeat_break
+    goto str_repeat_2
 )
 
 set /a N=%N% - %L%
 set R=%R%%R%
 set /a L*=2
-goto str_repeat_continue
+goto str_repeat_1
 
-:str_repeat_break
+:str_repeat_2
 endlocal && set %~1=%R%
 exit /b 0
 
-:str_repeat_remainder
+:str_repeat_3
 set Q=!R:~-%M%!
 goto :EOF
 
