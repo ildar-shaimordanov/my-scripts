@@ -12,26 +12,26 @@ if defined getoptions_exit (
 
 set caps=
 
-if defined opts_/u (
-    if defined opts_/i (
+if defined opts.u (
+    if defined opts.i (
         set caps=lcase
     ) else (
         set caps=ucase
     )
-) else if defined opts_/l (
-    if defined opts_/i (
+) else if defined opts.l (
+    if defined opts.i (
         set caps=ucase
     ) else (
         set caps=lcase
     )
-) else if defined opts_/uf (
-    if defined opts_/i (
+) else if defined opts.uf (
+    if defined opts.i (
         set caps=lfirst
     ) else (
         set caps=ufirst
     )
-) else if defined opts_/lf (
-    if defined opts_/i (
+) else if defined opts.lf (
+    if defined opts.i (
         set caps=ufirst
     ) else (
         set caps=lfirst
@@ -43,9 +43,7 @@ if defined opts_/u (
     goto :EOF
 )
 
-echo.%TIME%
 call :%caps% caps "%opts_1%"
-echo.%TIME%
 echo.%caps%
 
 endlocal
