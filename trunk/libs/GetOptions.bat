@@ -10,10 +10,10 @@ set %getoptions_name%_count=0
 
 :getoptions_loop_start
 
-for /f "usebackq delims=: tokens=1,*" %%a in ( `echo %~1^|findstr "^/[a-z0-9_][a-z0-9_]*"` ) do (
-    for %%h in ( /h /help /man ) do (
+for /f "usebackq delims=:/ tokens=1,*" %%a in ( `echo %~1^|findstr "^/[a-z0-9_][a-z0-9_]*"` ) do (
+    for %%h in ( h help man ) do (
         if /i "%%~a" == "%%h" if defined getoptions_autohelp (
-            call :%getoptions_help% %%~a
+            call :%getoptions_help% /%%~a
             set getoptions_exit=1
             goto :EOF
         )
@@ -21,10 +21,10 @@ for /f "usebackq delims=: tokens=1,*" %%a in ( `echo %~1^|findstr "^/[a-z0-9_][a
 
     if "%%~b" == "" (
         rem set %getoptions_name%_%%a=%%a
-        call :getoptions_set "%getoptions_name%_%%a" "%%~a"
+        call :getoptions_set "%getoptions_name%.%%a" "%%~a"
     ) else (
         rem set %getoptions_name%_%%a=%%b
-        call :getoptions_set "%getoptions_name%_%%a" "%%~b"
+        call :getoptions_set "%getoptions_name%.%%a" "%%~b"
     )
 
     goto getoptions_loop_continue
