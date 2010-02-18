@@ -22,9 +22,9 @@ if %mktemp_count% gtr 1 (
 :: 2. Set default path to %TEMP%
 :: 3. Check the path existance
 :: 4. Construct the target
-call :tempname mktemp "%mktemp_1%" "%mktemp_/p%"
+call :tempname mktemp "%mktemp_1%" "%mktemp.p%"
 if errorlevel 3 (
-    set mktemp_error=The path "%mktemp_/p%" not found
+    set mktemp_error=The path "%mktemp.p%" not found
     goto error
 )
 if errorlevel 2 (
@@ -38,8 +38,8 @@ if errorlevel 1 (
 
 
 :: 5. Create temporary file or directory
-if not defined mktemp_/u (
-    if defined mktemp_/d (
+if not defined mktemp.u (
+    if defined mktemp.d (
         md "%mktemp%"
     ) else (
         copy /b /y nul "%mktemp%">nul
