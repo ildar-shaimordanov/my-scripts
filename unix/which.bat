@@ -12,7 +12,7 @@ if errorlevel 1 goto help
 rem Looking up DOSKEY macros
 for /f "tokens=1* delims==" %%a in ( '"%SystemRoot%\system32\doskey.exe" /macros' ) do (
     if /i "%~1" == "%%a" (
-        echo -- DOSKEY macro
+        echo.-- DOSKEY macro
         goto :EOF
     )
 )
@@ -25,7 +25,7 @@ echo."%~1"|"%SystemRoot%\system32\find.exe" " " >nul
 if errorlevel 1 (
     echo." assoc break call cd chdir cls color copy date del dir echo endlocal erase exit for ftype goto if md mkdir move path pause popd prompt pushd rd rem ren rename rmdir set setlocal shift start time title type ver verify vol "|"%SystemRoot%\system32\find.exe" " %~1 " >nul
     if not errorlevel 1 (
-        echo -- CMD internal command
+        echo.-- CMD internal
         goto :EOF
     )
 )
@@ -38,13 +38,13 @@ rem Looking up the external executable command using %PATH% and %PATHEXT%.
 call :lookup found "%~1"
 
 if not defined found (
-    echo %~n0: no %~1 in ^(%PATH%^)
+    echo.%~n0: no %~1 in ^(%PATH%^)
 
     endlocal
     exit /b 1
 )
 
-echo %found%
+echo.%found%
 
 
 :EOS
@@ -58,20 +58,11 @@ rem
 rem @param  variable name
 rem @param  filename
 :lookup
-if "%~x2" == "" (
-    call :lookup1 "%~1" "%~2" "%PATHEXT%"
-    goto :EOF
-)
+if not "%~x2" == "" goto lookup2
 
-call :lookup2 "%~1" "%~2"
-goto :EOF
-
-:lookup1
-for /f "delims=; tokens=1,*" %%c in ( "%~3" ) do (
+for %%c in ( "%PATHEXT:;=" "%" ) do (
     call :lookup2 "%~1" "%~2%%~c"
     if defined %~1 goto :EOF
-
-    call :lookup1 "%~1" "%~2" "%%~d"
 )
 goto :EOF
 
@@ -84,6 +75,6 @@ goto :EOF
 echo.Usage:
 echo.    %~n0 PROGNAME
 echo.
-echo. where PROGNAME should not consist of drive, paths or wildcards
+echo.  where PROGNAME should not consist of drive, paths or wildcards
 goto :EOF
 
