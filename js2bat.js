@@ -23,6 +23,7 @@ var args = WScript.Arguments.Named('A')
 var prolog = [
     '@set @x=0 /*', 
     ['@', host, args, '/e:javascript "%~dpnx0" %*'].join(' '), 
+    '@set @x=', 
     '@goto:eof */', 
     ''
 ].join('\n');
