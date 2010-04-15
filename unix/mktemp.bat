@@ -20,15 +20,15 @@ if %mktemp_count% gtr 1 (
 
 
 :: 2. Set default path to %TEMP%
-if not defined mktemp_/p (
-    set mktemp_/p=%TEMP%
+if not defined mktemp.p (
+    set mktemp.p=%TEMP%
 )
 
 
 :: 3. Check the path existance
-dir /ad "%mktemp_/p%">nul 2>nul
+dir /ad "%mktemp.p%">nul 2>nul
 if errorlevel 1 (
-    set mktemp_error=The path "%mktemp_/p%" not found
+    set mktemp_error=The path "%mktemp.p%" not found
     goto error
 )
 
@@ -46,8 +46,8 @@ if errorlevel 1 (
 
 
 :: 5. Create temporary file or directory
-if not defined mktemp_/u (
-    if defined mktemp_/d (
+if not defined mktemp.u (
+    if defined mktemp.d (
         md "%mktemp%"
     ) else (
         copy /b /y nul "%mktemp%">nul
@@ -116,7 +116,7 @@ if not "%~x1" == "" (
 )
 
 rem 4.7. Compile the resulting string
-endlocal && set mktemp=%mktemp_/p%\%mktemp_t%
+endlocal && set mktemp=%mktemp.p%\%mktemp_t%
 exit /b 0
 
 
