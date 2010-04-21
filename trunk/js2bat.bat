@@ -1,7 +1,6 @@
 @set @x=0 /*
 @set @x=
 @ cscript /nologo /e:javascript "%~dpnx0" %*
-@set @x=
 @goto:eof */
 
 // Display the minimal usage screen
@@ -29,7 +28,6 @@ var prolog = [
     '@set @x=0 /*', 
     '@set @x=', 
     ['@', host, args, '/e:javascript "%~dpnx0" %*'].join(' '), 
-    '@set @x=', 
     '@goto:eof */', 
     ''
 ].join('\n');
