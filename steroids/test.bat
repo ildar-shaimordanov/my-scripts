@@ -66,8 +66,6 @@ goto :EOF
 ::
 :: Example
 ::     call :if -n "some string" && echo NOTEMPTY
-::
-:: Example
 ::     call :if -z "" && echo EMPTY
 ::
 :: Example
@@ -77,7 +75,7 @@ goto :EOF
 :: Evaluates conditional expressions and returns the status of (0) if the 
 :: expression is true, otherwise (0).
 ::
-:: "USLESS" works similar to "IF" but the sense of the test is reversed.
+:: "UNLESS" works similar to "IF" but the sense of the test is reversed.
 :: 
 :: Standard operators
 ::
@@ -114,6 +112,7 @@ goto :EOF
 ::     variable is defined.
 ::
 :: compare-op
+::
 :: EQU
 ::     Equal
 :: NEQ
@@ -179,20 +178,20 @@ goto :EOF
 :: Extended string operators:
 ::
 :: -z STRING
-::     True if string is empty.
+::     True if STRING is empty.
 :: -n STRING
-::     True if string is not empty.
+::     True if STRING is not empty.
 ::
 :: More extended string operators:
 ::
 :: STACK -contains NEEDLE
-::     True if string STACK contains string NEEDLE
+::     True if STACK contains NEEDLE
 ::
 :: STACK -starts NEEDLE
-::     True if string STACK starts with string NEEDLE
+::     True if STACK starts with NEEDLE
 ::
 :: STACK -ends NEEDLE
-::     True if string STACK ends with string NEEDLE
+::     True if STACK ends with NEEDLE
 ::
 :unless
 call :if %* && exit /b 1
