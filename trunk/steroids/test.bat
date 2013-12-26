@@ -47,7 +47,7 @@
 ::     call :if -f "%COMSPEC%" && echo FILE
 ::
 @echo off
-if /i "%~1" == "HELP" ( setlocal enabledelayedexpansion & ( for /f "tokens=*" %%s in ( 'type "%~f0"' ) do ( set "if_str=%%s" & if "!if_str:~0,2!" == "::" echo:!if_str:~3!) ) & endlocal & exit /b 0 )
+if /i "%~1" == "HELP" ( findstr /b "::" "%~f0" | powershell -command "$input -replace '^:: ?', ''" & exit /b 0 )
 if /i "%~1" == "APPEND-TO" ( if "%~2" == "" ( findstr /v "::" "%~f0" && exit /b 0 ) else ( findstr /v "::" "%~f0" >>"%~2" && exit /b 0 || exit /b 1 ) )
 
 call %*
