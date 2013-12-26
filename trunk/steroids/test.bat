@@ -10,7 +10,7 @@
 ::
 :: This script declares two "functions" implementing conditional operators 
 :: for performing additional conditional expressions over files and 
-:: strings. These functions exits with a status of (0) or (1) depending on 
+:: strings. These functions exit with a status of (0) or (1) depending on 
 :: the evaluations of an expression.
 ::
 :: Expression could be in the standard form for the "IF" operator used in 
@@ -24,27 +24,24 @@
 ::
 :: USAGE
 ::
-:: Execute the following command to see this help page
-::     test help
+:: 1.  Run the following command to see this page
 ::
-:: There are two ways for using of this solution:
-:: 
-:: These functions would be available on the whole system wherever you 
-:: were. Put this script to some place on your system declared in the 
-:: %PATH% variable and call the functions as it is shown below: 
+::     test HELP
 ::
-::     call test :if -f "%COMSPEC%" && echo FILE
-::
-:: Copy and paste the content of this file appending it to the end of your 
-:: script or execute the command as below. After that these functions are 
-:: available as follows:
+:: 2.  Execute the following command to embed the functionality into  your 
+::     script "filename"
 ::
 ::     test APPEND-TO filename
 ::
-:: After executing this command the content of this file will be appended 
-:: to your scenario exccluding the comments.
+::     Alfter that you can get these features as below:
 ::
 ::     call :if -f "%COMSPEC%" && echo FILE
+::
+:: 3.  These functions would be available on the whole system wherever you 
+::     were. Put this script to some place on your system declared in the 
+::     %PATH% variable and call the functions as it is shown below:
+::
+::     call test :if -f "%COMSPEC%" && echo FILE
 ::
 @echo off
 if /i "%~1" == "HELP" ( findstr /b "::" "%~f0" | powershell -command "$input -replace '^:: ?', ''" & exit /b 0 )
