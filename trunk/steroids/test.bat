@@ -44,8 +44,8 @@
 ::     call test :if -f "%COMSPEC%" && echo FILE
 ::
 @echo off
-if /i "%~1" == "HELP" ( findstr /b "::" "%~f0" | powershell -command "$input -replace '^:: ?', ''" & exit /b 0 )
-if /i "%~1" == "APPEND-TO" ( if "%~2" == "" ( findstr /v "::" "%~f0" && exit /b 0 ) else ( findstr /v "::" "%~f0" >>"%~2" && exit /b 0 || exit /b 1 ) )
+setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( findstr /b "::" "%~f0" | powershell -command "$input -replace '^:: ?', ''" ) & endlocal & exit /b 0
+setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "APPEND-TO" ( set "filename=%~2" & if "!param!" == "" ( findstr /v "::" "%~f0" ) else ( findstr /v "::" "%~f0" >>"!filename!" ) ) & endlocal & exit /b 0
 
 call %*
 goto :EOF
