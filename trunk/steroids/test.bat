@@ -45,7 +45,7 @@
 ::
 @echo off
 setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( findstr /b "::" "%~f0" | powershell -command "$input -replace '^:: ?', ''" ) & endlocal & exit /b 0
-setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "APPEND-TO" ( set "filename=%~2" & if "!param!" == "" ( findstr /v "::" "%~f0" ) else ( findstr /v "::" "%~f0" >>"!filename!" ) ) & endlocal & exit /b 0
+setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "APPEND-TO" ( set "filename=%~2" & if "!filename!" == "" ( findstr /v "::" "%~f0" ) else ( findstr /v "::" "%~f0" >>"!filename!" ) ) & endlocal & exit /b 0
 
 call %*
 goto :EOF
