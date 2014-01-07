@@ -290,7 +290,7 @@ if "%~1" == "-s" (
 )
 
 if "%~1" == "-w" (
-	rem True if file is writable
+	rem True if file is writable (not ready only)
 	call :if -a "%~2" && call :unless -attr r "%~2"
 	goto :EOF
 )
@@ -358,32 +358,27 @@ if not defined if_needle (
 
 if "%~2" == "-contains" (
 	rem Unchanged STACK string means that NEEDLE is not in it
+	rem Doesn't work well if STACK or NEEDLE contains "=" and/or "*"
 	if not "!if_stack!" == "!if_stack:%if_needle%=!" (
 		endlocal
 		exit /b 0
 	)
 ) else (
-	rem Uses a tricky way to estimate the string length
-	rem The tested string is limited by 8189 characters
-	set "if_str=!if_needle!"
+	set "if_str=A!if_needle!"
 	set /a "if_len=0"
-	for %%n in ( 4096 2048 1024 512 256 128 64 32 16 ) do (
-		if "!if_str:~%%n,1!" neq "" (
-			set "if_str=!if_str:~%%n!"
-			set /a "if_len+=%%n"
-		)
+	for /l %%a in ( 12, -1, 0 ) do (
+		set /a "if_len|=1<<%%a"
+		for %%b in ( !if_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_len&=~1<<%%a"
 	)
-	set "if_str=!if_str!0FEDCBA9876543211"
-	set /a "if_len+=0x!if_str:~32,1!!if_str:~16,1!"
 
 	rem Extract from STACK the substring which length is similar to NEEDLE
 	if "%~2" == "-starts" (
-		call set "if_stack=%%if_stack:~0,!if_len!%%"
+		call set "if_str=%%if_stack:~0,!if_len!%%"
 	) else if "%~2" == "-ends" (
-		call set "if_stack=%%if_stack:~-!if_len!%%"
+		call set "if_str=%%if_stack:~-!if_len!%%"
 	)
 
-	if "!if_stack!" == "!if_needle!" (
+	if "!if_str!" == "!if_needle!" (
 		endlocal
 		exit /b 0
 	)
@@ -408,12 +403,15 @@ exit /b 1
 :: Elegant idea that inspired this work (Russian forum)
 :: http://forum.script-coding.com/viewtopic.php?pid=55000#p55000
 ::
+:: :strLen - returns the length of a string 
+:: http://www.dostips.com/DtTipsStringOperations.php#Function.strLen
+::
 :: The fastest method of the string length estimation (Russian forum)
 :: http://forum.script-coding.com/viewtopic.php?pid=71000#p71000
 ::
 ::
 :: COPYRIGHTS
 ::
-:: Copyright (c) 2013 Ildar Shaimordanov
+:: Copyright (c) 2013, 2014 Ildar Shaimordanov
 ::
 
