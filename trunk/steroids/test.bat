@@ -330,16 +330,18 @@ if "%~2" == "-ot" (
 	goto :EOF
 )
 
-if "%~2" == "-contains" goto if_search_substr
-if "%~2" == "-starts"   goto if_search_substr
-if "%~2" == "-ends"     goto if_search_substr
+for %%l in ( contains starts ends ) do (
+	if "%~2" == "-%%l" goto if_%%l
+)
 
 rem True if expression is true
 if %* exit /b 0
 exit /b 1
 
 
-:if_search_substr
+:if_contains
+:if_starts
+:if_ends
 setlocal enabledelayedexpansion
 
 rem Skip estimation if one of STACK or NEEDLE is empty
@@ -356,31 +358,37 @@ if not defined if_needle (
 	exit /b 1
 )
 
-if "%~2" == "-contains" (
-	rem Unchanged STACK string means that NEEDLE is not in it
-	rem Doesn't work well if STACK or NEEDLE contains "=" and/or "*"
-	if not "!if_stack!" == "!if_stack:%if_needle%=!" (
-		endlocal
-		exit /b 0
-	)
-) else (
-	set "if_str=A!if_needle!"
-	set /a "if_len=0"
-	for /l %%a in ( 12, -1, 0 ) do (
-		set /a "if_len|=1<<%%a"
-		for %%b in ( !if_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_len&=~1<<%%a"
-	)
+set "if_str=A!if_stack!"
+set /a "if_stack_len=0"
+for /l %%a in ( 12, -1, 0 ) do (
+	set /a "if_stack_len|=1<<%%a"
+	for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
+)
 
-	rem Extract from STACK the substring which length is similar to NEEDLE
-	if "%~2" == "-starts" (
-		call set "if_str=%%if_stack:~0,!if_len!%%"
-	) else if "%~2" == "-ends" (
-		call set "if_str=%%if_stack:~-!if_len!%%"
-	)
+set "if_str=A!if_needle!"
+set /a "if_needle_len=0"
+for /l %%a in ( 12, -1, 0 ) do (
+	set /a "if_needle_len|=1<<%%a"
+	for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
+)
 
-	if "!if_str!" == "!if_needle!" (
-		endlocal
-		exit /b 0
+set /a "if_rest_len=if_stack_len-if_needle_len"
+set /a "if_str_pos=0"
+
+for /l %%l in ( 0, 1, %if_rest_len% ) do (
+	if "!if_stack:~%%l,%if_needle_len%!" == "!if_needle!" (
+		if "%~2" == "-contains" (
+			endlocal
+			exit /b 0
+		)
+		if "%~2" == "-starts" if %%l equ 0 (
+			endlocal
+			exit /b 0
+		)
+		if "%~2" == "-ends" if %%l equ %if_rest_len% (
+			endlocal
+			exit /b 0
+		)
 	)
 )
 
