@@ -44,7 +44,7 @@
 ::     call test :if -f "%COMSPEC%" && echo FILE
 ::
 @echo off
-setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( findstr /b "::" "%~f0" | powershell -command "$input -replace '^:: ?', ''" ) & endlocal & exit /b 0
+setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( findstr /b "::" "%~f0" | powershell -nologo -noprofile -command "$input -replace '^:: ?', ''" ) & endlocal & exit /b 0
 setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "APPEND-TO" ( set "filename=%~2" & if "!filename!" == "" ( findstr /v "::" "%~f0" ) else ( findstr /v "::" "%~f0" >>"!filename!" ) ) & endlocal & exit /b 0
 
 call %*
@@ -199,9 +199,12 @@ exit /b 0
 
 
 :if
-if "%~1" == "-n" (
+setlocal enabledelayedexpansion
+
+set "if_opt=%~1"
+
+if "!if_opt!" == "-n" (
 	rem True if string is not empty
-	setlocal
 	set "if_str=%~2"
 	if defined if_str (
 		endlocal
@@ -211,9 +214,8 @@ if "%~1" == "-n" (
 	exit /b 1
 )
 
-if "%~1" == "-z" (
+if "!if_opt!" == "-z" (
 	rem True if string is empty
-	setlocal
 	set "if_str=%~2"
 	if not defined if_str (
 		endlocal
@@ -223,21 +225,24 @@ if "%~1" == "-z" (
 	exit /b 1
 )
 
-if "%~1" == "-a" (
-	rem True if file exists
-	call :if exist "%~2"
-	goto :EOF
+for %%o in ( a e ) do (
+	if "!if_opt!" == "-%%o" (
+		rem True if file exists
+		call :if exist "%~2"
+		endlocal
+		goto :EOF
+	)
 )
 
-if "%~1" == "-b" (
+if "!if_opt!" == "-b" (
 	rem True if file is drive
 	call :if -a "%~2" && call :if "%~dp2" == "%~f2"
+	endlocal
 	goto :EOF
 )
 
-if "%~1" == "-c" (
+if "!if_opt!" == "-c" (
 	rem True if file is character device
-	setlocal enabledelayedexpansion
 	set "if_dev=%~d0\%~2"
 	if exist !if_dev! (
 		endlocal
@@ -247,66 +252,64 @@ if "%~1" == "-c" (
 	exit /b 1
 )
 
-if "%~1" == "-d" (
+if "!if_opt!" == "-d" (
 	rem True if file is a directory
 	call :if -a "%~2" && call :if -attr d "%~2"
+	endlocal
 	goto :EOF
 )
 
-if "%~1" == "-e" (
-	rem True if file exists
-	call :if -a "%~2"
-	goto :EOF
-)
-
-if "%~1" == "-f" (
+if "!if_opt!" == "-f" (
 	rem True if file exists and is a regular file
 	call :if -a "%~2" && call :unless -attr d "%~2"
+	endlocal
 	goto :EOF
 )
 
-if "%~1" == "-h" (
-	rem True if file is a link
-	call :if -a "%~2" && call :if -attr l "%~2"
-	goto :EOF
+for %%o in ( h L ) do (
+	if "!if_opt!" == "-%%o" (
+		rem True if file is a link
+		call :if -a "%~2" && call :if -attr l "%~2"
+		endlocal
+		goto :EOF
+	)
 )
 
-if "%~1" == "-L" (
-	rem True if file is a link
-	call :if -h "%~2"
-	goto :EOF
-)
-
-if "%~1" == "-r" (
+if "!if_opt!" == "-r" (
 	rem True if file is read only
 	call :if -a "%~2" && call :if -attr r "%~2"
+	endlocal
 	goto :EOF
 )
 
-if "%~1" == "-s" (
+if "!if_opt!" == "-s" (
 	rem True if file exists and is not empty
 	call :if -a "%~2" && call :if "%~z2" gtr "0"
+	endlocal
 	goto :EOF
 )
 
-if "%~1" == "-w" (
+if "!if_opt!" == "-w" (
 	rem True if file is writable (not ready only)
 	call :if -a "%~2" && call :unless -attr r "%~2"
+	endlocal
 	goto :EOF
 )
 
-if "%~1" == "-x" (
+if "!if_opt!" == "-x" (
 	rem True if file is executable
 	call :if -f "%~2" && for %%x in ( %PATHEXT% ) do (
-		if /i "%%~x" == "%~x2" exit /b 0
+		if /i "%%~x" == "%~x2" (
+			endlocal
+			exit /b 0
+		)
 	)
+	endlocal
 	exit /b 1
 )
 
-if "%~1" == "-attr" (
+if "!if_opt!" == "-attr" (
 	rem True if ATTR is set
-	setlocal enabledelayedexpansion
-
 	set "if_attr=%~a3"
 
 	if defined if_attr if not "!if_attr!" == "!if_attr:%~2=-!" (
@@ -318,80 +321,84 @@ if "%~1" == "-attr" (
 	exit /b 1
 )
 
-if "%~2" == "-nt" (
+set "if_opt=%~2"
+
+if "!if_opt!" == "-nt" (
 	rem True if FILE1 is newer than FILE2
 	call :if "%~t1" gtr "%~t3"
+	endlocal
 	goto :EOF
 )
 
-if "%~2" == "-ot" (
+if "!if_opt!" == "-ot" (
 	rem True if FILE1 is older than FILE2
 	call :if "%~t1" lss "%~t3"
+	endlocal
 	goto :EOF
 )
 
-for %%l in ( contains starts ends ) do (
-	if "%~2" == "-%%l" goto if_%%l
-)
+for %%o in ( contains starts ends ) do (
+	if "!if_opt!" == "-%%o" (
+		rem Skip estimation if one of STACK or NEEDLE is empty
+		set "if_stack=%~1"
+		set "if_needle=%~3"
 
-rem True if expression is true
-if %* exit /b 0
-exit /b 1
-
-
-:if_contains
-:if_starts
-:if_ends
-setlocal enabledelayedexpansion
-
-rem Skip estimation if one of STACK or NEEDLE is empty
-set "if_stack=%~1"
-set "if_needle=%~3"
-
-if not defined if_stack (
-	endlocal
-	exit /b 1
-)
-
-if not defined if_needle (
-	endlocal
-	exit /b 1
-)
-
-set "if_str=A!if_stack!"
-set /a "if_stack_len=0"
-for /l %%a in ( 12, -1, 0 ) do (
-	set /a "if_stack_len|=1<<%%a"
-	for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
-)
-
-set "if_str=A!if_needle!"
-set /a "if_needle_len=0"
-for /l %%a in ( 12, -1, 0 ) do (
-	set /a "if_needle_len|=1<<%%a"
-	for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
-)
-
-set /a "if_rest_len=if_stack_len-if_needle_len"
-set /a "if_str_pos=0"
-
-for /l %%l in ( 0, 1, %if_rest_len% ) do (
-	if "!if_stack:~%%l,%if_needle_len%!" == "!if_needle!" (
-		if "%~2" == "-contains" (
+		if not defined if_stack (
 			endlocal
-			exit /b 0
+			exit /b 1
 		)
-		if "%~2" == "-starts" if %%l equ 0 (
+
+		if not defined if_needle (
 			endlocal
-			exit /b 0
+			exit /b 1
 		)
-		if "%~2" == "-ends" if %%l equ %if_rest_len% (
-			endlocal
-			exit /b 0
+
+		set "if_str=A!if_stack!"
+		set /a "if_stack_len=0"
+		for /l %%a in ( 12, -1, 0 ) do (
+			set /a "if_stack_len|=1<<%%a"
+			for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
 		)
+
+		set "if_str=A!if_needle!"
+		set /a "if_needle_len=0"
+		for /l %%a in ( 12, -1, 0 ) do (
+			set /a "if_needle_len|=1<<%%a"
+			for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
+		)
+
+		set /a "if_rest_len=if_stack_len-if_needle_len"
+		set /a "if_str_pos=0"
+
+		for %%k in ( !if_needle_len! ) do (
+			for /l %%l in ( 0, 1, !if_rest_len! ) do (
+				if "!if_stack:~%%l,%%k!" == "!if_needle!" (
+					if "!if_opt!" == "-contains" (
+						endlocal
+						exit /b 0
+					)
+					if "!if_opt!" == "-starts" if %%l equ 0 (
+						endlocal
+						exit /b 0
+					)
+					if "!if_opt!" == "-ends" if %%l equ !if_rest_len! (
+						endlocal
+						exit /b 0
+					)
+				)
+			)
+		)
+
+		endlocal
+		exit /b 1
 	)
 )
 
+rem True if expression is true
+if %* (
+	endlocal
+	exit /b 0
+)
 endlocal
 exit /b 1
 
