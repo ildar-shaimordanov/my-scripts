@@ -76,8 +76,9 @@ exit /b 0
 :: wrap the comparable arguments within double quotes. Operators must be 
 :: left unquoted anyway. So the following examples will work properly:
 ::
-::     call :if -e equ && echo FILE EXISTS
-::     call :if "-e" equ "-e" && echo EQUAL STRINGS
+::     copy nul equ
+::     call :if  -e  "equ"      && echo FILE EXISTS
+::     call :if "-e"  equ  "-e" && echo EQUAL STRINGS
 ::
 :if
 setlocal enabledelayedexpansion
