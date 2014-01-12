@@ -1,6 +1,7 @@
 ::
 :: Conditionals on steroids
 ::
+
 ::
 :: DESCRIPTION
 ::
@@ -21,6 +22,7 @@
 :: extends capabilities of the standard operator in batches. In other 
 :: words, there are steroids. 
 ::
+
 ::
 :: USAGE
 ::
@@ -33,7 +35,7 @@
 ::
 ::     test APPEND-TO filename
 ::
-::     Alfter that you can get these features as below:
+::     After that you can get these features as below:
 ::
 ::     call :if -f "%COMSPEC%" && echo FILE
 ::
@@ -55,28 +57,278 @@ goto :EOF
 :: if EXPR
 :: unless EXPR
 ::
-:: Example
-::     call :if -d "%COMSPEC%" && (
-::         echo DIR
-::     ) || ( call :if -f "%COMSPEC%" ) && (
-::         echo FILE
-::     ) || (
-::         echo UNKNOWN
-::     )
-::
-:: Example
-::     call :if -n "some string" && echo NOTEMPTY
-::     call :if -z "" && echo EMPTY
-::
-:: Example
-::     call :if -f "%COMSPEC%" && echo FILE
-::     call :unless -d "%COMSPEC%" && echo FILE
-::
 :: Evaluates conditional expressions and returns the status of (0) if the 
 :: expression is true, otherwise (0).
 ::
+
+::
 :: "UNLESS" works similar to "IF" but the sense of the test is reversed.
-:: 
+::
+:unless
+call :if %* && exit /b 1
+exit /b 0
+
+
+::
+:: To perform extended conditional operators this solution considers some 
+:: arguments (starting with the "-" symbol) as special operators. To avoid 
+:: confusion between those operators and normal arguments it's recommended 
+:: wrap the comparable arguments within double quotes. Operators must be 
+:: left unquoted anyway. So the following examples will work properly:
+::
+::     call :if -e equ && echo FILE EXISTS
+::     call :if "-e" equ "-e" && echo EQUAL STRINGS
+::
+:if
+setlocal enabledelayedexpansion
+
+
+::
+:: Extended file operators:
+::
+set "if_opt=%1"
+
+:: -a FILE
+::     True if file exists.
+:: -e FILE
+::     True if file exists.
+for %%o in ( a e ) do (
+	if "!if_opt!" == "-%%o" (
+		call :if exist "%~2"
+		endlocal
+		goto :EOF
+	)
+)
+
+:: -b FILE
+::     True if file is drive.
+if "!if_opt!" == "-b" (
+	call :if -a "%~2" && call :if "%~dp2" == "%~f2"
+	endlocal
+	goto :EOF
+)
+
+:: -c FILE
+::     True if file is character device.
+if "!if_opt!" == "-c" (
+	set "if_dev=%~d0\%~2"
+	if exist !if_dev! (
+		endlocal
+		exit /b 0
+	)
+	endlocal
+	exit /b 1
+)
+
+:: -d FILE
+::     True if file is a directory (similar to "-attr d").
+if "!if_opt!" == "-d" (
+	call :if -a "%~2" && call :if -attr d "%~2"
+	endlocal
+	goto :EOF
+)
+
+:: -f FILE
+::     True if file exists and is a regular file.
+if "!if_opt!" == "-f" (
+	call :if -a "%~2" && call :unless -attr d "%~2"
+	endlocal
+	goto :EOF
+)
+
+:: -h FILE
+::     True if file is a link (similar to "-attr l").
+:: -L FILE
+::     True if file is a link (similar to "-attr l").
+for %%o in ( h L ) do (
+	if "!if_opt!" == "-%%o" (
+		call :if -a "%~2" && call :if -attr l "%~2"
+		endlocal
+		goto :EOF
+	)
+)
+
+:: -r FILE
+::     True if file is read only (similar to "-attr r").
+if "!if_opt!" == "-r" (
+	call :if -a "%~2" && call :if -attr r "%~2"
+	endlocal
+	goto :EOF
+)
+
+:: -s FILE
+::     True if file exists and is not empty.
+if "!if_opt!" == "-s" (
+	call :if -a "%~2" && call :if "%~z2" gtr "0"
+	endlocal
+	goto :EOF
+)
+
+:: -w FILE
+::     True if the file is writable (not read only).
+if "!if_opt!" == "-w" (
+	call :if -a "%~2" && call :unless -attr r "%~2"
+	endlocal
+	goto :EOF
+)
+
+:: -x FILE
+::     True if the file is executable.
+if "!if_opt!" == "-x" (
+	call :if -f "%~2" && for %%x in ( %PATHEXT% ) do (
+		if /i "%%~x" == "%~x2" (
+			endlocal
+			exit /b 0
+		)
+	)
+	endlocal
+	exit /b 1
+)
+
+:: -attr ATTR FILE
+::     True if ATTR is set for FILE
+if "!if_opt!" == "-attr" (
+	set "if_attr=%~a3"
+
+	if defined if_attr if not "!if_attr!" == "!if_attr:%~2=-!" (
+		endlocal
+		exit /b 0
+	)
+
+	endlocal
+	exit /b 1
+)
+
+
+::
+:: Extended string operators:
+::
+
+:: -n STRING
+::     True if STRING is not empty.
+if "!if_opt!" == "-n" (
+	set "if_str=%~2"
+	if defined if_str (
+		endlocal
+		exit /b 0
+	)
+	endlocal
+	exit /b 1
+)
+
+:: -z STRING
+::     True if STRING is empty.
+if "!if_opt!" == "-z" (
+	set "if_str=%~2"
+	if not defined if_str (
+		endlocal
+		exit /b 0
+	)
+	endlocal
+	exit /b 1
+)
+
+
+::
+:: More file operators:
+::
+set "if_opt=%2"
+
+:: FILE1 -nt FILE2
+::     True if FILE1 is newer than FILE2 (according to modification time). 
+::     This operator is depending on the user-defined settings or locales, 
+::     that means that the result of this comparison cannot be considered 
+::     as reliable. 
+if "!if_opt!" == "-nt" (
+	call :if "%~t1" gtr "%~t3"
+	endlocal
+	goto :EOF
+)
+
+:: FILE1 -ot FILE2
+::     True if FILE1 is older than FILE2 (according to modification time). 
+::     This operator is depending on the user-defined settings or locales, 
+::     that means that the result of this comparison cannot be considered 
+::     as reliable. 
+if "!if_opt!" == "-ot" (
+	call :if "%~t1" lss "%~t3"
+	endlocal
+	goto :EOF
+)
+
+
+::
+:: More string operators:
+::
+
+:: STACK -contains NEEDLE
+::     True if STACK contains NEEDLE
+:: STACK -starts NEEDLE
+::     True if STACK starts with NEEDLE
+:: STACK -ends NEEDLE
+::     True if STACK ends with NEEDLE
+for %%o in ( contains starts ends ) do (
+	if "!if_opt!" == "-%%o" (
+		rem Skip estimation if one of STACK or NEEDLE is empty
+		set "if_stack=%~1"
+		set "if_needle=%~3"
+
+		if not defined if_stack (
+			endlocal
+			exit /b 1
+		)
+
+		if not defined if_needle (
+			endlocal
+			exit /b 1
+		)
+
+		rem The length of STACK
+		set "if_str=A!if_stack!"
+		set /a "if_stack_len=0"
+		for /l %%a in ( 12, -1, 0 ) do (
+			set /a "if_stack_len|=1<<%%a"
+			for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
+		)
+
+		rem The length of NEEDLE
+		set "if_str=A!if_needle!"
+		set /a "if_needle_len=0"
+		for /l %%a in ( 12, -1, 0 ) do (
+			set /a "if_needle_len|=1<<%%a"
+			for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
+		)
+
+		rem The length of the rest of STACK without NEEDLE
+		set /a "if_rest_len=if_stack_len-if_needle_len"
+		set /a "if_str_pos=0"
+
+		for %%k in ( !if_needle_len! ) do (
+			for /l %%l in ( 0, 1, !if_rest_len! ) do (
+				if "!if_stack:~%%l,%%k!" == "!if_needle!" (
+					if "!if_opt!" == "-contains" (
+						endlocal
+						exit /b 0
+					)
+					if "!if_opt!" == "-starts" if %%l equ 0 (
+						endlocal
+						exit /b 0
+					)
+					if "!if_opt!" == "-ends" if %%l equ !if_rest_len! (
+						endlocal
+						exit /b 0
+					)
+				)
+			)
+		)
+
+		endlocal
+		exit /b 1
+	)
+)
+
+
+::
 :: Standard operators
 ::
 :: IF [NOT] ERRORLEVEL number
@@ -133,274 +385,41 @@ goto :EOF
 ::     both comprised of all numeric digits, then the strings are 
 ::     converted to numbers and a numeric comparison is performed. 
 ::
-:: Extended file operators:
-::
-:: -a FILE
-::     True if file exists.
-:: -b FILE
-::     True if file is drive.
-:: -c FILE
-::     True if file is character device.
-:: -d FILE
-::     True if file is a directory (similar to "-attr d").
-:: -e FILE
-::     True if file exists.
-:: -f FILE
-::     True if file exists and is a regular file.
-:: -h FILE
-::     True if file is a link (similar to "-attr l").
-:: -L FILE
-::     True if file is a link (similar to "-attr l").
-:: -r FILE
-::     True if file is read only (similar to "-attr r").
-:: -s FILE
-::     True if file exists and is not empty.
-:: -w FILE
-::     True if the file is writable (not read only).
-:: -x FILE
-::     True if the file is executable.
-::
-:: -attr ATTR FILE
-::     True if ATTR is set for FILE
-::
-:: FILE1 -nt FILE2
-::     True if FILE1 is newer than FILE2 (according to modification time). 
-::     This operator is depending on the user-defined settings or locales, 
-::     that means that the result of this comparison cannot be considered 
-::     as reliable. 
-::
-:: FILE1 -ot FILE2
-::     True if FILE1 is older than FILE2 (according to modification 
-::     time).This operator is depending on the user-defined settings or 
-::     locales, that means that the result of this comparison cannot be 
-::     considered as reliable. 
-::
-:: Extended string operators:
-::
-:: -z STRING
-::     True if STRING is empty.
-:: -n STRING
-::     True if STRING is not empty.
-::
-:: More extended string operators:
-::
-:: STACK -contains NEEDLE
-::     True if STACK contains NEEDLE
-::
-:: STACK -starts NEEDLE
-::     True if STACK starts with NEEDLE
-::
-:: STACK -ends NEEDLE
-::     True if STACK ends with NEEDLE
-::
-:unless
-call :if %* && exit /b 1
-exit /b 0
-
-
-:if
-setlocal enabledelayedexpansion
-
-set "if_opt=%~1"
-
-if "!if_opt!" == "-n" (
-	rem True if string is not empty
-	set "if_str=%~2"
-	if defined if_str (
-		endlocal
-		exit /b 0
-	)
-	endlocal
-	exit /b 1
-)
-
-if "!if_opt!" == "-z" (
-	rem True if string is empty
-	set "if_str=%~2"
-	if not defined if_str (
-		endlocal
-		exit /b 0
-	)
-	endlocal
-	exit /b 1
-)
-
-for %%o in ( a e ) do (
-	if "!if_opt!" == "-%%o" (
-		rem True if file exists
-		call :if exist "%~2"
-		endlocal
-		goto :EOF
-	)
-)
-
-if "!if_opt!" == "-b" (
-	rem True if file is drive
-	call :if -a "%~2" && call :if "%~dp2" == "%~f2"
-	endlocal
-	goto :EOF
-)
-
-if "!if_opt!" == "-c" (
-	rem True if file is character device
-	set "if_dev=%~d0\%~2"
-	if exist !if_dev! (
-		endlocal
-		exit /b 0
-	)
-	endlocal
-	exit /b 1
-)
-
-if "!if_opt!" == "-d" (
-	rem True if file is a directory
-	call :if -a "%~2" && call :if -attr d "%~2"
-	endlocal
-	goto :EOF
-)
-
-if "!if_opt!" == "-f" (
-	rem True if file exists and is a regular file
-	call :if -a "%~2" && call :unless -attr d "%~2"
-	endlocal
-	goto :EOF
-)
-
-for %%o in ( h L ) do (
-	if "!if_opt!" == "-%%o" (
-		rem True if file is a link
-		call :if -a "%~2" && call :if -attr l "%~2"
-		endlocal
-		goto :EOF
-	)
-)
-
-if "!if_opt!" == "-r" (
-	rem True if file is read only
-	call :if -a "%~2" && call :if -attr r "%~2"
-	endlocal
-	goto :EOF
-)
-
-if "!if_opt!" == "-s" (
-	rem True if file exists and is not empty
-	call :if -a "%~2" && call :if "%~z2" gtr "0"
-	endlocal
-	goto :EOF
-)
-
-if "!if_opt!" == "-w" (
-	rem True if file is writable (not ready only)
-	call :if -a "%~2" && call :unless -attr r "%~2"
-	endlocal
-	goto :EOF
-)
-
-if "!if_opt!" == "-x" (
-	rem True if file is executable
-	call :if -f "%~2" && for %%x in ( %PATHEXT% ) do (
-		if /i "%%~x" == "%~x2" (
-			endlocal
-			exit /b 0
-		)
-	)
-	endlocal
-	exit /b 1
-)
-
-if "!if_opt!" == "-attr" (
-	rem True if ATTR is set
-	set "if_attr=%~a3"
-
-	if defined if_attr if not "!if_attr!" == "!if_attr:%~2=-!" (
-		endlocal
-		exit /b 0
-	)
-
-	endlocal
-	exit /b 1
-)
-
-set "if_opt=%~2"
-
-if "!if_opt!" == "-nt" (
-	rem True if FILE1 is newer than FILE2
-	call :if "%~t1" gtr "%~t3"
-	endlocal
-	goto :EOF
-)
-
-if "!if_opt!" == "-ot" (
-	rem True if FILE1 is older than FILE2
-	call :if "%~t1" lss "%~t3"
-	endlocal
-	goto :EOF
-)
-
-for %%o in ( contains starts ends ) do (
-	if "!if_opt!" == "-%%o" (
-		rem Skip estimation if one of STACK or NEEDLE is empty
-		set "if_stack=%~1"
-		set "if_needle=%~3"
-
-		if not defined if_stack (
-			endlocal
-			exit /b 1
-		)
-
-		if not defined if_needle (
-			endlocal
-			exit /b 1
-		)
-
-		set "if_str=A!if_stack!"
-		set /a "if_stack_len=0"
-		for /l %%a in ( 12, -1, 0 ) do (
-			set /a "if_stack_len|=1<<%%a"
-			for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
-		)
-
-		set "if_str=A!if_needle!"
-		set /a "if_needle_len=0"
-		for /l %%a in ( 12, -1, 0 ) do (
-			set /a "if_needle_len|=1<<%%a"
-			for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
-		)
-
-		set /a "if_rest_len=if_stack_len-if_needle_len"
-		set /a "if_str_pos=0"
-
-		for %%k in ( !if_needle_len! ) do (
-			for /l %%l in ( 0, 1, !if_rest_len! ) do (
-				if "!if_stack:~%%l,%%k!" == "!if_needle!" (
-					if "!if_opt!" == "-contains" (
-						endlocal
-						exit /b 0
-					)
-					if "!if_opt!" == "-starts" if %%l equ 0 (
-						endlocal
-						exit /b 0
-					)
-					if "!if_opt!" == "-ends" if %%l equ !if_rest_len! (
-						endlocal
-						exit /b 0
-					)
-				)
-			)
-		)
-
-		endlocal
-		exit /b 1
-	)
-)
-
-rem True if expression is true
 if %* (
 	endlocal
 	exit /b 0
 )
 endlocal
 exit /b 1
+
+
+::
+:: EXAMPLES
+::
+:: %COMSPEC% is file
+::     call :if -f "%COMSPEC%" && echo FILE
+::
+:: %COMSPEC% is not directory
+::     call :unless -d "%COMSPEC%" && echo FILE
+::
+:: %STR% is not empty string
+::     set "STR=some string"
+::     call :if -n "%STR%" && echo NOTEMPTY
+::
+:: %STR% is empty string
+::     set "STR="
+::     call :if -z "%STR%" && echo EMPTY
+::
+:: Do something depending on a file attribute
+::     set "FILE=%COMSPEC%"
+::     call :if -d "%FILE%" && (
+::         echo DIR
+::     ) || ( call :if -f "%FILE%" ) && (
+::         echo FILE
+::     ) || (
+::         echo UNKNOWN
+::     )
+::
 
 
 ::
