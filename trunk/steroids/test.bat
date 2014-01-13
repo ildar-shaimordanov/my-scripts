@@ -1,7 +1,6 @@
 ::
 :: Conditionals on steroids
 ::
-
 ::
 :: DESCRIPTION
 ::
@@ -22,7 +21,6 @@
 :: extends capabilities of the standard operator in batches. In other 
 :: words, there are steroids. 
 ::
-
 ::
 :: USAGE
 ::
@@ -45,12 +43,11 @@
 ::
 ::     call test :if -f "%COMSPEC%" && echo FILE
 ::
-@echo off
+@echo off &rem ::
 setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( findstr /b "::" "%~f0" | powershell -nologo -noprofile -command "$input -replace '^:: ?', ''" ) & endlocal & exit /b 0
 setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "APPEND-TO" ( set "filename=%~2" & if "!filename!" == "" ( findstr /v "::" "%~f0" ) else ( findstr /v "::" "%~f0" >>"!filename!" ) ) & endlocal & exit /b 0
-
-call %*
-goto :EOF
+call %* &rem ::
+goto :EOF &rem ::
 
 
 ::
@@ -403,16 +400,13 @@ exit /b 1
 :: %COMSPEC% is not directory
 ::     call :unless -d "%COMSPEC%" && echo FILE
 ::
-:: %STR% is not empty string
-::     set "STR=some string"
+:: Do something if %STR% is not empty string
 ::     call :if -n "%STR%" && echo NOTEMPTY
 ::
-:: %STR% is empty string
-::     set "STR="
+:: Do something if %STR% is empty string
 ::     call :if -z "%STR%" && echo EMPTY
 ::
 :: Do something depending on a file attribute
-::     set "FILE=%COMSPEC%"
 ::     call :if -d "%FILE%" && (
 ::         echo DIR
 ::     ) || ( call :if -f "%FILE%" ) && (
@@ -421,8 +415,6 @@ exit /b 1
 ::         echo UNKNOWN
 ::     )
 ::
-
-
 ::
 :: REFERENCES
 ::
