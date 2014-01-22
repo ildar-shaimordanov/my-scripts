@@ -221,10 +221,13 @@ if "!if_opt!" == "-attr" (
 		exit /b 1
 	)
 
+	set "if_attr_abbr=%~2"
 	set "if_attr=%~a3"
-	if defined if_attr if not "!if_attr!" == "!if_attr:%~2=-!" (
-		endlocal
-		exit /b 0
+	for %%a in ( d r a h s c o t l ) do if "!if_attr_abbr!" == "%%a" (
+		if defined if_attr if not "!if_attr!" == "!if_attr:%%a=-!" (
+			endlocal
+			exit /b 0
+		)
 	)
 
 	endlocal
