@@ -63,6 +63,7 @@ goto :EOF &rem ::
 ::
 :unless
 call :if %* && exit /b 1
+if %ERRORLEVEL% == 2 exit /b 2
 exit /b 0
 
 
@@ -215,23 +216,20 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 ::     FILE_ATTRIBUTE_REPARSE_POINT --------l
 ::     FILE_ATTRIBUTE_NORMAL        --------- 
 if "!if_opt!" == "-attr" (
-	set "if_file=%3"
-	if not exist !if_file! (
-		endlocal
-		exit /b 1
-	)
-
 	set "if_attr_abbr=%~2"
-	set "if_attr=%~a3"
 	for %%a in ( d r a h s c o t l ) do if "!if_attr_abbr!" == "%%a" (
+		set "if_attr=%~a3"
 		if defined if_attr if not "!if_attr!" == "!if_attr:%%a=-!" (
 			endlocal
 			exit /b 0
 		)
+		endlocal
+		exit /b 1
 	)
 
+	echo:Unknown file attribute: "!if_attr_abbr!">&2
 	endlocal
-	exit /b 1
+	exit /b 2
 )
 
 
