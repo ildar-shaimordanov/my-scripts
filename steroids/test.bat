@@ -201,6 +201,19 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 
 :: -attr ATTR FILE
 ::     True if ATTR is set for FILE.
+::
+::     The following attributes can be recognized:
+::     Attribute                    Expansion 
+::     FILE_ATTRIBUTE_DIRECTORY     d-------- 
+::     FILE_ATTRIBUTE_READONLY      -r------- 
+::     FILE_ATTRIBUTE_ARCHIVE       --a------ 
+::     FILE_ATTRIBUTE_HIDDEN        ---h----- 
+::     FILE_ATTRIBUTE_SYSTEM        ----s---- 
+::     FILE_ATTRIBUTE_COMPRESSED    -----c--- 
+::     FILE_ATTRIBUTE_OFFLINE       ------o-- 
+::     FILE_ATTRIBUTE_TEMPORARY     -------t- 
+::     FILE_ATTRIBUTE_REPARSE_POINT --------l
+::     FILE_ATTRIBUTE_NORMAL        --------- 
 if "!if_opt!" == "-attr" (
 	set "if_file=%3"
 	if not exist !if_file! (
@@ -474,6 +487,9 @@ exit /b 1
 ::
 :: The fastest method of the string length estimation (Russian forum)
 :: http://forum.script-coding.com/viewtopic.php?pid=71000#p71000
+::
+:: Extended Attributes of a file
+:: http://ss64.com/nt/syntax-args.html#attributes
 ::
 ::
 :: COPYRIGHTS
