@@ -84,9 +84,10 @@ setlocal enabledelayedexpansion
 ::
 :: Extended file operators:
 ::
+set "if_opt=%1"
 
 :: -a FILE
-::     True if file exists
+::     True if file exists.
 :: -b FILE
 ::     True if file is drive.
 :: -c FILE
@@ -94,7 +95,7 @@ setlocal enabledelayedexpansion
 :: -d FILE
 ::     True if file is a directory. Similar to "-attr d".
 :: -e FILE
-::     True if file exists
+::     True if file exists.
 :: -f FILE
 ::     True if file exists and is a regular file.
 :: -h FILE
@@ -109,7 +110,6 @@ setlocal enabledelayedexpansion
 ::     True if the file is writable, i.e. not read only.
 :: -x FILE
 ::     True if the file is executable.
-set "if_opt=%1"
 for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 	set "if_file=%2"
 	if "!if_opt!" == "-c" set "if_file=.\%~2:"
@@ -200,7 +200,7 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 )
 
 :: -attr ATTR FILE
-::     True if ATTR is set for FILE
+::     True if ATTR is set for FILE.
 if "!if_opt!" == "-attr" (
 	set "if_file=%3"
 	if not exist !if_file! (
@@ -281,11 +281,11 @@ if "!if_opt!" == "-ot" (
 ::
 
 :: STACK -contains NEEDLE
-::     True if STACK contains NEEDLE
+::     True if STACK contains NEEDLE.
 :: STACK -starts NEEDLE
-::     True if STACK starts with NEEDLE
+::     True if STACK starts with NEEDLE.
 :: STACK -ends NEEDLE
-::     True if STACK ends with NEEDLE
+::     True if STACK ends with NEEDLE.
 for %%o in ( contains starts ends ) do (
 	if "!if_opt!" == "-%%o" (
 		rem Skip estimation if one of STACK or NEEDLE is empty
