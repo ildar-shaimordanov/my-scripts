@@ -84,110 +84,131 @@ setlocal enabledelayedexpansion
 ::
 :: Extended file operators:
 ::
-set "if_opt=%1"
 
 :: -a FILE
-::     True if file exists.
-:: -e FILE
-::     True if file exists.
-for %%o in ( a e ) do (
-	if "!if_opt!" == "-%%o" (
-		call :if exist "%~2"
-		endlocal
-		goto :EOF
-	)
-)
-
+::     True if file exists
 :: -b FILE
 ::     True if file is drive.
-if "!if_opt!" == "-b" (
-	call :if -a "%~2" && call :if "%~dp2" == "%~f2"
-	endlocal
-	goto :EOF
-)
-
 :: -c FILE
 ::     True if file is character device.
-if "!if_opt!" == "-c" (
-	set "if_dev=%~d0\%~2"
-	if exist !if_dev! (
+:: -d FILE
+::     True if file is a directory. Similar to "-attr d".
+:: -e FILE
+::     True if file exists
+:: -f FILE
+::     True if file exists and is a regular file.
+:: -h FILE
+::     True if file is a link. Similar to "-attr l".
+:: -L FILE
+::     True if file is a link. Similar to "-attr l".
+:: -r FILE
+::     True if file is read only. Similar to "-attr r".
+:: -s FILE
+::     True if file exists and is not empty.
+:: -w FILE
+::     True if the file is writable, i.e. not read only.
+:: -x FILE
+::     True if the file is executable.
+set "if_opt=%1"
+for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
+	set "if_file=%2"
+	if "!if_opt!" == "-c" set "if_file=.\%~2:"
+
+	if not exist !if_file! (
+		endlocal
+		exit /b 1
+	)
+
+	if "!if_opt!" == "-a" (
 		endlocal
 		exit /b 0
 	)
-	endlocal
-	exit /b 1
-)
 
-:: -d FILE
-::     True if file is a directory (similar to "-attr d").
-if "!if_opt!" == "-d" (
-	call :if -a "%~2" && call :if -attr d "%~2"
-	endlocal
-	goto :EOF
-)
-
-:: -f FILE
-::     True if file exists and is a regular file.
-if "!if_opt!" == "-f" (
-	call :if -a "%~2" && call :unless -attr d "%~2"
-	endlocal
-	goto :EOF
-)
-
-:: -h FILE
-::     True if file is a link (similar to "-attr l").
-:: -L FILE
-::     True if file is a link (similar to "-attr l").
-for %%o in ( h L ) do (
-	if "!if_opt!" == "-%%o" (
-		call :if -a "%~2" && call :if -attr l "%~2"
-		endlocal
-		goto :EOF
-	)
-)
-
-:: -r FILE
-::     True if file is read only (similar to "-attr r").
-if "!if_opt!" == "-r" (
-	call :if -a "%~2" && call :if -attr r "%~2"
-	endlocal
-	goto :EOF
-)
-
-:: -s FILE
-::     True if file exists and is not empty.
-if "!if_opt!" == "-s" (
-	call :if -a "%~2" && call :if "%~z2" gtr "0"
-	endlocal
-	goto :EOF
-)
-
-:: -w FILE
-::     True if the file is writable (not read only).
-if "!if_opt!" == "-w" (
-	call :if -a "%~2" && call :unless -attr r "%~2"
-	endlocal
-	goto :EOF
-)
-
-:: -x FILE
-::     True if the file is executable.
-if "!if_opt!" == "-x" (
-	call :if -f "%~2" && for %%x in ( %PATHEXT% ) do (
-		if /i "%%~x" == "%~x2" (
+	if "!if_opt!" == "-b" (
+		if "%~dp2" == "%~f2" (
 			endlocal
 			exit /b 0
 		)
+		endlocal
+		exit /b 1
 	)
-	endlocal
-	exit /b 1
+
+	if "!if_opt!" == "-c" (
+		endlocal
+		exit /b 0
+	)
+
+	if "!if_opt!" == "-d" (
+		call :if -attr d !if_file!
+		endlocal
+		goto :EOF
+	)
+
+	if "!if_opt!" == "-e" (
+		endlocal
+		exit /b 0
+	)
+
+	if "!if_opt!" == "-f" (
+		call :unless -attr d !if_file!
+		endlocal
+		goto :EOF
+	)
+
+	if "!if_opt!" == "-h" (
+		call :if -attr l !if_file!
+		endlocal
+		goto :EOF
+	)
+	if "!if_opt!" == "-L" (
+		call :if -attr l !if_file!
+		endlocal
+		goto :EOF
+	)
+
+	if "!if_opt!" == "-r" (
+		call :if -attr r !if_file!
+		endlocal
+		goto :EOF
+	)
+
+	if "!if_opt!" == "-s" (
+		if "%~z2" gtr 0 (
+			endlocal
+			exit /b 0
+		)
+		endlocal
+		exit /b 1
+	)
+
+	if "!if_opt!" == "-w" (
+		call :unless -attr r !if_file!
+		endlocal
+		goto :EOF
+	)
+
+	if "!if_opt!" == "-x" (
+		call :unless -attr d !if_file! && for %%x in ( %PATHEXT% ) do (
+			if /i "%%~x" == "%~x2" (
+				endlocal
+				exit /b 0
+			)
+		)
+		endlocal
+		exit /b 1
+	)
 )
 
 :: -attr ATTR FILE
 ::     True if ATTR is set for FILE
 if "!if_opt!" == "-attr" (
-	set "if_attr=%~a3"
+	set "if_file=%3"
+	if not exist !if_file! (
+		endlocal
+		exit /b 1
+	)
 
+	set "if_attr=%~a3"
 	if defined if_attr if not "!if_attr!" == "!if_attr:%~2=-!" (
 		endlocal
 		exit /b 0
@@ -416,6 +437,22 @@ exit /b 1
 ::     ) || (
 ::         echo UNKNOWN
 ::     )
+::
+:: Full test example
+::     set "f=%~1"
+::     echo FILE: "%f%"
+::     call test :if -a "%f%" && echo -a
+::     call test :if -b "%f%" && echo -b
+::     call test :if -c "%f%" && echo -c
+::     call test :if -d "%f%" && echo -d
+::     call test :if -e "%f%" && echo -e
+::     call test :if -f "%f%" && echo -f
+::     call test :if -h "%f%" && echo -h
+::     call test :if -L "%f%" && echo -L
+::     call test :if -r "%f%" && echo -r
+::     call test :if -s "%f%" && echo -s
+::     call test :if -w "%f%" && echo -w
+::     call test :if -x "%f%" && echo -x
 ::
 ::
 :: REFERENCES
