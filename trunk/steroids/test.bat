@@ -297,25 +297,27 @@ for %%o in ( contains starts ends ) do (
 			for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
 		)
 
+		if !if_stack_len! lss !if_needle_len! (
+			endlocal
+			exit /b 1
+		)
+
 		rem The length of the rest of STACK without NEEDLE
 		set /a "if_rest_len=if_stack_len-if_needle_len"
-		set /a "if_str_pos=0"
 
 		for %%k in ( !if_needle_len! ) do (
-			for /l %%l in ( 0, 1, !if_rest_len! ) do (
+			if "!if_opt!" == "-starts" if "!if_stack:~0,%%k!" == "!if_needle!" (
+				endlocal
+				exit /b 0
+			)
+			if "!if_opt!" == "-ends" if "!if_stack:~-%%k!" == "!if_needle!" (
+				endlocal
+				exit /b 0
+			)
+			if "!if_opt!" == "-contains" for /l %%l in ( 0, 1, !if_rest_len! ) do (
 				if "!if_stack:~%%l,%%k!" == "!if_needle!" (
-					if "!if_opt!" == "-contains" (
-						endlocal
-						exit /b 0
-					)
-					if "!if_opt!" == "-starts" if %%l equ 0 (
-						endlocal
-						exit /b 0
-					)
-					if "!if_opt!" == "-ends" if %%l equ !if_rest_len! (
-						endlocal
-						exit /b 0
-					)
+					endlocal
+					exit /b 0
 				)
 			)
 		)
