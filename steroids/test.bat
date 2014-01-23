@@ -55,7 +55,8 @@ goto :EOF &rem ::
 :: unless EXPR
 ::
 :: Evaluates conditional expressions and returns the status of (0) if the 
-:: expression is true, otherwise (0).
+:: expression is true, otherwise (1). Returns the status of (2) if an 
+:: invalid argumnts are given.
 ::
 
 ::
@@ -262,6 +263,13 @@ if "!if_opt!" == "-z" (
 )
 
 
+if "!if_opt:~0,1!" == "-" (
+	echo:"!if_opt!": Unary operator expected>&2
+	endlocal
+	exit /b 2
+)
+
+
 ::
 :: More file operators:
 ::
@@ -360,6 +368,13 @@ for %%o in ( contains starts ends ) do (
 		endlocal
 		exit /b 1
 	)
+)
+
+
+if "!if_opt:~0,1!" == "-" (
+	echo:"!if_opt!": Binary operator expected>&2
+	endlocal
+	exit /b 2
 )
 
 
