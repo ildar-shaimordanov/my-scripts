@@ -233,6 +233,18 @@ if "!if_opt!" == "-attr" (
 	exit /b 2
 )
 
+:: -path FILE
+::     True if FILE is listed in the PATH environment variable.
+if "!if_opt!" == "-path" (
+	set "if_file=%~2"
+	for %%f in ( "!if_file!" ) do if "%%~$PATH:f" == "" (
+		endlocal
+		exit /b 1
+	)
+	endlocal
+	exit /b 0
+)
+
 
 ::
 :: Extended string operators:
