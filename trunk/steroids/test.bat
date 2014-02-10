@@ -44,7 +44,7 @@
 ::     call test :if -f "%COMSPEC%" && echo FILE
 ::
 @echo off &rem ::
-setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( findstr /b "::" "%~f0" | powershell -nologo -noprofile -command "$input -replace '^:: ?', ''" ) & endlocal & exit /b 0
+setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "HELP" ( for /f "tokens=* delims=:" %%a in ( 'findstr /b "::" "%~f0"' ) do (set "s=%%a" & if defined s (echo:!s:~1!) else (echo:)) ) & endlocal & exit /b 0
 setlocal enabledelayedexpansion & set "param=%~1" & if /i "!param!" == "APPEND-TO" ( set "filename=%~2" & if "!filename!" == "" ( findstr /v "::" "%~f0" ) else ( findstr /v "::" "%~f0" >>"!filename!" ) ) & endlocal & exit /b 0
 call %* &rem ::
 goto :EOF &rem ::
