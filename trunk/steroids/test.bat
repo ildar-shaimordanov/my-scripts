@@ -293,9 +293,12 @@ set "if_opt=%2"
 ::     that means that the result of this comparison cannot be considered 
 ::     as reliable. 
 if "!if_opt!" == "-nt" (
-	call :if "%~t1" gtr "%~t3"
+	if "%~t1" gtr "%~t3" (
+		endlocal
+		exit /b 0
+	)
 	endlocal
-	goto :EOF
+	exit /b 1
 )
 
 :: FILE1 -ot FILE2
@@ -304,9 +307,12 @@ if "!if_opt!" == "-nt" (
 ::     that means that the result of this comparison cannot be considered 
 ::     as reliable. 
 if "!if_opt!" == "-ot" (
-	call :if "%~t1" lss "%~t3"
+	if "%~t1" lss "%~t3" (
+		endlocal
+		exit /b 0
+	)
 	endlocal
-	goto :EOF
+	exit /b 1
 )
 
 
@@ -320,66 +326,64 @@ if "!if_opt!" == "-ot" (
 ::     True if STACK starts with NEEDLE.
 :: STACK -ends NEEDLE
 ::     True if STACK ends with NEEDLE.
-for %%o in ( contains starts ends ) do (
-	if "!if_opt!" == "-%%o" (
-		rem Skip estimation if one of STACK or NEEDLE is empty
-		set "if_stack=%~1"
-		set "if_needle=%~3"
+for %%o in ( contains starts ends ) do if "!if_opt!" == "-%%o" (
+	rem Skip estimation if one of STACK or NEEDLE is empty
+	set "if_stack=%~1"
+	set "if_needle=%~3"
 
-		if not defined if_stack (
-			endlocal
-			exit /b 1
-		)
-
-		if not defined if_needle (
-			endlocal
-			exit /b 1
-		)
-
-		rem The length of STACK
-		set "if_str=A!if_stack!"
-		set /a "if_stack_len=0"
-		for /l %%a in ( 12, -1, 0 ) do (
-			set /a "if_stack_len|=1<<%%a"
-			for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
-		)
-
-		rem The length of NEEDLE
-		set "if_str=A!if_needle!"
-		set /a "if_needle_len=0"
-		for /l %%a in ( 12, -1, 0 ) do (
-			set /a "if_needle_len|=1<<%%a"
-			for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
-		)
-
-		if !if_stack_len! lss !if_needle_len! (
-			endlocal
-			exit /b 1
-		)
-
-		rem The length of the rest of STACK without NEEDLE
-		set /a "if_rest_len=if_stack_len-if_needle_len"
-
-		for %%k in ( !if_needle_len! ) do (
-			if "!if_opt!" == "-starts" if "!if_stack:~0,%%k!" == "!if_needle!" (
-				endlocal
-				exit /b 0
-			)
-			if "!if_opt!" == "-ends" if "!if_stack:~-%%k!" == "!if_needle!" (
-				endlocal
-				exit /b 0
-			)
-			if "!if_opt!" == "-contains" for /l %%l in ( 0, 1, !if_rest_len! ) do (
-				if "!if_stack:~%%l,%%k!" == "!if_needle!" (
-					endlocal
-					exit /b 0
-				)
-			)
-		)
-
+	if not defined if_stack (
 		endlocal
 		exit /b 1
 	)
+
+	if not defined if_needle (
+		endlocal
+		exit /b 1
+	)
+
+	rem The length of STACK
+	set "if_str=A!if_stack!"
+	set /a "if_stack_len=0"
+	for /l %%a in ( 12, -1, 0 ) do (
+		set /a "if_stack_len|=1<<%%a"
+		for %%b in ( !if_stack_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_stack_len&=~1<<%%a"
+	)
+
+	rem The length of NEEDLE
+	set "if_str=A!if_needle!"
+	set /a "if_needle_len=0"
+	for /l %%a in ( 12, -1, 0 ) do (
+		set /a "if_needle_len|=1<<%%a"
+		for %%b in ( !if_needle_len! ) do if "!if_str:~%%b,1!" == "" set /a "if_needle_len&=~1<<%%a"
+	)
+
+	if !if_stack_len! lss !if_needle_len! (
+		endlocal
+		exit /b 1
+	)
+
+	rem The length of the rest of STACK without NEEDLE
+	set /a "if_rest_len=if_stack_len-if_needle_len"
+
+	for %%k in ( !if_needle_len! ) do (
+		if "!if_opt!" == "-starts" if "!if_stack:~0,%%k!" == "!if_needle!" (
+			endlocal
+			exit /b 0
+		)
+		if "!if_opt!" == "-ends" if "!if_stack:~-%%k!" == "!if_needle!" (
+			endlocal
+			exit /b 0
+		)
+		if "!if_opt!" == "-contains" for /l %%l in ( 0, 1, !if_rest_len! ) do (
+			if "!if_stack:~%%l,%%k!" == "!if_needle!" (
+				endlocal
+				exit /b 0
+			)
+		)
+	)
+
+	endlocal
+	exit /b 1
 )
 
 
