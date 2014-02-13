@@ -113,7 +113,7 @@ set if_opt=%1
 :: -x FILE
 ::     True if the file is executable.
 for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
-	set "if_file=%2"
+	set "if_file=%~2"
 	if "!if_opt!" == "-c" set "if_file=.\%~2:"
 
 	if not exist !if_file! (
