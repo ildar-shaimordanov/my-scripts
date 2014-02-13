@@ -86,7 +86,7 @@ setlocal enabledelayedexpansion
 ::
 :: Extended file operators:
 ::
-set if_opt=%1
+set if_opt1=%1
 
 :: -a FILE
 ::     True if file exists.
@@ -112,21 +112,21 @@ set if_opt=%1
 ::     True if the file is writable, i.e. not read only.
 :: -x FILE
 ::     True if the file is executable.
-for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
+for %%o in ( a b c d e f h L r s w x ) do if "!if_opt1!" == "-%%o" (
 	set "if_file=%~2"
-	if "!if_opt!" == "-c" set "if_file=.\%~2:"
+	if "!if_opt1!" == "-c" set "if_file=.\%~2:"
 
 	if not exist !if_file! (
 		endlocal
 		exit /b 1
 	)
 
-	if "!if_opt!" == "-a" (
+	if "!if_opt1!" == "-a" (
 		endlocal
 		exit /b 0
 	)
 
-	if "!if_opt!" == "-b" (
+	if "!if_opt1!" == "-b" (
 		if "%~dp2" == "%~f2" (
 			endlocal
 			exit /b 0
@@ -135,46 +135,46 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 		exit /b 1
 	)
 
-	if "!if_opt!" == "-c" (
+	if "!if_opt1!" == "-c" (
 		endlocal
 		exit /b 0
 	)
 
-	if "!if_opt!" == "-d" (
+	if "!if_opt1!" == "-d" (
 		call :if -attr d !if_file!
 		endlocal
 		goto :EOF
 	)
 
-	if "!if_opt!" == "-e" (
+	if "!if_opt1!" == "-e" (
 		endlocal
 		exit /b 0
 	)
 
-	if "!if_opt!" == "-f" (
+	if "!if_opt1!" == "-f" (
 		call :unless -attr d !if_file!
 		endlocal
 		goto :EOF
 	)
 
-	if "!if_opt!" == "-h" (
+	if "!if_opt1!" == "-h" (
 		call :if -attr l !if_file!
 		endlocal
 		goto :EOF
 	)
-	if "!if_opt!" == "-L" (
+	if "!if_opt1!" == "-L" (
 		call :if -attr l !if_file!
 		endlocal
 		goto :EOF
 	)
 
-	if "!if_opt!" == "-r" (
+	if "!if_opt1!" == "-r" (
 		call :if -attr r !if_file!
 		endlocal
 		goto :EOF
 	)
 
-	if "!if_opt!" == "-s" (
+	if "!if_opt1!" == "-s" (
 		if "%~z2" gtr 0 (
 			endlocal
 			exit /b 0
@@ -183,13 +183,13 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 		exit /b 1
 	)
 
-	if "!if_opt!" == "-w" (
+	if "!if_opt1!" == "-w" (
 		call :unless -attr r !if_file!
 		endlocal
 		goto :EOF
 	)
 
-	if "!if_opt!" == "-x" (
+	if "!if_opt1!" == "-x" (
 		call :unless -attr d !if_file! && for %%x in ( %PATHEXT% ) do (
 			if /i "%%~x" == "%~x2" (
 				endlocal
@@ -205,18 +205,18 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt!" == "-%%o" (
 ::     True if ATTR is set for FILE.
 ::
 ::     The following attributes can be recognized:
-::     Attribute                    Expansion 
-::     FILE_ATTRIBUTE_DIRECTORY     d-------- 
-::     FILE_ATTRIBUTE_READONLY      -r------- 
-::     FILE_ATTRIBUTE_ARCHIVE       --a------ 
-::     FILE_ATTRIBUTE_HIDDEN        ---h----- 
-::     FILE_ATTRIBUTE_SYSTEM        ----s---- 
-::     FILE_ATTRIBUTE_COMPRESSED    -----c--- 
-::     FILE_ATTRIBUTE_OFFLINE       ------o-- 
-::     FILE_ATTRIBUTE_TEMPORARY     -------t- 
+::     Attribute                    Expansion
+::     FILE_ATTRIBUTE_DIRECTORY     d--------
+::     FILE_ATTRIBUTE_READONLY      -r-------
+::     FILE_ATTRIBUTE_ARCHIVE       --a------
+::     FILE_ATTRIBUTE_HIDDEN        ---h-----
+::     FILE_ATTRIBUTE_SYSTEM        ----s----
+::     FILE_ATTRIBUTE_COMPRESSED    -----c---
+::     FILE_ATTRIBUTE_OFFLINE       ------o--
+::     FILE_ATTRIBUTE_TEMPORARY     -------t-
 ::     FILE_ATTRIBUTE_REPARSE_POINT --------l
-::     FILE_ATTRIBUTE_NORMAL        --------- 
-if "!if_opt!" == "-attr" (
+::     FILE_ATTRIBUTE_NORMAL        ---------
+if "!if_opt1!" == "-attr" (
 	set "if_attr_abbr=%~2"
 	for %%a in ( d r a h s c o t l ) do if "!if_attr_abbr!" == "%%a" (
 		set "if_attr=%~a3"
@@ -235,7 +235,7 @@ if "!if_opt!" == "-attr" (
 
 :: -path FILE
 ::     True if FILE is listed in the PATH environment variable.
-if "!if_opt!" == "-path" (
+if "!if_opt1!" == "-path" (
 	set "if_file=%~2"
 	for %%f in ( "!if_file!" ) do if "%%~$PATH:f" == "" (
 		endlocal
@@ -252,7 +252,7 @@ if "!if_opt!" == "-path" (
 
 :: -n STRING
 ::     True if STRING is not empty.
-if "!if_opt!" == "-n" (
+if "!if_opt1!" == "-n" (
 	set "if_str=%~2"
 	if defined if_str (
 		endlocal
@@ -264,7 +264,7 @@ if "!if_opt!" == "-n" (
 
 :: -z STRING
 ::     True if STRING is empty.
-if "!if_opt!" == "-z" (
+if "!if_opt1!" == "-z" (
 	set "if_str=%~2"
 	if not defined if_str (
 		endlocal
@@ -275,8 +275,8 @@ if "!if_opt!" == "-z" (
 )
 
 
-if "!if_opt:~0,1!" == "-" (
-	echo:"!if_opt!": Unary operator expected>&2
+if "!if_opt1:~0,1!" == "-" (
+	echo:"!if_opt1!": Unary operator expected>&2
 	endlocal
 	exit /b 2
 )
@@ -285,14 +285,14 @@ if "!if_opt:~0,1!" == "-" (
 ::
 :: More file operators:
 ::
-set if_opt=%2
+set if_opt2=%2
 
 :: FILE1 -nt FILE2
 ::     True if FILE1 is newer than FILE2 (according to modification time). 
 ::     This operator is depending on the user-defined settings or locales, 
 ::     that means that the result of this comparison cannot be considered 
 ::     as reliable. 
-if "!if_opt!" == "-nt" (
+if "!if_opt2!" == "-nt" (
 	if "%~t1" gtr "%~t3" (
 		endlocal
 		exit /b 0
@@ -306,7 +306,7 @@ if "!if_opt!" == "-nt" (
 ::     This operator is depending on the user-defined settings or locales, 
 ::     that means that the result of this comparison cannot be considered 
 ::     as reliable. 
-if "!if_opt!" == "-ot" (
+if "!if_opt2!" == "-ot" (
 	if "%~t1" lss "%~t3" (
 		endlocal
 		exit /b 0
@@ -326,7 +326,7 @@ if "!if_opt!" == "-ot" (
 ::     True if STACK starts with NEEDLE.
 :: STACK -ends NEEDLE
 ::     True if STACK ends with NEEDLE.
-for %%o in ( contains starts ends ) do if "!if_opt!" == "-%%o" (
+for %%o in ( contains starts ends ) do if "!if_opt2!" == "-%%o" (
 	rem Skip estimation if one of STACK or NEEDLE is empty
 	set "if_stack=%~1"
 	set "if_needle=%~3"
@@ -366,15 +366,15 @@ for %%o in ( contains starts ends ) do if "!if_opt!" == "-%%o" (
 	set /a "if_rest_len=if_stack_len-if_needle_len"
 
 	for %%k in ( !if_needle_len! ) do (
-		if "!if_opt!" == "-starts" if "!if_stack:~0,%%k!" == "!if_needle!" (
+		if "!if_opt2!" == "-starts" if "!if_stack:~0,%%k!" == "!if_needle!" (
 			endlocal
 			exit /b 0
 		)
-		if "!if_opt!" == "-ends" if "!if_stack:~-%%k!" == "!if_needle!" (
+		if "!if_opt2!" == "-ends" if "!if_stack:~-%%k!" == "!if_needle!" (
 			endlocal
 			exit /b 0
 		)
-		if "!if_opt!" == "-contains" for /l %%l in ( 0, 1, !if_rest_len! ) do (
+		if "!if_opt2!" == "-contains" for /l %%l in ( 0, 1, !if_rest_len! ) do (
 			if "!if_stack:~%%l,%%k!" == "!if_needle!" (
 				endlocal
 				exit /b 0
@@ -387,8 +387,8 @@ for %%o in ( contains starts ends ) do if "!if_opt!" == "-%%o" (
 )
 
 
-if "!if_opt:~0,1!" == "-" (
-	echo:"!if_opt!": Binary operator expected>&2
+if "!if_opt2:~0,1!" == "-" (
+	echo:"!if_opt2!": Binary operator expected>&2
 	endlocal
 	exit /b 2
 )
