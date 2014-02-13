@@ -86,7 +86,7 @@ setlocal enabledelayedexpansion
 ::
 :: Extended file operators:
 ::
-set "if_opt=%1"
+set if_opt=%1
 
 :: -a FILE
 ::     True if file exists.
@@ -285,7 +285,7 @@ if "!if_opt:~0,1!" == "-" (
 ::
 :: More file operators:
 ::
-set "if_opt=%2"
+set if_opt=%2
 
 :: FILE1 -nt FILE2
 ::     True if FILE1 is newer than FILE2 (according to modification time). 
