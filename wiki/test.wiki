@@ -92,46 +92,46 @@ IF [NOT] DEFINED variable
 IF [/I] string1 compare-op string2
 }}}
 
- * *NOT*
+ * *`NOT`*
     Specifies that Windows should carry out the command only if the 
     condition is false.
 
- * *ERRORLEVEL number*
+ * *`ERRORLEVEL number`*
     Specifies a true condition if the last program run returned an exit 
     code equal to or greater than the number specified.
 
- * *string1==string2*
+ * *`string1==string2`*
     Specifies a true condition if the specified text strings match. 
 
- * *EXIST filename*
+ * *`EXIST filename`*
     Specifies a true condition if the specified filename exists.
 
- * *CMDEXTVERSION number*
+ * *`CMDEXTVERSION number`*
     The CMDEXTVERSION conditional works just like ERRORLEVEL, except it 
     iscomparing against an internal version number associated with the 
     Command Extensions.
 
- * *DEFINED variable*
+ * *`DEFINED variable`*
     The DEFINED conditional works just like EXIST except it takes an 
     environment variable name and returns true if the environment 
     variable is defined.
 
 === `compare-op` ===
 
- * *EQU*
+ * *`EQU`*
     Equal
- * *NEQ*
+ * *`NEQ`*
     Not equal
- * *LSS*
+ * *`LSS`*
     Less than
- * *LEQ*
+ * *`LEQ`*
     Less than or equal
- * *GTR*
+ * *`GTR`*
     Greater than
- * *GEQ*
+ * *`GEQ`*
     Greater than or equal
 
- * */I*
+ * *`/I`*
     If specified, says to do case insensitive string compares. The `/I` 
     switch can also be used on the `string1==string2` form of `IF`. These 
     comparisons are generic, in that if both `string1` and `string2` are 
@@ -140,31 +140,31 @@ IF [/I] string1 compare-op string2
 
 == Extended file operators ==
 
- * *-a FILE*
+ * *`-a FILE`*
     True if file exists.
- * *-b FILE*
+ * *`-b FILE`*
     True if file is drive.
- * *-c FILE*
+ * *`-c FILE`*
     True if file is character device.
- * *-d FILE*
+ * *`-d FILE`*
     True if file is a directory. Similar to `-attr d`.
- * *-e FILE*
+ * *`-e FILE`*
     True if file exists.
- * *-f FILE*
+ * *`-f FILE`*
     True if file exists and is a regular file.
- * *-h FILE*
+ * *`-h FILE`*
     True if file is a link. Similar to `-attr l`.
- * *-L FILE*
+ * *`-L FILE`*
     True if file is a link. Similar to `-attr l`.
- * *-r FILE*
+ * *`-r FILE`*
     True if file is read only. Similar to `-attr r`.
- * *-s FILE*
+ * *`-s FILE`*
     True if file exists and is not empty.
- * *-w FILE*
+ * *`-w FILE`*
     True if the file is writable, i.e. not read only.
- * *-x FILE*
+ * *`-x FILE`*
     True if the file is executable.
- * *-attr ATTR FILE*
+ * *`-attr ATTR FILE`*
     True if ATTR is set for FILE.
 
     The following attributes can be recognized:
@@ -182,17 +182,17 @@ IF [/I] string1 compare-op string2
     FILE_ATTRIBUTE_NORMAL        ---------
 }}}
 
- * *-path FILE*
+ * *`-path FILE`*
     True if FILE is listed in the PATH environment variable.
 
 == More file operators ==
 
- * *FILE1 -nt FILE2*
+ * *`FILE1 -nt FILE2`*
     True if FILE1 is newer than FILE2 (according to modification time). 
     This operator is depending on the user-defined settings or locales, 
     that means that the result of this comparison cannot be considered 
     as reliable. 
- * *FILE1 -ot FILE2*
+ * *`FILE1 -ot FILE2`*
     True if FILE1 is older than FILE2 (according to modification time). 
     This operator is depending on the user-defined settings or locales, 
     that means that the result of this comparison cannot be considered 
@@ -200,39 +200,39 @@ IF [/I] string1 compare-op string2
 
 == Extended string operators ==
 
- * *-n STRING*
+ * *`-n STRING`*
     True if STRING is not empty.
- * *-z STRING*
+ * *`-z STRING`*
     True if STRING is empty.
 
 == More string operators ==
 
- * *STACK -contains NEEDLE*
+ * *`STACK -contains NEEDLE`*
     True if STACK contains NEEDLE.
- * *STACK -starts NEEDLE*
+ * *`STACK -starts NEEDLE`*
     True if STACK starts with NEEDLE.
- * *STACK -ends NEEDLE*
+ * *`STACK -ends NEEDLE`*
     True if STACK ends with NEEDLE.
 
 
 = EXAMPLES =
 
-%COMSPEC% is file
+`%COMSPEC%` is file
 {{{
     call :if -f "%COMSPEC%" && echo FILE
 }}}
 
-%COMSPEC% is not directory
+`%COMSPEC%` is not directory
 {{{
     call :unless -d "%COMSPEC%" && echo FILE
 }}}
 
-Do something if %STR% is not empty string
+Do something if `%STR%` is not empty string
 {{{
     call :if -n "%STR%" && echo NOTEMPTY
 }}}
 
-Do something if %STR% is empty string
+Do something if `%STR%` is empty string
 {{{
     call :if -z "%STR%" && echo EMPTY
 }}}
@@ -288,9 +288,9 @@ example, it is true for `!` under the `enabledelayedexpansion` mode.
  * [http://www.dostips.com/forum/viewtopic.php?p=6475#p6475 BatchLibrary or how to include batch files]
  * [http://support.microsoft.com/kb/65994 Testing If a Drive or Directory Exists from a Batch File]
  * [http://www.dostips.com/forum/viewtopic.php?f=3&t=2464 How to check if parameter is file (or directory)?]
- * [http://forum.script-coding.com/viewtopic.php?pid=55000#p55000 Elegant idea that inspired this work (Russian forum)]
- * [http://www.dostips.com/DtTipsStringOperations.php#Function.strLen :strLen - returns the length of a string]
- * [http://forum.script-coding.com/viewtopic.php?pid=71000#p71000 The fastest method of the string length estimation (Russian forum)]
+ * [http://forum.script-coding.com/viewtopic.php?pid=55000#p55000 Elegant idea that inspired this work (_Russian forum_)]
+ * [http://www.dostips.com/DtTipsStringOperations.php#Function.strLen `:strLen` - returns the length of a string]
+ * [http://forum.script-coding.com/viewtopic.php?pid=71000#p71000 The fastest method of the string length estimation (_Russian forum_)]
  * [http://ss64.com/nt/syntax-args.html#attributes Extended Attributes of a file]
 
 
