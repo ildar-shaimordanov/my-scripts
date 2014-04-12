@@ -141,7 +141,7 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt1!" == "-%%o" (
 	)
 
 	if "!if_opt1!" == "-d" (
-		call :if -attr d !if_file!
+		call :if -attr d "!if_file!"
 		endlocal
 		goto :EOF
 	)
@@ -152,24 +152,28 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt1!" == "-%%o" (
 	)
 
 	if "!if_opt1!" == "-f" (
-		call :unless -attr d !if_file!
+		if exist !if_file!: (
+			endlocal
+			exit /b 1
+		)
+		call :unless -attr d "!if_file!"
 		endlocal
 		goto :EOF
 	)
 
 	if "!if_opt1!" == "-h" (
-		call :if -attr l !if_file!
+		call :if -attr l "!if_file!"
 		endlocal
 		goto :EOF
 	)
 	if "!if_opt1!" == "-L" (
-		call :if -attr l !if_file!
+		call :if -attr l "!if_file!"
 		endlocal
 		goto :EOF
 	)
 
 	if "!if_opt1!" == "-r" (
-		call :if -attr r !if_file!
+		call :if -attr r "!if_file!"
 		endlocal
 		goto :EOF
 	)
@@ -184,13 +188,13 @@ for %%o in ( a b c d e f h L r s w x ) do if "!if_opt1!" == "-%%o" (
 	)
 
 	if "!if_opt1!" == "-w" (
-		call :unless -attr r !if_file!
+		call :unless -attr r "!if_file!"
 		endlocal
 		goto :EOF
 	)
 
 	if "!if_opt1!" == "-x" (
-		call :unless -attr d !if_file! && for %%x in ( %PATHEXT% ) do (
+		call :unless -attr d "!if_file!" && for %%x in ( %PATHEXT% ) do (
 			if /i "%%~x" == "%~x2" (
 				endlocal
 				exit /b 0
@@ -485,7 +489,9 @@ exit /b 1
 ::
 :: Full test example
 ::     set "f=%~1"
+::     set "a=%~a1"
 ::     echo FILE: "%f%"
+::     echo ATTR: "%a%"
 ::     call test :if -a "%f%" && echo -a
 ::     call test :if -b "%f%" && echo -b
 ::     call test :if -c "%f%" && echo -c
@@ -498,6 +504,20 @@ exit /b 1
 ::     call test :if -s "%f%" && echo -s
 ::     call test :if -w "%f%" && echo -w
 ::     call test :if -x "%f%" && echo -x
+::
+::
+:: LIMITATIONS
+::
+:: Even though the steroids cover and unify many uncertain features of 
+:: batch files they have few limitations coming from the batches 
+:: themselves. 
+::
+:: We can never be sure that arguments of scripts are completely checked. 
+:: Anytime a user can pass a string to an argument that will be executed 
+:: as never expected. 
+::
+:: Sometimes we can lost some input characters in the arguments. For 
+:: example, it is true for "!" under the "enabledelayedexpansion" mode. 
 ::
 ::
 :: REFERENCES
