@@ -1,57 +1,57 @@
 #labels Featured
 _
-This page tells about `test` script introducing more usability and flexibility to Windows batch script. 
+Эта страница рассказывает о функции `test`, добавляющей большего удобства и гибкости в пакетные файлы Windows. 
 _
 
-= Conditionals on steroids =
+= Условные операторы на стероидах =
 
 <wiki:toc max_depth="5" />
 
 
-= DESCRIPTION =
+= ОПИСАНИЕ =
 
-This script extends conditionals in Windows batch scenarios. Once 
-included to your script it allows to construct the more powerful and 
-flexible conditionals implemented on _steroids_.
+Этот скрипт расширяет условный оператор в пакетных файлах Windows. Как 
+только в ваши скрипты он позволяет строить более мощные и гибкие условные 
+операторы, реализованные на _стероидах_. 
 
-This script declares two _functions_ implementing conditional operators 
-for performing additional conditional expressions over files and 
-strings. These functions exit with a status of (0) or (1) depending on 
-the evaluations of an expression.
+Этот скрипт объявляет две _функции_, реализующие условные операторы для 
+вычисления дополнительных условных выражений над файлами и строками. Эти 
+функции завершаются с кодом возврата (0) или (1) в зависимости от 
+вычисленного выражения. 
 
-Expression could be in the standard form for the `IF` operator used in 
-batch scenarios. For the details of the syntax read the help page by 
-the `IF /?` command. 
+Выражения могут быть в стандартной форме оператора `IF`, используемого в 
+пакетных сценариях. Детально синтаксис описан в справке команды `IF /?`. 
 
-The second form came from the Bash's `test` builtin command that 
-extends capabilities of the standard operator in batches. In other 
-words, there are *steroids*. 
+Вторая форма пришла из встроенной команды unix shell `test`, которая 
+расширяет возможности стандартного оператора в пакетных файлах. Другими 
+словами, это и есть *стероиды*. 
 
 
-= USAGE =
+= ИСПОЛЬЗОВАНИЕ =
 
-Run the following command to see this page
+Запустите следующую команду, чтобы получить справку
 
 {{{
     test HELP
 }}}
 
-Execute the following command to embed the functionality into your script 
-"filename"
+Запустите следующую команду, чтобы встроить функциональность в ваш скрипт 
+"filename" 
 
 {{{
     test APPEND-TO filename
 }}}
 
-After that you can get all these features in your script as below:
+После этого у вам доступны все возможности в скриптах, подобно следующему: 
 
 {{{
     call :if -f "%COMSPEC%" && echo FILE
 }}}
 
-These functions would be available on the whole system wherever you were. 
-Put this script to some place on your system declared in the `%PATH%` 
-variable and call the functions as it is shown below: 
+Эти функции могут быть доступны во всей системе, где бы вы не исполняли 
+ич. Для этого поместите этот скрипт в вашей системе в один из каталогов, 
+описанном в переменной окружения `%PATH%` и вызовите как показано в 
+примере ниже:
 
 {{{
     call test :if -f "%COMSPEC%" && echo FILE
@@ -60,19 +60,19 @@ variable and call the functions as it is shown below:
 
 == `if EXPR` / `unless EXPR` ==
 
-Evaluates conditional expressions and returns the status of (0) if the 
-expression is true, otherwise (1). Returns the status of (2) if an 
-invalid arguments are given.
+Вычисляет условное выражение и возвращает (0), если выражение верно, иначе 
+(1). Вернет код (2), в случае неправильных аргументов. 
 
 
-_UNLESS works similar to IF but the sense of the test is reversed._
+_UNLESS аналогично IF, но смысл проверки противоположен._
 
 
-To perform extended conditional operators this solution considers some 
-arguments (starting with the "`-`" symbol) as special operators. To avoid 
-confusion between those operators and normal arguments it's recommended 
-wrap the comparable arguments within double quotes. Operators must be 
-left unquoted anyway. So the following examples will work properly:
+Чтобы выполнить расширенные условные операторы, настоящий скрипт 
+рассматривает некоторые аргументы (начинающиеся с символа "`-`") как 
+специальные операторы. Чтобы избежать возможной путаницы между этими 
+операторами и обычными аргументами, рекомендуется оборачивать сравниваемые 
+аргументы в двойные кавычки. Операторы же должны оставаться 
+незакавыченные. Таким образом, следующие примеры работают правильно: 
 
 {{{
     copy nul equ
@@ -81,7 +81,7 @@ left unquoted anyway. So the following examples will work properly:
 }}}
 
 
-== Standard `IF` operators ==
+== Стандартные операторы `IF` ==
 
 {{{
     IF [NOT] ERRORLEVEL number
@@ -146,45 +146,46 @@ numeric comparison is performed.
 == Extended file operators ==
 
 === `-a FILE` ===
-True if file exists.
+Верно, если файл существует. 
 
 === `-b FILE` ===
-True if file is drive.
+Верно, если аргумент - диск. 
 
 === `-c FILE` ===
-True if file is character device.
+Верно, если аргумент - символьное устройство. 
 
 === `-d FILE` ===
-True if file is a directory. Similar to `-attr d`.
+Верно, если аргумент - каталог. Аналогично `-attr d`.
 
 === `-e FILE` ===
-True if file exists.
+Верно, если файл существует. 
 
 === `-f FILE` ===
-True if file exists and is a regular file.
+Верно, если аргумент - обычный файл. 
 
 === `-h FILE` ===
-True if file is a link. Similar to `-attr l`.
+Верно, если аргумент - ссылка. Аналогично `-attr l`.
 
 === `-L FILE` ===
-True if file is a link. Similar to `-attr l`.
+Верно, если аргумент - ссылка. Аналогично `-attr l`.
 
 === `-r FILE` ===
-True if file is read only. Similar to `-attr r`.
+Верно, если файл имеет атрибут только чтение. Аналогично `-attr r`.
 
 === `-s FILE` ===
-True if file exists and is not empty.
+Верно, если файл существует и непустой. 
 
 === `-w FILE` ===
+Верно, если файл доступен на запись, например, не установлен атрибут только чтение.
 True if the file is writable, i.e. not read only.
 
 === `-x FILE` ===
-True if the file is executable.
+Верно, если файл исполнимый. 
 
 === `-attr ATTR FILE` ===
-True if ATTR is set for FILE.
+Верно, если установлен атрибут файла. 
 
-The following attributes can be recognized:
+Доступные следующие атрибуты: 
 {{{
     Attribute                    Expansion
     FILE_ATTRIBUTE_DIRECTORY     d--------
@@ -200,66 +201,66 @@ The following attributes can be recognized:
 }}}
 
 === `-path FILE` ===
-True if FILE is listed in the PATH environment variable.
+Верно, если файл есть в одном из каталогов переменной окружения PATH. 
 
 
-== More file operators ==
+== Еще файловых операторов ==
 
 === `FILE1 -nt FILE2` ===
-True if FILE1 is newer than FILE2 (according to modification time). This 
-operator is depending on the user-defined settings or locales, that means 
-that the result of this comparison cannot be considered as reliable. 
+Верно, если FILE1 новее чем FILE2 (в соответствии с временем модификации 
+файла). Этот оператор зависит от пользовательских и региональных настроек. 
+Это значит, что в общем случае, сравнение не может быть надежным. 
 
 === `FILE1 -ot FILE2` ===
-True if FILE1 is older than FILE2 (according to modification time). This 
-operator is depending on the user-defined settings or locales, that means 
-that the result of this comparison cannot be considered as reliable. 
+Верно, если FILE1 старее чем FILE2 (в соответствии с временем модификации 
+файла). Этот оператор зависит от пользовательских и региональных настроек. 
+Это значит, что в общем случае, сравнение не может быть надежным. 
 
 
-== Extended string operators ==
+== Расширенные строковые операторы ==
 
 === `-n STRING` ===
-True if STRING is not empty.
+Верно, если строка непустая.
 
 === `-z STRING` ===
-True if STRING is empty.
+Верно, если строка пустая.
 
 
-== More string operators ==
+== Еще строковых операторов ==
 
 === `STACK -contains NEEDLE` ===
-True if STACK contains NEEDLE.
+Верно, если STACK содержит NEEDLE.
 
 === `STACK -starts NEEDLE` ===
-True if STACK starts with NEEDLE.
+Верно, если STACK начинается с NEEDLE.
 
 === `STACK -ends NEEDLE` ===
-True if STACK ends with NEEDLE.
+Вернл, если STACK завершается NEEDLE.
 
 
-= EXAMPLES =
+= ПРИМЕРЫ =
 
-`%COMSPEC%` is file
+`%COMSPEC%` - файл
 {{{
     call :if -f "%COMSPEC%" && echo FILE
 }}}
 
-`%COMSPEC%` is not directory
+`%COMSPEC%` - не каталог
 {{{
     call :unless -d "%COMSPEC%" && echo FILE
 }}}
 
-Do something if `%STR%` is not empty string
+Что-то сделать, если `%STR%` - непустая строка 
 {{{
     call :if -n "%STR%" && echo NOTEMPTY
 }}}
 
-Do something if `%STR%` is empty string
+Что-то сделать, если `%STR%` - пустая строка 
 {{{
     call :if -z "%STR%" && echo EMPTY
 }}}
 
-Do something depending on a file attribute
+Что-то сделать в зависимости от атрибута файла
 {{{
     call :if -d "%FILE%" && (
         echo DIR
@@ -270,7 +271,7 @@ Do something depending on a file attribute
     )
 }}}
 
-Full test example
+Пример полного  теста
 {{{
     set "f=%~1"
     set "a=%~a1"
@@ -291,21 +292,21 @@ Full test example
 }}}
 
 
-= LIMITATIONS =
+= ОГРАНИЧЕНИЯ =
 
-Even though the steroids cover and unify many uncertain features of 
-batch files they have few limitations coming from the batches 
-themselves. 
+Хотя стероиды покрывают и унифицируют много неочевидных особенностей 
+пакетных файлов, они имеют некоторые ограничения, являющиеся ограничениями 
+самих пакетных файлов. 
 
-We can never be sure that arguments of scripts are completely checked. 
-Anytime a user can pass a string to an argument that will be executed 
-as never expected. 
+Мы никогда не можем быть уверены, что аргумерты полностью проверены. В 
+любое время пользователь может передать строку, которая будет выполнена 
+совсем не так как ожидалось. 
 
-Sometimes we can lost some input characters in the arguments. For 
-example, it is true for `!` under the `enabledelayedexpansion` mode. 
+Иногда могут потеряны некоторые символы входных параметров. Например, это 
+так для символа `!` в режиме `enabledelayedexpansion`. 
 
 
-= REFERENCES =
+= ССЫЛКИ =
 
  * [http://www.dostips.com/forum/viewtopic.php?p=6475#p6475 BatchLibrary or how to include batch files]
  * [http://support.microsoft.com/kb/65994 Testing If a Drive or Directory Exists from a Batch File]
