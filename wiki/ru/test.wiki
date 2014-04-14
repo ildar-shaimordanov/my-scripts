@@ -143,13 +143,13 @@ all numeric digits, then the strings are converted to numbers and a
 numeric comparison is performed. 
 
 
-== Extended file operators ==
+== Расширенные файловые операторы ==
 
 === `-a FILE` ===
 Верно, если файл существует. 
 
 === `-b FILE` ===
-Верно, если аргумент - диск. 
+Верно, если аргумент - дисковое устройство. 
 
 === `-c FILE` ===
 Верно, если аргумент - символьное устройство. 
