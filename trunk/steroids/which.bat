@@ -26,11 +26,21 @@
 ::     DOSKEY /?
 ::     HELP /?
 ::     http://ss64.com/nt/
+::
+:: COPYRIGHTS
+:: Copyright (c) 2010, 2014 Ildar Shaimordanov
 
 @echo off
 
 if "%~1" == "" (
-	powershell -NoProfile -NoLogo -Command "cat '%~f0' | where { $_ -match '^::' } | %% { $_ -replace ':: ?', '' }"
+	for %%p in ( powershell.exe ) do if not "%%~$PATH:p" == "" (
+		"%%~$PATH:p" -NoProfile -NoLogo -Command "cat '%~f0' | where { $_ -match '^::' } | %% { $_ -replace '::', '' }"
+		goto :EOF
+	)
+	for /f "usebackq tokens=* delims=:" %%s in ( "%~f0" ) do (
+		if /i "%%s" == "@echo off" goto :EOF
+		echo:%%s
+	)
 	goto :EOF
 )
 
@@ -52,6 +62,11 @@ goto :which_opt_begin
 
 :which_arg_begin
 if "%~1" == "" goto :which_arg_end
+
+echo:%~1 | "%windir%\system32\findstr.exe" /v ": \ * ? ; /" >nul || (
+	echo:%~n0: Name should not consist of drive, paths or wildcards>&2
+	goto :which_arg_continue
+)
 
 for /f "tokens=1,* delims==" %%a in ( ' "%windir%\System32\doskey.exe" /MACROS ' ) do (
 	if /i "%~1" == "%%a" (
