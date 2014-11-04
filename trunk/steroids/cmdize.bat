@@ -102,14 +102,14 @@ call :cmdize.vbs.h goto :EOF
 
 del /q "%TEMP%\%~n0.$$"
 rem type "%~f1"
-for /f "usebackq tokens=* delims=" %%s in ( "%~f1" ) do (
+for /f "tokens=1,* delims=]" %%r in ( ' call "%windir%\System32\find.exe" /n /v "" ^<"%~f1" ' ) do (
 	rem Filtering and commenting "Option Explicit". This ugly code 
 	rem tries as much as possible but fails if "Option" and "Explicit" 
 	rem are located on two neighbor lines, consecutively, one by one. 
 	rem But it is too hard to imagine that there is someone who 
 	rem practices this coding style. 
 	for /f "usebackq tokens=1,2" %%a in ( '%%s' ) do if /i "%%~a" == "Option" for /f "usebackq tokens=1,* delims=:'" %%i in ( 'x%%b' ) do if /i "%%~i" == "xExplicit" (
-		set /p "=::'" <nul
+		set /p "=rem " <nul
 		echo:%~n0: Commenting Option Explicit in "%~1">&2
 	)
 	echo:%%s
