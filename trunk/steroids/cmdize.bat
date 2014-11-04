@@ -103,14 +103,17 @@ call :cmdize.vbs.h goto :EOF
 del /q "%TEMP%\%~n0.$$"
 rem type "%~f1"
 for /f "tokens=1,* delims=]" %%r in ( ' call "%windir%\System32\find.exe" /n /v "" ^<"%~f1" ' ) do (
-	rem Filtering and commenting "Option Explicit". This ugly code 
-	rem tries as much as possible but fails if "Option" and "Explicit" 
+	rem Filtering and commenting "Option Explicit". 
+	rem This ugly code tries as much as possible to recognize and 
+	rem comment this directive. It fails if "Option" and "Explicit" 
 	rem are located on two neighbor lines, consecutively, one by one. 
 	rem But it is too hard to imagine that there is someone who 
-	rem practices this coding style. 
+	rem practices such a strange coding style. 
 	for /f "usebackq tokens=1,2" %%a in ( '%%s' ) do if /i "%%~a" == "Option" for /f "usebackq tokens=1,* delims=:'" %%i in ( 'x%%b' ) do if /i "%%~i" == "xExplicit" (
-		set /p "=rem " <nul
 		echo:%~n0: Commenting Option Explicit in "%~1">&2
+		echo:rem To prevent compilation error due to embedding into a batch file, 
+		echo:rem the following line was commented automatically.
+		set /p "=rem " <nul
 	)
 	echo:%%s
 )
