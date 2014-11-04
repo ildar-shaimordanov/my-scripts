@@ -60,7 +60,7 @@ if not exist "%~f1" (
 
 for %%x in ( .js .vbs .pl .ps1 .hta .htm .html .wsf ) do (
 	if /i "%~x1" == "%%~x" (
-		call :cmdize%%~x "%~f1" >"%~dpn1.bat"
+		call :cmdize%%~x "%~1" >"%~dpn1.bat"
 		goto :cmdize.loop.continue
 	)
 )
@@ -86,23 +86,34 @@ type "%~f1"
 goto :EOF
 
 
+:cmdize.vbs.h
+set /p "=::'" <nul
+type "%TEMP%\%~n0.$$"
+echo:%*
+goto :EOF
+
+
 :cmdize.vbs
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
 
-set /p "=::'" <nul
-type "%TEMP%\%~n0.$$"
-echo:@echo off
-
-set /p "=::'" <nul
-type "%TEMP%\%~n0.$$"
-echo:"%%windir%%\System32\cscript.exe" //nologo //e:vbscript "%%~f0" %%*
-
-set /p "=::'" <nul
-type "%TEMP%\%~n0.$$"
-echo:goto :EOF
+call :cmdize.vbs.h @echo off
+call :cmdize.vbs.h "%%%%windir%%%%\System32\cscript.exe" //nologo //e:vbscript "%%%%~f0" %%%%*
+call :cmdize.vbs.h goto :EOF
 
 del /q "%TEMP%\%~n0.$$"
-type "%~f1"
+rem type "%~f1"
+for /f "usebackq tokens=* delims=" %%s in ( "%~f1" ) do (
+	rem Filtering and commenting "Option Explicit". This ugly code 
+	rem tries as much as possible but fails if "Option" and "Explicit" 
+	rem are located on two neighbor lines, consecutively, one by one. 
+	rem But it is too hard to imagine that there is someone who 
+	rem practices this coding style. 
+	for /f "usebackq tokens=1,2" %%a in ( '%%s' ) do if /i "%%~a" == "Option" for /f "usebackq tokens=1,* delims=:'" %%i in ( 'x%%b' ) do if /i "%%~i" == "xExplicit" (
+		set /p "=::'" <nul
+		echo:%~n0: Commenting Option Explicit in "%~1">&2
+	)
+	echo:%%s
+)
 goto :EOF
 
 
