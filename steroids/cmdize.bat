@@ -9,6 +9,12 @@
 :: special header that being the "polyglot" and having some tricks to be a 
 :: valid code in batch file and the wrapped code at the same time. 
 ::
+:: FEATURES
+:: It does comment on "Option Explicit" in VBScript.
+:: "<?xml?>" declaration for wsf-files is expected.
+:: "Option Explicit" and "<?xml?>" in a single line only are supported.
+:: BOM is not supported at all.
+::
 :: SEE ALSO
 :: Proceed the following links to learn more the origins
 ::
@@ -157,16 +163,16 @@ goto :EOF
 
 
 :cmdize.wsf
-for /f "usebackq tokens=1,*" %%a in ( "%~f1" ) do (
-	echo:%%a :
-	for /f "tokens=1,* delims=?>" %%c in ( "%%b" ) do (
-		echo:: %%c
-		echo:: ?^>^<!--
-		echo:@echo off
-		echo:"%%windir%%\System32\cscript.exe" //nologo "%%~f0?.wsf" %%*
-		echo:goto :EOF
-		echo:: --^>%%d
-	)
+for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
+	rem We use this code to transform the "<?xml?>" declaration 
+	rem located at the very beginning of the file to the "polyglot" 
+	rem form to do it acceptable by the batch file.
+	echo:%%a?%%d :
+	echo:: %%e ?^>^<!--
+	echo:@echo off
+	echo:"%%windir%%\System32\cscript.exe" //nologo "%%~f0?.wsf" %%*
+	echo:goto :EOF
+	echo:: --%%c
 	more +1 <"%~f1"
 	goto :EOF
 )
