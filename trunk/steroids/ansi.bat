@@ -505,7 +505,7 @@ function parse-ansi-string( [string]$string ) {
 		process-ansi-sequence $found[$i].Groups[1].Value $found[$i].Groups[2].Value;
 	}
 
-	Write-Host -NoNewLine $string.Substring($pos);
+	Write-Host $string.Substring($pos);
 }
 
 # =========================================================================
