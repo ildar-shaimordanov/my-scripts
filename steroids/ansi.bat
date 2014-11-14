@@ -147,16 +147,14 @@ $ColorIndex = $AnsiColor;
 
 if ( $args[0] -eq "--dos-colors" ) {
 	$ColorIndex = $DosColor;
-	$null, $args = $args;
-	$args = @( $args );
+	$args = $args[1..$args.count];
 }
 
 $RestoreColors = $False;
 
 if ( $args[0] -eq "--restore" ) {
 	$RestoreColors = $True;
-	$null, $args = $args;
-	$args = @( $args );
+	$args = $args[1..$args.count];
 }
 
 # =========================================================================
