@@ -111,6 +111,7 @@ http://en.wikipedia.org/wiki/ANSI_escape_code
 http://misc.flogisoft.com/bash/tip_colors_and_formatting
 http://ss64.com/nt/color.html
 http://stackoverflow.com/a/24273024/3627676
+http://www.robvanderwoude.com/ansi.php#AnsiArt
 "@;
 
 # =========================================================================
