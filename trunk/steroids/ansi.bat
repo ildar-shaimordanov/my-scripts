@@ -11,13 +11,14 @@ goto :EOF
 
 $ProgName = if ( $MyInvocation.MyCommand.Name ) { $MyInvocation.MyCommand.Name } else { "ANSI" };
 
-$Version = "0.1 Alpha";
+$Version = "0.2 Beta";
 
 $Help = @"
-$ProgName [ --dos-colors ] [ --restore ] [text ...]
+$ProgName [ --dos-colors ] [ --restore ] [ --no-new-line ] [text ...]
 
 --dos-colors  Use DOS colors instead ANSI (See "COLOR /?")
 --restore     Restore the colors to the values set before the starting
+--no-new-line Discard printing the trailing new line
 
 --help        Print this help
 --man         Print the manual
@@ -25,6 +26,10 @@ $ProgName [ --dos-colors ] [ --restore ] [text ...]
 
 Parse the specified text from the command line or pipe and output it 
 accordingly the ANSI codes provided within the text.
+
+The first empty argument after possible options from the list above 
+stops processing of arguments and considers the rest of arguments as a 
+regular text.
 "@;
 
 $Manual = @"
@@ -116,23 +121,6 @@ http://www.robvanderwoude.com/ansi.php#AnsiArt
 
 # =========================================================================
 
-if ( $args[0] -eq "--help" ) {
-	Write-Host $Help;
-	exit;
-}
-
-if ( $args[0] -eq "--man" ) {
-	Write-Host $Manual;
-	exit;
-}
-
-if ( $args[0] -eq "--version" ) {
-	Write-Host "$ProgName $Version";
-	exit;
-}
-
-# =========================================================================
-
 $AnsiColor = @( 
 	0,  4,  2,  6,  1,  5,  3,  7, 
 	8, 12, 10, 14,  9, 13, 11, 15
@@ -144,18 +132,47 @@ $DosColor = @(
 );
 
 $ColorIndex = $AnsiColor;
-
-if ( $args[0] -eq "--dos-colors" ) {
-	$ColorIndex = $DosColor;
-	$args = $args[1..$args.count];
-}
-
 $RestoreColors = $False;
+$PrintNewLine = $True;
 
-if ( $args[0] -eq "--restore" ) {
-	$RestoreColors = $True;
-	$args = $args[1..$args.count];
+:parse_args
+for ($i = 0; $i -lt $args.count; $i++) {
+	switch ( $args[$i] ) {
+	"--help" {
+		Write-Host $Help;
+		exit;
+		}
+	"--man" {
+		Write-Host $Manual;
+		exit;
+		}
+	"--version" {
+		Write-Host "$ProgName $Version";
+		exit;
+		}
+	"--restore" {
+		$RestoreColors = $True;
+		break;
+		}
+	"--dos-colors" {
+		$ColorIndex = $DosColor;
+		break;
+		}
+	"--no-new-line" {
+		$PrintNewLine = $False;
+		break;
+		}
+	"" {
+		$i++;
+		break parse_args;
+		}
+	default {
+		break parse_args;
+		}
+	}
 }
+
+$args = $args[$i..$args.count];
 
 # =========================================================================
 
@@ -506,7 +523,10 @@ function parse-ansi-string( [string]$string ) {
 		process-ansi-sequence $found[$i].Groups[1].Value $found[$i].Groups[2].Value;
 	}
 
-	Write-Host $string.Substring($pos);
+	Write-Host -NoNewLine $string.Substring($pos);
+	if ( $PrintNewLine ) {
+		Write-Host;
+	}
 }
 
 # =========================================================================
