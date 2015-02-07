@@ -11,7 +11,9 @@ goto :EOF
 
 $ProgName = if ( $MyInvocation.MyCommand.Name ) { $MyInvocation.MyCommand.Name } else { "ANSI" };
 
-$Version = "0.2 Beta";
+$Version = "0.4 Beta";
+
+$DemoURL = "http://www.robvanderwoude.com/files/apple_ansi.txt";
 
 $Help = @"
 $ProgName [ --dos-colors ] [ --restore ] [ --no-new-line ] [text ...]
@@ -23,6 +25,9 @@ $ProgName [ --dos-colors ] [ --restore ] [ --no-new-line ] [text ...]
 --help        Print this help
 --man         Print the manual
 --version     Print the version
+
+--demo        Print demo with the file from the URL:
+              $DemoURL
 
 Parse the specified text from the command line or pipe and output it 
 accordingly the ANSI codes provided within the text.
@@ -121,61 +126,6 @@ http://www.robvanderwoude.com/ansi.php#AnsiArt
 
 # =========================================================================
 
-$AnsiColor = @( 
-	0,  4,  2,  6,  1,  5,  3,  7, 
-	8, 12, 10, 14,  9, 13, 11, 15
-);
-
-$DosColor = @(
-	0,  1,  2,  3,  4,  5,  6,  7, 
-	8,  9, 10, 11, 12, 13, 14, 15
-);
-
-$ColorIndex = $AnsiColor;
-$RestoreColors = $False;
-$PrintNewLine = $True;
-
-:parse_args
-for ($i = 0; $i -lt $args.count; $i++) {
-	switch ( $args[$i] ) {
-	"--help" {
-		Write-Host $Help;
-		exit;
-		}
-	"--man" {
-		Write-Host $Manual;
-		exit;
-		}
-	"--version" {
-		Write-Host "$ProgName $Version";
-		exit;
-		}
-	"--restore" {
-		$RestoreColors = $True;
-		break;
-		}
-	"--dos-colors" {
-		$ColorIndex = $DosColor;
-		break;
-		}
-	"--no-new-line" {
-		$PrintNewLine = $False;
-		break;
-		}
-	"" {
-		$i++;
-		break parse_args;
-		}
-	default {
-		break parse_args;
-		}
-	}
-}
-
-$args = $args[$i..$args.count];
-
-# =========================================================================
-
 $HostColor = @{};
 
 function save-host-colors {
@@ -262,6 +212,13 @@ function set-ansi-color( [array]$colors ) {
 
 # =========================================================================
 
+function set-cursor( $x, $y ) {
+    [System.Console]::CursorTop = $y;
+    [System.Console]::CursorLeft = $x;
+}
+
+# =========================================================================
+
 function set-cursor-position( [array]$position, [string]$movement ) {
 	if ($position.count -ne 2 ) {
 		$position += 1;
@@ -335,8 +292,7 @@ function set-cursor-position( [array]$position, [string]$movement ) {
 		$col = [Math]::min( [Math]::max($col + $Host.UI.RawUI.WindowPosition.X, 0), $Host.UI.RawUI.BufferSize.Width - 1 );
 	}
 
-	[System.Console]::CursorTop = $row;
-	[System.Console]::CursorLeft = $col;
+	set-cursor $col $row;
 }
 
 # =========================================================================
@@ -369,8 +325,7 @@ function erase-display( [array]$mode ) {
 		}
 	1 {
 		# clear from cursor to beginning of the screen.
-		[System.Console]::CursorTop = $Host.UI.RawUI.WindowPosition.Y;
-		[System.Console]::CursorLeft = $Host.UI.RawUI.WindowPosition.X;
+		set-cursor $Host.UI.RawUI.WindowPosition.X $Host.UI.RawUI.WindowPosition.Y;
 
 		$s = " " * ( $y * $w + $x );
 		Write-Host -NoNewLine $s;
@@ -383,8 +338,7 @@ function erase-display( [array]$mode ) {
 	}
 
 	# Restore to the original cursor position
-	[System.Console]::CursorTop = $posY;
-	[System.Console]::CursorLeft = $posX;
+	set-cursor $posX $posY;
 }
 
 # =========================================================================
@@ -403,17 +357,17 @@ function erase-line( [array]$mode ) {
 
 	switch ( $mode[0] ) {
 	0 {
-		# clear from cursor to end of screen.
+		# clear from cursor to end of the line.
 		$s = " " * ( $w - $x );
 		break;
 		}
 	1 {
-		# clear from cursor to beginning of the screen.
+		# clear from cursor to beginning of the line.
 		$s = " " * $x;
 		break;
 		}
 	2 {
-		# clear entire screen.
+		# clear entire line.
 		$s = " " * $w;
 		break;
 		}
@@ -423,14 +377,14 @@ function erase-line( [array]$mode ) {
 	}
 
 	if ( $mode[0] -ne 0 ) {
-		[System.Console]::CursorLeft = $Host.UI.RawUI.WindowPosition.X;
+		# Set the cursor to beginning of the line
+		set-cursor $Host.UI.RawUI.WindowPosition.X $posY;
 	}
 
 	Write-Host -NoNewLine $s;
 
 	# Restore to the original cursor position
-	[System.Console]::CursorTop = $posY;
-	[System.Console]::CursorLeft = $posX;
+	set-cursor $posX $posY;
 }
 
 # =========================================================================
@@ -528,6 +482,66 @@ function parse-ansi-string( [string]$string ) {
 		Write-Host;
 	}
 }
+
+# =========================================================================
+
+$AnsiColor = @( 
+	0,  4,  2,  6,  1,  5,  3,  7, 
+	8, 12, 10, 14,  9, 13, 11, 15
+);
+
+$DosColor = @(
+	0,  1,  2,  3,  4,  5,  6,  7, 
+	8,  9, 10, 11, 12, 13, 14, 15
+);
+
+$ColorIndex = $AnsiColor;
+$RestoreColors = $False;
+$PrintNewLine = $True;
+
+:parse_args
+for ($i = 0; $i -lt $args.count; $i++) {
+	switch ( $args[$i] ) {
+	"--help" {
+		Write-Host $Help;
+		exit;
+		}
+	"--man" {
+		Write-Host $Manual;
+		exit;
+		}
+	"--version" {
+		Write-Host "$ProgName $Version";
+		exit;
+		}
+	"--demo" {
+		$wc = New-Object System.Net.WebClient;
+		$wc.DownloadString($DemoURL) | % { parse-ansi-string $_ };
+		exit;
+		}
+	"--restore" {
+		$RestoreColors = $True;
+		break;
+		}
+	"--dos-colors" {
+		$ColorIndex = $DosColor;
+		break;
+		}
+	"--no-new-line" {
+		$PrintNewLine = $False;
+		break;
+		}
+	"" {
+		$i++;
+		break parse_args;
+		}
+	default {
+		break parse_args;
+		}
+	}
+}
+
+$args = $args[$i..$args.count];
 
 # =========================================================================
 
