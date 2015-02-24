@@ -437,8 +437,8 @@ function __trapExit()
 trap '__trapError $? $LINENO' HUP INT QUIT TERM ERR
 trap '__trapExit' EXIT
 
-# Print the prolog
 [ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+	# Print the prolog
 	info "==== $ME Starting ===="
 }
 
