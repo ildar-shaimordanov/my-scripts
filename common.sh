@@ -20,6 +20,7 @@
 #
 # Functions
 #
+# catecho
 # logMsg
 # debug
 # info
