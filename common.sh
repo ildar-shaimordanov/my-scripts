@@ -51,6 +51,15 @@
 #
 ###########################################################################
 #
+# Imports
+#
+# Controlling variables
+#
+# $LOGFILE_NAMEAUGMENT
+# $SCRIPT_OUTPUT_TO_STDOUT
+#
+###########################################################################
+#
 # Internally used definitions
 #
 # Functions
@@ -91,8 +100,12 @@ readonly TEMPDIR
 # $LOGDIR refers to a directory where the script stores a log file
 readonly LOGDIR="${LOGDIR:-$MYDIR/log}"
 
+# $LOGFILE_NAMEAUGMENT is the command that will be eval'd to the string to 
+# append to the file name (excluding the path and the extension).
+readonly LOGFILE_NAMEAUGMENT="$( ${LOGFILE_NAMEAUGMENT} )"
+
 # $LOGFILE refers to the location of the script's log file
-readonly LOGFILE="${LOGFILE:-$LOGDIR/$ME.log}"
+readonly LOGFILE="${LOGFILE:-$LOGDIR/$ME$LOGFILE_NAMEAUGMENT.log}"
 
 
 # Error codes
@@ -100,12 +113,14 @@ readonly E_SUCCESS=0	# The script is terminated successfully
 readonly E_ERROR=1		# Some error has happened
 readonly E_DIED=255		# The script died
 
+
+# Logging control
+readonly SCRIPT_OUTPUT_TO_STDOUT
+
 ###########################################################################
 
-# Displays a log message prepenting in the front of it a log level. 
-# The first argument has the specific meaning considered as a log level. 
-# The rest of arguments are considered as the message to be displayed but 
-# there are a few features. 
+# Prints a message or outputs a file content. it pretends to be working 
+# similar to "cat" and "echo" depending on its arguments.
 # 1. An empty message or the single string "-". It means to read from 
 #    a standard input or a output of the previous command in a pipe. 
 # 2. Two parameters exactly. The first one is the string "-" and the 
@@ -114,28 +129,49 @@ readonly E_DIED=255		# The script died
 # 3. In other cases the function considers arguments "as is" and prints
 #    out in usual way. 
 #
+# @param	{string}	A message, optional
+# @param	{string}	A filename, optional
+function catecho()
+{
+	if [ ! -t 0 -a \( $# -eq 0 -o $# -eq 1 -a "$1" == "-" \) ]
+	then
+		# command | catecho
+		# command | catecho -
+		cat -
+	elif [ $# -eq 2 -a "$1" == "-" -a -r "$2" -a ! -d "$2" ]
+	then
+		# catecho - filename
+		# catecho - <(command)
+		cat "$2"
+	else
+		# catecho message
+		# catecho "message"
+		echo "$@"
+	fi
+}
+
+# Displays a log message prepenting in the front of it a log level. 
+# The first argument has the specific meaning considered as a log level. 
+# The rest of arguments are considered as the message to be displayed but 
+# there are a few features. 
+#
+# See the details description of the function "catecho"
+#
 # @param	{string}	A log level
 # @param	{string}	A message, optional
 # @param	{string}	A filename, optional
 function logMsg()
 {
-	if [ $# -eq 1 -o $# -eq 2 -a "$2" == "-" ]
+	local level="$1"
+	shift
+
+	if [ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ]
 	then
-		# command | logMsg level
-		# command | logMsg level -
-		tee
-	elif [ $# -eq 3 -a "$2" == "-" -a -r "$3" -a ! -d "$3" ]
-	then
-		# logMsg level - filename
-		# logMsg level - <(command)
-		cat "$3"
+		catecho "$@"
 	else
-		# logMsg level message
-		# logMsg level "message"
-		shift
-		echo -e "$@"
-	fi \
-	| sed "s|^|$(date '+%Y/%m/%d %H:%M:%S') ($$) ($1): |"
+		catecho "$@" \
+		| sed "s|^|$(date '+%Y/%m/%d %H:%M:%S') ($$) ($level): |"
+	fi
 }
 
 # Displays a DEBUG message
@@ -312,11 +348,13 @@ function onExit()
 mkdir -p "$LOGDIR" || die "Cannot create the directory $LOGFIR"
 mkdir -p "$TMPDIR" || die "Cannot create the directory $TMPDIR"
 
-# Assign new descriptors for STDOUT and STDERR respectively
-exec 11>&1 12>&2
+[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+	# Assign new descriptors for STDOUT and STDERR respectively
+	exec 11>&1 12>&2
 
-# Redirect STDOUT and STDERR to the $LOGFILE
-exec >>"$LOGFILE" 2>&1
+	# Redirect STDOUT and STDERR to the $LOGFILE
+	exec >>"$LOGFILE" 2>&1
+}
 
 # Traps the exit signals: HUP (1), INT (2), QUIT (3), TERM (15), ERR
 # Prints out a diagnostic message and triggers an exit of a script.
@@ -329,12 +367,14 @@ function __trapError
 	local ERRORCODE="${1:-$?}"
 	local ERRORLINE="${2:-$LINENO}"
 
-	# Reopen STDOUT and STDERR to point to the $LOGFILE
-	exec 1>&- 2>&-
-	exec >>"$LOGFILE" 2>&1
+	[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+		# Reopen STDOUT and STDERR to point to the $LOGFILE
+		exec 1>&- 2>&-
+		exec >>"$LOGFILE" 2>&1
 
-	[ "$ERRORCODE" != "0" ] \
-	&& error "Error Code=$ERRORCODE at Line Number=$ERRORLINE"
+		[ "$ERRORCODE" != "0" ] \
+		&& error "Error Code=$ERRORCODE at Line Number=$ERRORLINE"
+	}
 
 	exit $ERRORCODE
 }
@@ -382,12 +422,14 @@ function __trapExit()
 	[ "$(cat "$LOCKFILE" 2>/dev/null)" == "$$" ] \
 	&& rm -rf "$LOCKFILE" "$TMPDIR/$ME"*
 
-	# Print the epilog
-	info "Exit Code=$ERRORCODE"
+	[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+		# Print the epilog
+		info "Exit Code=$ERRORCODE"
 
-	# Restore the original STDOUT and STDERR
-	exec 1>&11 11>&-
-	exec 2>&12 12>&-
+		# Restore the original STDOUT and STDERR
+		exec 1>&11 11>&-
+		exec 2>&12 12>&-
+	}
 }
 
 # trap the script termination
@@ -395,7 +437,9 @@ trap '__trapError $? $LINENO' HUP INT QUIT TERM ERR
 trap '__trapExit' EXIT
 
 # Print the prolog
-info "==== $ME Starting ===="
+[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+	info "==== $ME Starting ===="
+}
 
 # $LOCKFILE refers to the location of the script's lock file
 readonly LOCKFILE="${LOCKFILE:-$TMPDIR/$ME.lock}"
