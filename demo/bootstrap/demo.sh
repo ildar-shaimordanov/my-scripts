@@ -47,7 +47,7 @@ function showDirs()
 }
 
 # $VARDIR is the directory for storing something on the persistent basis.
-VARDIR="$MYDIR/var"
+VARDIR="$MYDIR/var/$ME"
 mkdir -p "$VARDIR" || die "Unable to create directory $VARDIR."
 
 ###########################################################################
