@@ -57,7 +57,8 @@
 # Controlling variables
 #
 # $LOGFILE_NAMEAUGMENT
-# $SCRIPT_OUTPUT_TO_STDOUT
+# $SCRIPT_OUTPUT_STDOUT
+# $SCRIPT_OUTPUT_PROLOG
 #
 ###########################################################################
 #
@@ -92,7 +93,7 @@ elif [ ! -z "$TEMPDIR" ]
 then
 	TMPDIR="$TEMPDIR"
 else
-	TMPDIR="$MYDIR/tmp"
+	TMPDIR="$MYDIR/tmp/$ME"
 	TEMPDIR="$TMPDIR"
 fi
 readonly TMPDIR
@@ -111,12 +112,13 @@ readonly LOGFILE="${LOGFILE:-$LOGDIR/$ME$LOGFILE_NAMEAUGMENT.log}"
 
 # Error codes
 readonly E_SUCCESS=0	# The script is terminated successfully
-readonly E_ERROR=1		# Some error has happened
-readonly E_DIED=255		# The script died
+readonly E_ERROR=1	# Some error has happened
+readonly E_DIED=255	# The script died
 
 
 # Logging control
-readonly SCRIPT_OUTPUT_TO_STDOUT
+readonly SCRIPT_OUTPUT_STDOUT
+readonly SCRIPT_OUTPUT_PROLOG
 
 ###########################################################################
 
@@ -166,7 +168,7 @@ function logMsg()
 	local level="$1"
 	shift
 
-	if [ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ]
+	if [ "$SCRIPT_OUTPUT_STDOUT" == "1" ]
 	then
 		catecho "$@"
 	else
@@ -349,7 +351,7 @@ function onExit()
 mkdir -p "$LOGDIR" || die "Cannot create the directory $LOGFIR"
 mkdir -p "$TMPDIR" || die "Cannot create the directory $TMPDIR"
 
-[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+[ "$SCRIPT_OUTPUT_STDOUT" == "1" ] || {
 	# Assign new descriptors for STDOUT and STDERR respectively
 	exec 11>&1 12>&2
 
@@ -368,7 +370,7 @@ function __trapError
 	local ERRORCODE="${1:-$?}"
 	local ERRORLINE="${2:-$LINENO}"
 
-	[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+	[ "$SCRIPT_OUTPUT_STDOUT" == "1" ] || {
 		# Reopen STDOUT and STDERR to point to the $LOGFILE
 		exec 1>&- 2>&-
 		exec >>"$LOGFILE" 2>&1
@@ -421,9 +423,9 @@ function __trapExit()
 	# Clean up before exiting
 	# Be sure that we remove items created by ourselves
 	[ "$(cat "$LOCKFILE" 2>/dev/null)" == "$$" ] \
-	&& rm -rf "$LOCKFILE" "$TMPDIR/$ME"*
+	&& rm -rf "$LOCKFILE" "$TMPDIR"
 
-	[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+	[ "$SCRIPT_OUTPUT_STDOUT" == "1" ] || {
 		# Print the epilog
 		info "Exit Code=$ERRORCODE"
 
@@ -437,9 +439,9 @@ function __trapExit()
 trap '__trapError $? $LINENO' HUP INT QUIT TERM ERR
 trap '__trapExit' EXIT
 
-[ "$SCRIPT_OUTPUT_TO_STDOUT" == "1" ] || {
+[ "$SCRIPT_OUTPUT_STDOUT" == "1" ] || {
 	# Print the prolog
-	info "==== $ME Starting ===="
+	info "${SCRIPT_OUTPUT_PROLOG:-==== $ME Starting ====}"
 }
 
 # $LOCKFILE refers to the location of the script's lock file
