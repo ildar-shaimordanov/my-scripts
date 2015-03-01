@@ -6,7 +6,7 @@
 # to run the script with another instance name to prevent concurrent 
 # execution. 
 # Uncomment the following line to see changes.
-#ME=another_name
+#ME="$( basename "$0" .sh )"
 
 # By default, the $LOGFILE refers to $LOGDIR/$ME.log. That means all log 
 # entries will appear in the single logfile. To change this behavior 
