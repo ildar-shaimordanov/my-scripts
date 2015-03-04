@@ -60,6 +60,10 @@
 # $SCRIPT_OUTPUT_STDOUT
 # $SCRIPT_OUTPUT_PROLOG
 #
+# Debug variables
+#
+# $DEBUG
+#
 ###########################################################################
 #
 # Internally used definitions
@@ -422,7 +426,7 @@ function __trapExit()
 
 	# Clean up before exiting
 	# Be sure that we remove items created by ourselves
-	[ "$(cat "$LOCKFILE" 2>/dev/null)" == "$$" ] \
+	[ "$DEBUG" == "" -a "$(cat "$LOCKFILE" 2>/dev/null)" == "$$" ] \
 	&& rm -rf "$LOCKFILE" "$TMPDIR"
 
 	[ "$SCRIPT_OUTPUT_STDOUT" == "1" ] || {
@@ -462,8 +466,8 @@ then
 
 	# The lock file is stale
 	# Remove it and restart ourselves
-	debug "Removing stale lock of non-existant PID=$OTHERPID"
-	rm -rf "$LOCKFILE" "$PIPEFILE"
+	debug "Removing stale lock file of nonexistent PID=$OTHERPID"
+	rm -rf "$LOCKFILE"
 
 	debug "Restarting myself"
 	exec "$0" "$@"

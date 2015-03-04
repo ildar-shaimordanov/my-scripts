@@ -22,6 +22,11 @@
 # Just uncomment the following line. 
 #SCRIPT_OUTPUT_STDOUT=1
 
+# All temporary items under $TMPDIR will be removed automatically on 
+# finishing the script. To keep them (in debugging purpose) in their place 
+# uncomment the next line.
+#DEBUG=1
+
 ###########################################################################
 
 # This line should be the first statement in the script (excepting the 
