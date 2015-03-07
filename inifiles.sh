@@ -106,7 +106,8 @@ function ini_read()
 		# Remove whitespaces around equal (=)
 		s/\s*=\s*/=/;
 
-		# Safe shell assignment operators
+		# Safe shell assignment operators using ANSI C like strings
+		# http://wiki.bash-hackers.org/syntax/quoting
 		s/=(.*)/=\$'\''$1'\''/;
 
 		# Section name as prefix
