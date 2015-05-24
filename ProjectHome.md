@@ -1,0 +1,3 @@
+CMD/BAT scripts for WinNT platforms...
+
+Just for fun!
