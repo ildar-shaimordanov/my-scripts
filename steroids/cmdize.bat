@@ -15,12 +15,21 @@
 :: "Option Explicit" and "<?xml?>" in a single line only are supported.
 :: BOM is not supported at all.
 ::
+:: It is possible to select an engine for JavaScript, VBScript and WSF via 
+:: the command line options /E. If it is not pointed especially, CSCRIPT 
+:: is used as the default engine for all JavaScript, VBScript and WSF 
+:: files. Another valid engine is WSCRIPT. Additionally for JavaScript 
+:: files it is possible to set another engine such as NodeJS, Rhino etc. 
+:: The predefined option /E DEFAULT resets any previously set engines to 
+:: the default value. 
+::
 :: SEE ALSO
 :: Proceed the following links to learn more the origins
 ::
 :: .js
 :: http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 :: http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
+:: https://gist.github.com/ildar-shaimordanov/88d7a5544c0eeacaa3bc
 ::
 :: .vbs
 :: http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
@@ -40,15 +49,11 @@
 :: http://www.dostips.com/forum/viewtopic.php?p=33963#p33963
 ::
 :: COPYRIGHTS
-:: Copyright (c) 2014 Ildar Shaimordanov
+:: Copyright (c) 2014, 2015 Ildar Shaimordanov
 
 @echo off
 
 if "%~1" == "" (
-	for %%p in ( powershell.exe ) do if not "%%~$PATH:p" == "" (
-		"%%~$PATH:p" -NoProfile -NoLogo -Command "cat '%~f0' | where { $_ -match '^::' } | %% { $_ -replace '::', '' }"
-		goto :EOF
-	)
 	for /f "usebackq tokens=* delims=:" %%s in ( "%~f0" ) do (
 		if /i "%%s" == "@echo off" goto :EOF
 		echo:%%s
@@ -58,6 +63,13 @@ if "%~1" == "" (
 
 :cmdize.loop.begin
 if "%~1" == "" goto :cmdize.loop.end
+
+if /i "%~1" == "/e" (
+	set "CMDIZE_ENGINE="
+	if /i not "%~2" == "default" set "CMDIZE_ENGINE=%~2"
+	shift
+	goto :cmdize.loop.continue
+)
 
 if not exist "%~f1" (
 	echo:%~n0: File not found: "%~1">&2
@@ -83,15 +95,30 @@ goto :cmdize.loop.begin
 goto :EOF
 
 
+:: Convert the javascript file. 
+:: The environment variable %CMDIZE_ENGINE% allows to declare another 
+:: engine (cscript, wscript, node etc). 
+:: The default value is cscript.
 :cmdize.js
-echo:@if ^(true == false^) @end /*!
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+set "CMDIZE_ENGINE_OPTS="
+for %%e in ( "%CMDIZE_ENGINE%" ) do (
+	if /i "%%~ne" == "cscript" set "CMDIZE_ENGINE_OPTS=//nologo //e:javascript"
+	if /i "%%~ne" == "wscript" set "CMDIZE_ENGINE_OPTS=//nologo //e:javascript"
+)
+
+echo:0^</*! ::
 echo:@echo off
-echo:"%%windir%%\System32\cscript.exe" //nologo //e:javascript "%%~f0" %%*
-echo:goto :EOF */
+echo:%CMDIZE_ENGINE% %CMDIZE_ENGINE_OPTS% "%%~f0" %%*
+echo:goto :EOF */0;
 type "%~f1"
 goto :EOF
 
 
+:: Convert the vbscript file. 
+:: The environment variable %CMDIZE_ENGINE% allows to declare another 
+:: engine (cscript or wscript). 
+:: The default value is cscript. 
 :cmdize.vbs.h
 set /p "=::'" <nul
 type "%TEMP%\%~n0.$$"
@@ -100,10 +127,12 @@ goto :EOF
 
 
 :cmdize.vbs
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
 
 call :cmdize.vbs.h @echo off
-call :cmdize.vbs.h "%%%%windir%%%%\System32\cscript.exe" //nologo //e:vbscript "%%%%~f0" %%%%*
+call :cmdize.vbs.h %CMDIZE_ENGINE% //nologo //e:vbscript "%%%%~f0" %%%%*
 call :cmdize.vbs.h goto :EOF
 
 del /q "%TEMP%\%~n0.$$"
@@ -126,7 +155,14 @@ for /f "tokens=1,* delims=]" %%r in ( ' call "%windir%\System32\find.exe" /n /v 
 goto :EOF
 
 
+:: Convert the perl file.
 :cmdize.pl
+if /i "%CMDIZE_ENGINE%" == "cmd" (
+	echo:@echo off
+	echo:perl -x -S "%%~dpn0.pl" %%*
+	goto :EOF
+)
+
 echo:@rem = '--*-Perl-*--
 echo:@echo off
 echo:perl -x -S "%%~f0" %%*
@@ -137,6 +173,7 @@ type "%~f1"
 goto :EOF
 
 
+:: Convert the powershell file. 
 :cmdize.ps1
 echo:^<# :
 echo:@echo off
@@ -144,25 +181,34 @@ echo:setlocal
 echo:set "POWERSHELL_BAT_ARGS=%%*"
 echo:if defined POWERSHELL_BAT_ARGS set "POWERSHELL_BAT_ARGS=%%POWERSHELL_BAT_ARGS:"=\"%%"
 echo:endlocal ^& powershell -NoLogo -NoProfile -Command "$_ = $input; Invoke-Expression $( '$input = $_; $_ = \"\"; $args = @( &{ $args } %%POWERSHELL_BAT_ARGS%% );' + [String]::Join( [char]10, $( Get-Content \"%%~f0\" ) ) )"
+echo:rem endlocal ^& powershell -NoLogo -NoProfile -Command "$input | &{ [ScriptBlock]::Create( ( Get-Content \"%%~f0\" ) -join [char]10 ).Invoke( @( &{ $args } %%POWERSHELL_BAT_ARGS%% ) ) }"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
 goto :EOF
 
 
+:: Convert the html file. 
+:: Supportable file extensions are .hta, .htm and .html. 
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
 echo:^<!-- :
 echo:@echo off
-echo:start "" "%%windir%%\System32\mshta.exe" "%%~f0" %%*
+echo:start "" mshta "%%~f0" %%*
 echo:goto :EOF
 echo:--^>
 type "%~f1"
 goto :EOF
 
 
+:: Convert the wsf file. 
+:: The environment variable %CMDIZE_ENGINE% allows to declare another 
+:: engine (cscript or wscript). 
+:: The default value is cscript.
 :cmdize.wsf
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+
 for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
 	rem We use this code to transform the "<?xml?>" declaration 
 	rem located at the very beginning of the file to the "polyglot" 
@@ -170,7 +216,7 @@ for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*"
 	echo:%%a?%%d :
 	echo:: %%e ?^>^<!--
 	echo:@echo off
-	echo:"%%windir%%\System32\cscript.exe" //nologo "%%~f0?.wsf" %%*
+	echo:%CMDIZE_ENGINE% //nologo "%%~f0?.wsf" %%*
 	echo:goto :EOF
 	echo:: --%%c
 	more +1 <"%~f1"

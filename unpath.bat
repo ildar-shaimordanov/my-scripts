@@ -3,7 +3,7 @@
 ::UNPATH [[/S|/L] path] ...
 ::UNPATH PATH
 ::
-::Type UNPATH PATH to clear all search-path settings snd direct cmd.exe to
+::Type UNPATH PATH to clear all search-path settings and direct cmd.exe to
 ::search only in the current directory. It is similar to PATH ;.
 ::
 ::Type UNPATH without parameters to display the current path.
