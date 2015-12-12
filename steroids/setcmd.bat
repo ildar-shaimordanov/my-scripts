@@ -384,4 +384,5 @@ goto :EOF
 :: * https://msdn.microsoft.com/ru-ru/library/windows/desktop/ee872121%28v=vs.85%29.aspx
 :: * http://www.outsidethebox.ms/12669/
 :: * http://www.transl-gunsmoker.ru/2010/09/11.html
+:: * http://habrahabr.ru/post/263105/
 ::
