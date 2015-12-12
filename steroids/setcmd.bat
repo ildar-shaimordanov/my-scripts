@@ -302,9 +302,9 @@ goto :EOF
 :: directory, the command is extended as follows.
 ::
 :: See the following links for details
-:: http://ss64.com/nt/pushd.html
-:: http://ss64.com/nt/popd.html
-:: http://ss64.com/nt/cd.html
+:: * http://ss64.com/nt/pushd.html
+:: * http://ss64.com/nt/popd.html
+:: * http://ss64.com/nt/cd.html
 ::
 :: There is another way how to combine `cd`, `pushd` and `popd`. You can 
 :: find it following by the link:
@@ -379,7 +379,7 @@ goto :EOF
 ::
 :: # ADDITIONAL REFERENCES
 ::
-:: https://msdn.microsoft.com/ru-ru/library/windows/desktop/ee872121%28v=vs.85%29.aspx
-:: http://www.outsidethebox.ms/12669/
-:: http://www.transl-gunsmoker.ru/2010/09/11.html
+:: * https://msdn.microsoft.com/ru-ru/library/windows/desktop/ee872121%28v=vs.85%29.aspx
+:: * http://www.outsidethebox.ms/12669/
+:: * http://www.transl-gunsmoker.ru/2010/09/11.html
 ::
