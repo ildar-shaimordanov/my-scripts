@@ -1,0 +1,51 @@
+
+;==========================================================================
+;=
+;= http://technet.microsoft.com/en-us/library/bb490894.aspx
+;= http://en.wikipedia.org/wiki/DOSKEY
+;= http://ponderingdeveloper.com/2013/05/06/237/
+;= http://ben.versionzero.org/wiki/Doskey_Macros
+;= http://stackoverflow.com/q/4186427/3627676
+;=
+;==========================================================================
+;=
+
+[cmd.exe]
+
+;= "Question mark" shortcuts for echoing environment variables
+;=
+?=if "$1" == "" ( echo:%ERRORLEVEL% ) else ( set $* )
+
+;= Echoing date and time
+;=
+?d=echo:%DATE%
+?t=echo:%TIME%
+?dt=echo:%DATE% %TIME%
+
+;= "Exclamation mark" shortcuts for execution
+;=
+!=start cmd
+
+[powershell.exe]
+
+;= CTRL-D sortcut for exiting
+;=
+=exit
+
+[cscript.exe]
+
+;= CTRL-D sortcut for exiting
+;=
+=exit();
+
+;= "Exclamation mark" for cmd();
+;=
+!=cmd();
+
+;= "Question marks" for alerting
+;=
+?=alert($*);
+??=alert(Object.dump($*));
+
+;==========================================================================
+;=
