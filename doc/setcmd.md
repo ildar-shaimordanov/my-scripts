@@ -163,13 +163,15 @@ navigation between the current directory, previous one and user's home
 directory, the command is extended as follows.
 
 See the following links for details
+
 * http://ss64.com/nt/pushd.html
 * http://ss64.com/nt/popd.html
 * http://ss64.com/nt/cd.html
 
 There is another way how to combine `cd`, `pushd` and `popd`. You can 
 find it following by the link:
-https://www.safaribooksonline.com/library/view/learning-the-bash/1565923472/ch04s05.html
+
+* https://www.safaribooksonline.com/library/view/learning-the-bash/1565923472/ch04s05.html
 
 
 `cd`
