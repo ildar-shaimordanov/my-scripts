@@ -15,7 +15,7 @@ help()
 {
 	cat<<HELP
 Java Helper Batch Script
-Copyright (c) 2007-2009 by Ildar Shaimordanov ildar.shaimordanov^@hp.com
+Copyright (c) 2007-2009 by Ildar Shaimordanov
 
 SYNOPSIS
     J arguments

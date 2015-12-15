@@ -20,7 +20,7 @@ goto START
 
 :HELP
 echo.Java Helper Batch Script
-echo.Copyright ^(c^) 2007-2009 by Ildar Shaimordanov ildar.shaimordanov^@hp.com
+echo.Copyright ^(c^) 2007-2009 by Ildar Shaimordanov
 echo.
 echo.Usage:
 echo.    [CALL] J arguments
