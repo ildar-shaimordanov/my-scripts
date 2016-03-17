@@ -68,11 +68,11 @@ echo:%~1 | "%windir%\system32\findstr.exe" /v ": \ * ? ; /" >nul || (
 	goto :which_arg_continue
 )
 
-for /f "tokens=1,* delims==" %%a in ( ' "%windir%\System32\doskey.exe" /MACROS ' ) do (
-	if /i "%~1" == "%%a" (
-		echo:%%a=%%b
-		if not defined which_all goto :which_arg_continue
-	)
+for /f "tokens=1,* delims==" %%a in ( ' 
+	"%windir%\System32\doskey.exe" /MACROS 
+' ) do if /i "%~1" == "%%a" (
+	echo:%%a=%%b
+	if not defined which_all goto :which_arg_continue
 )
 
 for %%b in ( 
@@ -82,7 +82,7 @@ for %%b in (
 	SETLOCAL SHIFT START TIME TITLE TYPE VER VERIFY VOL 
 ) do if /i "%~1" == "%%~b" (
 	echo:"%~1" is internal
-	goto :which_arg_continue
+	if not defined which_all goto :which_arg_continue
 )
 
 set "which_ext="

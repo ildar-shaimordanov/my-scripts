@@ -42,6 +42,10 @@
 :: http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
 :: http://stackoverflow.com/a/2611487/3627676
 ::
+:: .py
+:: http://stackoverflow.com/a/29881143/3627676
+:: http://stackoverflow.com/a/17468811/3627676
+::
 :: .hta and .html?
 :: http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
 ::
@@ -76,7 +80,7 @@ if not exist "%~f1" (
 	goto :cmdize.loop.continue
 )
 
-for %%x in ( .js .vbs .pl .ps1 .hta .htm .html .wsf ) do (
+for %%x in ( .js .vbs .pl .ps1 .py .hta .htm .html .wsf ) do (
 	if /i "%~x1" == "%%~x" (
 		call :cmdize%%~x "%~1" >"%~dpn1.bat"
 		goto :cmdize.loop.continue
@@ -119,6 +123,9 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another 
 :: engine (cscript or wscript). 
 :: The default value is cscript. 
+:: The next label is duplicated intentionally to avoid error if this 
+:: script was saved in unix mode (EOL=LF).
+:cmdize.vbs.h
 :cmdize.vbs.h
 set /p "=::'" <nul
 type "%TEMP%\%~n0.$$"
@@ -184,6 +191,23 @@ echo:endlocal ^& powershell -NoLogo -NoProfile -Command "$_ = $input; Invoke-Exp
 echo:rem endlocal ^& powershell -NoLogo -NoProfile -Command "$input | &{ [ScriptBlock]::Create( ( Get-Content \"%%~f0\" ) -join [char]10 ).Invoke( @( &{ $args } %%POWERSHELL_BAT_ARGS%% ) ) }"
 echo:goto :EOF
 echo:#^>
+type "%~f1"
+goto :EOF
+
+
+:: Convert the python file.
+:cmdize.py
+:: Ascetic way is shorter but less flexible
+:: Uncomment the following 3 lines if it is more preferrable
+:: echo:@python -x "%%~f0" %%* ^& @goto :EOF
+:: type "%~f1"
+:: goto :EOF
+echo:0^<0# : ^^
+echo:"""
+echo:@echo off
+echo:python "%%~f0" %%*
+echo:goto :EOF
+echo:"""
 type "%~f1"
 goto :EOF
 
