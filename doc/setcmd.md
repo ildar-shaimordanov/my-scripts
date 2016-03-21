@@ -29,6 +29,13 @@ variable.
 Define the name of the file of aliases or `DOSKEY` macros. 
 
 
+`CMD_ALIAS_DISABLEBUILTINS`
+
+Any non-empty value disables setting of builtin aliases at startup. 
+This variable can be set in `setcmd.rc.bat` script located next to 
+`setcmd.bat`.
+
+
 `CMD_HISTFILE`
 
 Define the name of the file in which command history is saved. 
@@ -158,7 +165,7 @@ Write the current history to the file `CMD_HISTFILE` if it is defined.
 
 Change the current directory can be performed by the following commands 
 `CD` or `CHDIR`. To change both current directory and drive the option 
-'/D' is required. To avoid certain typing of the option and simplify 
+`/D` is required. To avoid certain typing of the option and simplify 
 navigation between the current directory, previous one and user's home 
 directory, the command is extended as follows.
 
