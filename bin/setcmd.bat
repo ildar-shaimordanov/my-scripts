@@ -18,8 +18,8 @@ if /i "%~1" == "help" (
 	findstr /b "::" "%~f0"
 	goto :EOF
 )
-if /i "%~1" == "aliases" (
-	call :cmd.aliases.readfile "%~2"
+if /i "%~1" == "alias.readfile" (
+	call :cmd.alias.readfile "%~2"
 	goto :EOF
 )
 if /i "%~1" == "history" (
@@ -39,6 +39,8 @@ if not "%~1" == "" (
 	goto :EOF
 )
 
+if exist "%~dpn0.rc.bat" call "%~dpn0.rc.bat"
+
 ::
 :: # ENVIRONMENT VARIABLES
 ::
@@ -55,6 +57,13 @@ if not "%~1" == "" (
 :: Define the name of the file of aliases or `DOSKEY` macros. 
 ::
 if not defined CMD_ALIASFILE set "CMD_ALIASFILE=%~dpn0.aliases"
+::
+:: `CMD_ALIAS_DISABLEBUILTINS`
+::
+:: Any non-empty value disables setting of builtin aliases at startup. 
+:: This variable can be set in `setcmd.rc.bat` script located next to 
+:: `setcmd.bat`.
+::
 ::
 :: `CMD_HISTFILE`
 ::
@@ -93,15 +102,13 @@ rem if not defined CMD_HISTCONTROL set "CMD_HISTCONTROL="
 ::
 rem if not defined CMD_HISTIGNORE set "CMD_HISTIGNORE="
 
-call :cmd.aliases.builtins
-if exist "%CMD_ALIASFILE%" call :cmd.aliases.readfile "%CMD_ALIASFILE%"
-
-if exist "%~dpn0.rc.bat" call "%~dpn0.rc.bat"
+if not defined CMD_ALIAS_DISABLEBUILTINS call :cmd.alias.builtins
+if exist "%CMD_ALIASFILE%" call :cmd.alias.readfile "%CMD_ALIASFILE%"
 
 goto :EOF
 
 
-:cmd.aliases.builtins
+:cmd.alias.builtins
 ::
 :: # ALIASES
 ::
@@ -120,7 +127,7 @@ goto :EOF
 ::
 :: Read aliases from the specified file or `CMD_ALIASFILE`.
 ::
-doskey alias=if "$1" == "" ( doskey /macros ) else if "$1" == "-r" ( "%~f0" aliases "$2" ) else ( doskey $* )
+doskey alias=if "$1" == "" ( doskey /macros ) else if "$1" == "-r" ( "%~f0" alias.readfile "$2" ) else ( doskey $* )
 ::
 :: `unalias name`
 ::
@@ -168,7 +175,7 @@ goto :EOF
 :: form `name=command` and can be loaded to the session by the prefedined 
 :: alias `alias -r`.
 ::
-:cmd.aliases.readfile
+:cmd.alias.readfile
 setlocal
 
 if not "%~1" == "" set "CMD_ALIASFILE=%~1"
@@ -297,7 +304,7 @@ goto :EOF
 ::
 :: Change the current directory can be performed by the following commands 
 :: `CD` or `CHDIR`. To change both current directory and drive the option 
-:: '/D' is required. To avoid certain typing of the option and simplify 
+:: `/D` is required. To avoid certain typing of the option and simplify 
 :: navigation between the current directory, previous one and user's home 
 :: directory, the command is extended as follows.
 ::
