@@ -58,18 +58,19 @@ if exist "%~dpn0.rc.bat" call "%~dpn0.rc.bat"
 ::
 if not defined CMD_ALIASFILE set "CMD_ALIASFILE=%~dpn0.aliases"
 ::
-:: `CMD_ALIAS_DISABLEBUILTINS`
+:: `CMD_ALIAS_NOBUILTINS`
 ::
 :: Any non-empty value disables setting of builtin aliases at startup. 
 :: This variable can be set in `setcmd.rc.bat` script located next to 
 :: `setcmd.bat`.
 ::
+rem if not defined CMD_ALIAS_NOBUILTINS set "CMD_ALIAS_NOBUILTINS=1"
 ::
 :: `CMD_HISTFILE`
 ::
 :: Define the name of the file in which command history is saved. 
 ::
-if not defined CMD_HISTFILE set "CMD_HISTFILE=%~dpn0.history"
+rem if not defined CMD_HISTFILE set "CMD_HISTFILE=%~dpn0.history"
 ::
 :: `CMD_HISTFILESIZE`
 ::
@@ -102,7 +103,7 @@ rem if not defined CMD_HISTCONTROL set "CMD_HISTCONTROL="
 ::
 rem if not defined CMD_HISTIGNORE set "CMD_HISTIGNORE="
 
-if not defined CMD_ALIAS_DISABLEBUILTINS call :cmd.alias.builtins
+if not defined CMD_ALIAS_NOBUILTINS call :cmd.alias.builtins
 if exist "%CMD_ALIASFILE%" call :cmd.alias.readfile "%CMD_ALIASFILE%"
 
 goto :EOF
