@@ -14,32 +14,49 @@
 ::
 @echo off
 
-if /i "%~1" == "help" (
-	findstr /b "::" "%~f0"
+for %%1 in (
+
+	"help"
+	"alias.readfile"
+	"history"
+	"cd"
+	"autorun"
+
+) do if /i "%~1" == "%%~1" (
+	call :cmd.%*
 	goto :EOF
 )
-if /i "%~1" == "alias.readfile" (
-	call :cmd.alias.readfile "%~2"
-	goto :EOF
-)
-if /i "%~1" == "history" (
-	call :cmd.history "%~2"
-	goto :EOF
-)
-if /i "%~1" == "cd" (
-	call :cmd.cd "%~2"
-	goto :EOF
-)
-if /i "%~1" == "autorun" (
-	call :cmd.autorun "%~2"
-	goto :EOF
-)
+
 if not "%~1" == "" (
 	>&2 echo:Unknown command "%~1".
 	goto :EOF
 )
 
+
+::
+:: # USER DEFINED FILE
+::
+::
+:: The user defined file `setcmd.rc.bat` allows to customize the user's 
+:: environment. Firstly, it is checked for existance in the same directory 
+:: where `setcmd.bat` is located, further it is checked under the `HOME` 
+:: directory and finally under the user's profile. If these files exist 
+:: they are called and affects on the further execution. Each of them can 
+:: override previous settings. 
+::
+:: This behavior is very close to the existing in unix world when settings 
+:: of `~/.bashrc` override settings of `/etc/bashrc`. 
+::
+:: The `CMD_SETCMDDIR` environment variable points to the directory where 
+:: the main script `setcmd.bat` is located. It can be used, if some 
+:: settings are placed under this directory. 
+::
+for /f "tokens=*" %%f in ( "%~dp0." ) do set "CMD_SETCMDDIR=%%~ff"
+
 if exist "%~dpn0.rc.bat" call "%~dpn0.rc.bat"
+if exist "%HOME%\%~n0.rc.bat" call "%HOME%\%~n0.rc.bat"
+if exist "%USERPROFILE%\%~n0.rc.bat" call "%USERPROFILE%\%~n0.rc.bat"
+
 
 ::
 :: # ENVIRONMENT VARIABLES
@@ -49,7 +66,8 @@ if exist "%~dpn0.rc.bat" call "%~dpn0.rc.bat"
 :: below. Most of them have synonyms in unix and the same meaning. 
 ::
 :: Uncomment a line if you want to turn on a feature supported by a 
-:: variable. 
+:: variable. The better place for tuning all these variables is auxiliary 
+:: `setcmd.rc.bat` script (see the description above). 
 ::
 ::
 :: `CMD_ALIASFILE`
@@ -61,8 +79,6 @@ if not defined CMD_ALIASFILE set "CMD_ALIASFILE=%~dpn0.aliases"
 :: `CMD_ALIAS_NOBUILTINS`
 ::
 :: Any non-empty value disables setting of builtin aliases at startup. 
-:: This variable can be set in `setcmd.rc.bat` script located next to 
-:: `setcmd.bat`.
 ::
 rem if not defined CMD_ALIAS_NOBUILTINS set "CMD_ALIAS_NOBUILTINS=1"
 ::
@@ -109,6 +125,13 @@ if exist "%CMD_ALIASFILE%" call :cmd.alias.readfile "%CMD_ALIASFILE%"
 goto :EOF
 
 
+:cmd.help
+for /f "tokens=* delims=: " %%s in ( ' 
+	findstr /b "::" "%~f0" 
+' ) do echo:%%~s
+goto :EOF
+
+
 :cmd.alias.builtins
 ::
 :: # ALIASES
@@ -128,7 +151,9 @@ goto :EOF
 ::
 :: Read aliases from the specified file or `CMD_ALIASFILE`.
 ::
-doskey alias=if "$1" == "" ( doskey /macros ) else if "$1" == "-r" ( "%~f0" alias.readfile "$2" ) else ( doskey $* )
+doskey alias=^
+if "$1" == "" ( doskey /macros ) else ^
+if "$1" == "-r" ( "%~f0" alias.readfile "$2" ) else ( doskey $* )
 ::
 :: `unalias name`
 ::

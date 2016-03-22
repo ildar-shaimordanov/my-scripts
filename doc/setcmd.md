@@ -1,4 +1,3 @@
-_This page tells about `setcmd` script introducing more usability and flexibility to Windows batch script._
 
 The tool was developed to enhance the functionality of `cmd.exe` 
 similar to Unix-like shells. It is completely written as batch script 
@@ -14,6 +13,24 @@ installation. The better way is to use the other solutions like
 `Clink`, `ConEmu` or something else. 
 
 
+# USER DEFINED FILE
+
+
+The user defined file `setcmd.rc.bat` allows to customize the user's 
+environment. Firstly, it is checked for existance in the same directory 
+where `setcmd.bat` is located, further it is checked under the `HOME` 
+directory and finally under the user's profile. If these files exist 
+they are called and affects on the further execution. Each of them can 
+override previous settings. 
+
+This behavior is very close to the existing in unix world when settings 
+of `~/.bashrc` override settings of `/etc/bashrc`. 
+
+The `CMD_SETCMDDIR` environment variable points to the directory where 
+the main script `setcmd.bat` is located. It can be used, if some 
+settings are placed under this directory. 
+
+
 # ENVIRONMENT VARIABLES
 
 
@@ -21,7 +38,8 @@ Behaviour of the script depends on some environment variables described
 below. Most of them have synonyms in unix and the same meaning. 
 
 Uncomment a line if you want to turn on a feature supported by a 
-variable. 
+variable. The better place for tuning all these variables is auxiliary 
+`setcmd.rc.bat` script (see the description above). 
 
 
 `CMD_ALIASFILE`
@@ -29,11 +47,9 @@ variable.
 Define the name of the file of aliases or `DOSKEY` macros. 
 
 
-`CMD_ALIAS_DISABLEBUILTINS`
+`CMD_ALIAS_NOBUILTINS`
 
 Any non-empty value disables setting of builtin aliases at startup. 
-This variable can be set in `setcmd.rc.bat` script located next to 
-`setcmd.bat`.
 
 
 `CMD_HISTFILE`
