@@ -78,6 +78,8 @@ set "sandbox-install="
 set "sandbox-persistent="
 set "sandbox-readonly="
 
+set "sandbox-reg-device=HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices"
+
 set "sandbox-error="
 
 :: ========================================================================
@@ -145,12 +147,11 @@ call :sandbox-mkdir-hier "%sandbox-mandatory-dirs:;=" "%" || exit /b 1
 call :sandbox-log "Install mandatory files"
 call :sandbox-write-files "%~f0" || exit /b 1
 
-set "sandbox-reg-device=HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices"
-
 if defined sandbox-persistent (
 	call :sandbox-log "Create the Registry entry"
-	call :sandbox-log "%sandbox-reg-device%\%sandbox-disk%"
-	reg add "%sandbox-reg-device%" /v "%sandbox-disk%" /t REG_SZ /d "\??\%sandbox-path%"
+	call :sandbox-log "[%sandbox-reg-device%]"
+	call :sandbox-log "%sandbox-disk% = %sandbox-path%"
+	reg add "%sandbox-reg-device%" /v "%sandbox-disk%" /t REG_SZ /d "\??\%sandbox-path%" /f
 )
 
 echo:
