@@ -20,6 +20,7 @@
 ::
 :: Version 0.5 Beta
 :: Improve handling empty options.
+:: Added generating of the file etc\sandbox-installed.log.
 ::
 :: Version 0.4 Beta
 :: Improve installation of mandatory files.
@@ -485,6 +486,38 @@ if "%~1" == "status" (
 endlocal
 goto :EOF
 ::FILE-END
+
+
+::FILE-BEGIN etc\sandbox-installed.log
+:: This file is part of UNIX FS SANDBOX
+::
+:: It was generated automatically while installing sandbox
+
+::FILE-CALL call :sandbox-install-log-reg
+::FILE-CALL call :sandbox-install-log-dirs
+::FILE-CALL call :sandbox-install-log-files
+::FILE-END
+
+:sandbox-install-log-reg
+if defined sandbox-persistent echo:REGISTRY %sandbox-disk% %sandbox-reg-device%
+goto :EOF
+
+:sandbox-install-log-dirs
+for %%f in ( 
+	"%sandbox-dirs:;=" "%" 
+	"%sandbox-mandatory-dirs:;=" "%" 
+) do if not "%%~f" == "" (
+	echo:DIR %%~f
+)
+goto :EOF
+
+:sandbox-install-log-files
+for /f "tokens=1,*" %%a in ( '
+	findstr /b "::FILE-BEGIN" "%~f0"
+' ) do (
+	echo:FILE %%~b
+)
+goto :EOF
 
 
 ::FILE-BEGIN etc\rc.d\rc.pause
