@@ -426,6 +426,7 @@ set "rc-list=%rc-list%;%~1"
 goto :EOF
 ::FILE-END
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\init.d\vdisk.bat
 :: This file is part of UNIX FS SANDBOX
@@ -487,6 +488,7 @@ endlocal
 goto :EOF
 ::FILE-END
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\sandbox-installed.log
 :: This file is part of UNIX FS SANDBOX
@@ -519,6 +521,7 @@ for /f "tokens=1,*" %%a in ( '
 )
 goto :EOF
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\rc.d\rc.pause
 ## This file is part of UNIX FS SANDBOX
@@ -526,6 +529,7 @@ goto :EOF
 # To escape pausing, remove this file
 ::FILE-END
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\rc.d\rc.list
 ## This file is part of UNIX FS SANDBOX
@@ -543,6 +547,7 @@ goto :EOF
 vdisk
 ::FILE-END
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\rc.d\rc.start
 ## This file is part of UNIX FS SANDBOX
@@ -553,6 +558,7 @@ vdisk
 vdisk
 ::FILE-END
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\rc.d\rc.stop
 ## This file is part of UNIX FS SANDBOX
@@ -563,6 +569,7 @@ vdisk
 vdisk
 ::FILE-END
 
+:: ========================================================================
 
 ::FILE-BEGIN etc\sandbox-release
 ## This file is part of UNIX FS SANDBOX
