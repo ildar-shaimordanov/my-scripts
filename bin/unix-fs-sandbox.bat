@@ -139,7 +139,7 @@ exit /b 0
 
 :: ========================================================================
 
-:sandbox-print-option
+:sandbox-print-settings-option
 set /p "=%~1 = " < nul
 if     defined %~2 echo:Yes
 if not defined %~2 echo:No
@@ -155,8 +155,8 @@ echo:Path  = %sandbox-path%
 echo:
 
 echo:Options
-call :sandbox-print-option "Persistent Drive" "sandbox-persistent"
-call :sandbox-print-option "Read-Only Mode  " "sandbox-readonly"
+call :sandbox-print-settings-option "Persistent Drive" "sandbox-persistent"
+call :sandbox-print-settings-option "Read-Only Mode  " "sandbox-readonly"
 echo:
 
 echo:File system hierarchy
