@@ -59,7 +59,7 @@
 
 setlocal
 
-set "sandbox-version=0.2 Beta"
+set "sandbox-version=0.3 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -82,7 +82,7 @@ if defined sandbox-error (
 	exit /b 1
 )
 
-:: --help or --version
+:: --help or --version provided
 if errorlevel 1 exit /b 0
 
 :: Validate disk name
