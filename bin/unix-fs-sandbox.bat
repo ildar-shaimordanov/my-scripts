@@ -139,71 +139,6 @@ exit /b 0
 
 :: ========================================================================
 
-:sandbox-print-settings-option
-set /p "=%~1 = " < nul
-if     defined %~2 echo:Yes
-if not defined %~2 echo:No
-goto :EOF
-
-:sandbox-print-settings
-echo:Settings for installation ^(with "--install" option^)
-echo:
-
-echo:Name  = %sandbox-name%
-echo:Drive = %sandbox-disk%
-echo:Path  = %sandbox-path%
-echo:
-
-echo:Options
-call :sandbox-print-settings-option "Persistent Drive" "sandbox-persistent"
-call :sandbox-print-settings-option "Read-Only Mode  " "sandbox-readonly"
-echo:
-
-echo:File system hierarchy
-for %%f in ( "%sandbox-dirs:;=" "%" ) do (
-	echo:    %sandbox-path%\%%~f
-)
-
-goto :EOF
-
-:: ========================================================================
-
-:sandbox-mkdir
-echo:Make dir: "%~1"
-md "%~1"
-dir /ad "%~1" >nul 2>nul
-goto :EOF
-
-:sandbox-mkdir-hier
-for %%f in ( %* ) do if not "%%~f" == "" (
-	call :sandbox-mkdir "%sandbox-path%\%%~f" || exit /b 1
-)
-goto :EOF
-
-:: ========================================================================
-
-:sandbox-write-file-static
-for /f "tokens=1,* delims= " %%a in ( '
-	findstr /l /b "::%~1" "%~f0" 
-' ) do (
-	echo:%%~b
-)
-goto :EOF
-
-:sandbox-write-file-release
-call :sandbox-write-file-static "%~1"
-echo:%sandbox-disk%;%sandbox-path%;%sandbox-name%
-goto :EOF
-
-:sandbox-write-file
-echo:Write file: "%sandbox-path%\%~2"
-call :sandbox-write-file-%~1 "%~2" > "%sandbox-path%\%~2"
-if errorlevel 1 exit /b 1
-if defined sandbox-readonly attrib +r "%sandbox-path%\%~2"
-goto :EOF
-
-:: ========================================================================
-
 :sandbox-parse-opts
 
 :sandbox-parse-opts-start
@@ -272,6 +207,71 @@ goto :EOF
 :sandbox-error
 >&2 echo:%~n0: %~1
 >&2 echo:Try "%~n0 --help" for details.
+goto :EOF
+
+:: ========================================================================
+
+:sandbox-print-settings-option
+set /p "=%~1 = " < nul
+if     defined %~2 echo:Yes
+if not defined %~2 echo:No
+goto :EOF
+
+:sandbox-print-settings
+echo:Settings for installation ^(with "--install" option^)
+echo:
+
+echo:Name  = %sandbox-name%
+echo:Drive = %sandbox-disk%
+echo:Path  = %sandbox-path%
+echo:
+
+echo:Options
+call :sandbox-print-settings-option "Persistent Drive" "sandbox-persistent"
+call :sandbox-print-settings-option "Read-Only Mode  " "sandbox-readonly"
+echo:
+
+echo:File system hierarchy
+for %%f in ( "%sandbox-dirs:;=" "%" ) do (
+	echo:    %sandbox-path%\%%~f
+)
+
+goto :EOF
+
+:: ========================================================================
+
+:sandbox-mkdir
+echo:Make dir: "%~1"
+md "%~1"
+dir /ad "%~1" >nul 2>nul
+goto :EOF
+
+:sandbox-mkdir-hier
+for %%f in ( %* ) do if not "%%~f" == "" (
+	call :sandbox-mkdir "%sandbox-path%\%%~f" || exit /b 1
+)
+goto :EOF
+
+:: ========================================================================
+
+:sandbox-write-file-static
+for /f "tokens=1,* delims= " %%a in ( '
+	findstr /l /b "::%~1" "%~f0" 
+' ) do (
+	echo:%%~b
+)
+goto :EOF
+
+:sandbox-write-file-release
+call :sandbox-write-file-static "%~1"
+echo:%sandbox-disk%;%sandbox-path%;%sandbox-name%
+goto :EOF
+
+:sandbox-write-file
+echo:Write file: "%sandbox-path%\%~2"
+call :sandbox-write-file-%~1 "%~2" > "%sandbox-path%\%~2"
+if errorlevel 1 exit /b 1
+if defined sandbox-readonly attrib +r "%sandbox-path%\%~2"
 goto :EOF
 
 :: ========================================================================
