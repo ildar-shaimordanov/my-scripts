@@ -18,6 +18,9 @@
 ::
 :: 2016
 ::
+:: Version 0.5 Beta
+:: Improve handling empty options.
+::
 :: Version 0.4 Beta
 :: Improve installation of mandatory files.
 :: Improve logging.
@@ -63,7 +66,7 @@
 
 setlocal
 
-set "sandbox-version=0.4 Beta"
+set "sandbox-version=0.5 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -89,6 +92,21 @@ if defined sandbox-error (
 
 :: --help or --version provided
 if errorlevel 1 exit /b 0
+
+if not defined sandbox-disk (
+	call :sandbox-error "Empty disk is not allowed"
+	exit /b 1
+)
+
+if not defined sandbox-path (
+	call :sandbox-error "Empty path is not allowed"
+	exit /b 1
+)
+
+if not defined sandbox-dirs (
+	call :sandbox-error "Empty dir list is not allowed"
+	exit /b 1
+)
 
 :: Validate disk name
 for %%f in ( "%sandbox-disk%\." ) do if not "%%~dpf" == "%%~ff" (
