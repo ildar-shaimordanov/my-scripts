@@ -18,6 +18,10 @@
 ::
 :: 2016
 ::
+:: Version 0.4 Beta
+:: Improve installation of mandatory files.
+:: Improve logging.
+::
 :: Version 0.3 Beta
 :: Rework installation of mandatory files.
 ::
@@ -59,7 +63,7 @@
 
 setlocal
 
-set "sandbox-version=0.3 Beta"
+set "sandbox-version=0.4 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -70,6 +74,7 @@ set "sandbox-mandatory-dirs=etc\rc.d;etc\init.d"
 set "sandbox-install="
 set "sandbox-persistent="
 set "sandbox-readonly="
+
 set "sandbox-error="
 
 :: ========================================================================
@@ -102,25 +107,31 @@ if not defined sandbox-install (
 	exit /b 0
 )
 
-:: ========================================================================
+echo:======================================================================
+echo:
+echo:Starting:
+echo:%~n0 %*
+echo:
+echo:======================================================================
+echo:
 
-echo:Create sandbox "%sandbox-path%"
+call :sandbox-log "Create sandbox: %sandbox-name%"
 call :sandbox-mkdir "%sandbox-path%" || exit /b 1
 
-echo:Create UNIX filesystem hierarchy
+call :sandbox-log "Create UNIX filesystem hierarchy"
 call :sandbox-mkdir-hier "%sandbox-dirs:;=" "%" || exit /b 1
 
-echo:Create mandatory directories
+call :sandbox-log "Create mandatory directories"
 call :sandbox-mkdir-hier "%sandbox-mandatory-dirs:;=" "%" || exit /b 1
 
-echo:Install mandatory files
+call :sandbox-log "Install mandatory files"
 call :sandbox-write-files "%~f0" || exit /b 1
 
 set "sandbox-reg-device=HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices"
 
 if defined sandbox-persistent (
-	echo:Create the Registry entry
-	echo:%sandbox-reg-device%\%sandbox-disk%
+	call :sandbox-log "Create the Registry entry"
+	call :sandbox-log "%sandbox-reg-device%\%sandbox-disk%"
 	reg add "%sandbox-reg-device%" /v "%sandbox-disk%" /t REG_SZ /d "\??\%sandbox-path%"
 )
 
@@ -210,6 +221,10 @@ goto :EOF
 >&2 echo:Try "%~n0 --help" for details.
 goto :EOF
 
+:sandbox-log
+echo:%DATE% %TIME%: %~1
+goto :EOF
+
 :: ========================================================================
 
 :sandbox-print-settings-option
@@ -242,7 +257,7 @@ goto :EOF
 :: ========================================================================
 
 :sandbox-mkdir
-echo:Make dir: "%~1"
+call :sandbox-log "Make dir: %~1"
 md "%~1"
 dir /ad "%~1" >nul 2>nul
 goto :EOF
@@ -266,11 +281,9 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	"LINE %%~s" 
 ) do if "%%~b" == "::FILE-BEGIN" (
 	set "sandbox-filename=%sandbox-path%\%%~c"
-	echo:Write file: !sandbox-filename!
-	(
-		for /f "tokens=*" %%f in ( "!sandbox-filename!" ) do if not exist "%%~dpf" md "%%~dpf"
-		type nul > "!sandbox-filename!"
-	) || exit /b 1
+	call :sandbox-log "Write file: !sandbox-filename!"
+	for /f "tokens=*" %%f in ( "!sandbox-filename!" ) do call :sandbox-mkdir "%%~dpf" || exit /b 1
+	type nul > "!sandbox-filename!" || exit /b 1
 ) else if "%%~b" == "::FILE-END" (
 	if defined sandbox-readonly attrib +r "!sandbox-filename!"
 	set "sandbox-filename="
