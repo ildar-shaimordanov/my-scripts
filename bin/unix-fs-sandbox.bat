@@ -276,6 +276,14 @@ goto :EOF
 
 :: ========================================================================
 
+:: The following part of the file represents the contents of files that 
+:: will be installed as the part of the sandbox. The beginning of each 
+:: file is marked with "::FILE-BEGIN filename" and the end of the file is 
+:: marked with "::FILE-END". 
+
+:: ========================================================================
+
+::FILE-BEGIN etc\rc.bat
 ::etc\rc.bat :: This file is part of UNIX FS SANDBOX
 ::etc\rc.bat @echo off
 ::etc\rc.bat
@@ -366,8 +374,10 @@ goto :EOF
 ::etc\rc.bat :rc-list-append
 ::etc\rc.bat set "rc-list=%rc-list%;%~1"
 ::etc\rc.bat goto :EOF
+::FILE-END
 
 
+::FILE-BEGIN etc\init.d\vdisk.bat
 ::etc\init.d\vdisk.bat :: This file is part of UNIX FS SANDBOX
 ::etc\init.d\vdisk.bat @echo off
 ::etc\init.d\vdisk.bat
@@ -425,13 +435,17 @@ goto :EOF
 ::etc\init.d\vdisk.bat :EOS
 ::etc\init.d\vdisk.bat endlocal
 ::etc\init.d\vdisk.bat goto :EOF
+::FILE-END
 
 
+::FILE-BEGIN etc\rc.d\rc.pause
 ::etc\rc.d\rc.pause # This file is part of UNIX FS SANDBOX
 ::etc\rc.d\rc.pause #
 ::etc\rc.d\rc.pause # To escape pausing, remove this file
+::FILE-END
 
 
+::FILE-BEGIN etc\rc.d\rc.list
 ::etc\rc.d\rc.list # This file is part of UNIX FS SANDBOX
 ::etc\rc.d\rc.list #
 ::etc\rc.d\rc.list # There is list of names of scripts from the directory "etc/init.d" to be 
@@ -445,24 +459,30 @@ goto :EOF
 ::etc\rc.d\rc.list # -- "etc/rc.d/rc.start" for starting
 ::etc\rc.d\rc.list # -- "etc/rc.d/rc.stop" for stopping
 ::etc\rc.d\rc.list vdisk
+::FILE-END
 
 
+::FILE-BEGIN etc\rc.d\rc.start
 ::etc\rc.d\rc.start # This file is part of UNIX FS SANDBOX
 ::etc\rc.d\rc.start #
 ::etc\rc.d\rc.start # There is list of names of scripts from the directory "etc/init.d" to be 
 ::etc\rc.d\rc.start # executed while starting the sandbox. One name is per one line. The order 
 ::etc\rc.d\rc.start # of names corresponds to the order of their execution.
 ::etc\rc.d\rc.start vdisk
+::FILE-END
 
 
+::FILE-BEGIN etc\rc.d\rc.stop
 ::etc\rc.d\rc.stop # This file is part of UNIX FS SANDBOX
 ::etc\rc.d\rc.stop #
 ::etc\rc.d\rc.stop # There is list of names of scripts from the directory "etc/init.d" to be 
 ::etc\rc.d\rc.stop # executed while stopping the sandbox. One name is per one line. The order 
 ::etc\rc.d\rc.stop # of names corresponds to the order of their execution.
 ::etc\rc.d\rc.stop vdisk
+::FILE-END
 
 
+::FILE-BEGIN etc\sandbox-release
 ::etc\sandbox-release # This file is part of UNIX FS SANDBOX
 ::etc\sandbox-release #
 ::etc\sandbox-release # This file contains the detailedd information regarding the current 
@@ -470,6 +490,7 @@ goto :EOF
 ::etc\sandbox-release # -- the virtual drive to which a path will be assigned;
 ::etc\sandbox-release # -- the directory where the sandbox is installed;
 ::etc\sandbox-release # -- the sandbox name.
+::FILE-END
 
 :: ========================================================================
 
