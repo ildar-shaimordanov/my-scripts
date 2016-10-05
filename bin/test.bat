@@ -241,12 +241,12 @@ if "!if_opt1!" == "-attr" (
 ::     True if FILE is listed in the PATH environment variable.
 if "!if_opt1!" == "-path" (
 	set "if_file=%~2"
-	for %%f in ( "!if_file!" ) do if "%%~$PATH:f" == "" (
+	for %%f in ( "!if_file!" ) do if not "%%~$PATH:f" == "" (
 		endlocal
-		exit /b 1
+		exit /b 0
 	)
 	endlocal
-	exit /b 0
+	exit /b 1
 )
 
 
