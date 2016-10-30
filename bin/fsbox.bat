@@ -315,8 +315,8 @@ set "pie-comment="
 
 for /f "delims=] tokens=1,*" %%r in ( '
 	find /n /v "" "%~f2" 
-' ) do for /f "tokens=1,2,* delims=]	 " %%a in (
-	"LINE]%%s"
+' ) do for /f "tokens=1,2,*" %%a in (
+	"LINE %%s"
 ) do if not defined pie-enabled (
 	if "%%b %%~c" == "::PIE-BEGIN %~1" set "pie-enabled=1"
 ) else if "%%b" == "::PIE-SETFILE" (
