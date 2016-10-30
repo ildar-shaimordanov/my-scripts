@@ -1,73 +1,96 @@
-::HELP Create sandbox for UNIX like filesystem structure
-::HELP
-::HELP -p PATH       set a directory where the sandbox will be installed
-::HELP -d DISK       set a virtual drive to which a path will be assigned
-::HELP -n NAME       set a name of the sandbox
-::HELP -f DIRS       set a list of directories whcih will be created
-::HELP
-::HELP --install     start installation
-::HELP --persistent  install persistent virtual drive
-::HELP --readonly    set read only attribute over all installed files
-::HELP
-::HELP --help        display this help and exit
-::HELP --version     display version information and exit
-
-:: ========================================================================
-
-:: RELEASE NOTES
-::
-:: 2016
-::
-:: Version 0.5 Beta
-:: Improve handling empty options.
-:: Added generating of the file etc\sandbox-installed.log.
-::
-:: Version 0.4 Beta
-:: Improve installation of mandatory files.
-:: Improve logging.
-::
-:: Version 0.3 Beta
-:: Rework installation of mandatory files.
-::
-:: Version 0.2 Beta
-:: It is implemented as the command line tool.
-::
-::
-:: 2009-2010
-::
-:: Initially it was GUI tool named "unix-sandbox-in-windows_install.hta" 
-:: developed as the part of the another project "jsxt" hosted on GitHub 
-:: https://github.com/ildar-shaimordanov/jsxt 
-:: (former https://code.google.com/p/jsxt).
-::
-:: The latest changes was done in the commit 976a98f. 
-::
-::
-:: 2008
-::
-:: Most probably first release.
-:: No information, if it was published at all.
-
-:: ========================================================================
-
-:: TODO
-::
-:: -- uninstalling feature
-::
-:: -- drive icon / label
-::    http://www.sevenforums.com/tutorials/65828-drive-icon-change.html
-::    http://www.sevenforums.com/tutorials/66118-drive-rename.html
-::
-:: -- options for creating user-specific or system-wide shortcuts to
-::    Desktop, Start Menu
-
-:: ========================================================================
-
 @echo off
+
+goto :sandbox-main
+
+:: ========================================================================
+
+::PIE-BEGIN	VERSION
+::PIE-ECHO	%~n0 %sandbox-version%
+::PIE-END	STOP
+
+:: ========================================================================
+
+::PIE-BEGIN	HELP
+::PIE-ECHO	Usage: %~n0 OPTIONS
+
+Create sandbox for UNIX like filesystem structure
+
+-p PATH       set a directory where the sandbox will be installed
+-d DISK       set a virtual drive to which a path will be assigned
+-n NAME       set a name of the sandbox
+-f DIRS       set a list of directories whcih will be created
+
+--install     start installation
+--persistent  install persistent virtual drive
+--readonly    set read only attribute over all installed files
+
+--help        display this help and exit
+--version     display version information and exit
+::PIE-END	STOP
+
+:: ========================================================================
+
+::PIE-BEGIN	RELEASE-NOTES
+RELEASE NOTES
+
+2016
+
+Version 0.6 beta
+Introduce PIE (the Plain, Impressive and Executable documentation format).
+
+Version 0.5 Beta
+Improve handling empty options.
+Added generating of the file etc\sandbox-installed.log.
+
+Version 0.4 Beta
+Improve installation of mandatory files.
+Improve logging.
+
+Version 0.3 Beta
+Rework installation of mandatory files.
+
+Version 0.2 Beta
+It is implemented as the command line tool.
+
+
+2009-2010
+
+Initially it was GUI tool named "unix-sandbox-in-windows_install.hta" 
+developed as the part of the another project "jsxt" hosted on GitHub 
+https://github.com/ildar-shaimordanov/jsxt 
+(former https://code.google.com/p/jsxt).
+
+The latest changes was done in the commit 976a98f. 
+
+
+2008
+
+Most probably first release.
+No information, if it was published at all.
+::PIE-END	STOP
+
+:: ========================================================================
+
+::PIE-BEGIN	TODO
+TODO
+
+-- uninstalling feature
+
+-- drive icon / label
+   http://www.sevenforums.com/tutorials/65828-drive-icon-change.html
+   http://www.sevenforums.com/tutorials/66118-drive-rename.html
+
+-- options for creating user-specific or system-wide shortcuts to
+   Desktop, Start Menu
+::PIE-END	STOP
+
+:: ========================================================================
+
+:sandbox-main
 
 setlocal
 
-set "sandbox-version=0.5 Beta"
+set "sandbox-version=0.6 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -146,7 +169,7 @@ call :sandbox-log "Create mandatory directories"
 call :sandbox-mkdir-hier "%sandbox-mandatory-dirs:;=" "%" || exit /b 1
 
 call :sandbox-log "Install mandatory files"
-call :sandbox-write-files "%~f0" || exit /b 1
+call :pie "WRITE-FILES" "%~f0" || exit /b 1
 
 if defined sandbox-persistent (
 	call :sandbox-log "Create the Registry entry"
@@ -177,12 +200,12 @@ exit /b 0
 if "%~1" == "" goto :sandbox-parse-opts-end
 
 if "%~1" == "--help" (
-	call :sandbox-help
+	call :pie HELP "%~f0"
 	exit /b 1
 )
 
 if "%~1" == "--version" (
-	call :sandbox-version
+	call :pie VERSION "%~f0"
 	exit /b 1
 )
 
@@ -222,19 +245,6 @@ goto :sandbox-parse-opts-start
 goto :EOF
 
 :: ========================================================================
-
-:sandbox-help
-echo:Usage: %~n0 OPTIONS
-for /f "tokens=1,* delims= " %%a in ( '
-	findstr /b "::HELP" "%~f0"
-' ) do (
-	echo:%%~b
-)
-goto :EOF
-
-:sandbox-version
-echo:%~n0 %sandbox-version%
-goto :EOF
 
 :sandbox-error
 >&2 echo:%~n0: %~1
@@ -276,6 +286,11 @@ goto :EOF
 
 :: ========================================================================
 
+:sandbox-log-writefile
+for /f "tokens=*" %%f in ( "%pie-filename%" ) do call :sandbox-mkdir "%%~dpf" || exit /b 1
+call :sandbox-log "Write file: %pie-filename%"
+goto :EOF
+
 :sandbox-mkdir
 call :sandbox-log "Make dir: %~1"
 md "%~1"
@@ -290,33 +305,66 @@ goto :EOF
 
 :: ========================================================================
 
-:sandbox-write-files
+:pie
 setlocal enabledelayedexpansion
 
-set "sandbox-filename="
+set "pie-enabled="
+set "pie-filename="
+set "pie-openfile="
+set "pie-comment="
 
 for /f "delims=] tokens=1,*" %%r in ( '
-	find /n /v "" "%~1"
-' ) do for /f "tokens=1,2,*" %%a in ( 
-	"LINE %%~s" 
-) do if "%%~b" == "::FILE-BEGIN" (
-	set "sandbox-filename=%sandbox-path%\%%~c"
-	call :sandbox-log "Write file: !sandbox-filename!"
-	for /f "tokens=*" %%f in ( "!sandbox-filename!" ) do call :sandbox-mkdir "%%~dpf" || exit /b 1
-	type nul > "!sandbox-filename!" || exit /b 1
-) else if "%%~b" == "::FILE-END" (
-	if defined sandbox-readonly attrib +r "!sandbox-filename!"
-	set "sandbox-filename="
-) else if defined sandbox-filename (
-	>>"!sandbox-filename!" (
-		setlocal disabledelayedexpansion
-		if "%%~b" == "::FILE-CALL" (
-			call %%~c
-		) else (
-			echo:%%~s
-		)
+	find /n /v "" "%~f2" 
+' ) do for /f "tokens=1,2,* delims=]	 " %%a in (
+	"LINE]%%s"
+) do if not defined pie-enabled (
+	if "%%b %%~c" == "::PIE-BEGIN %~1" set "pie-enabled=1"
+) else if "%%b" == "::PIE-SETFILE" (
+	call set "pie-filename=%%~c"
+	set "pie-openfile="
+) else if "%%b" == "::PIE-OPENFILE" (
+	set "pie-openfile=1"
+) else if "%%b" == "::PIE-CREATEFILE" (
+	set "pie-openfile=1"
+	if "%%~c" == "NEW" type nul >"!pie-filename!" || exit /b 1
+) else if "%%b" == "::PIE-COMMENT-BEGIN" (
+	set "pie-comment=1"
+) else if "%%b" == "::PIE-COMMENT-END" (
+	set "pie-comment="
+) else if "%%b" == "::PIE-END" (
+	set "pie-enabled="
+	set "pie-filename="
+	set "pie-openfile="
+	if "%%~c" == "STOP" (
 		endlocal
-	) || exit /b 1
+		goto :EOF
+	)
+) else if not defined pie-comment (
+	if defined pie-openfile (
+		>>"!pie-filename!" (
+			setlocal disabledelayedexpansion
+			if "%%b" == "::PIE-ECHO" (
+				call echo:%%~c
+			) else if "%%b" == "::PIE-CALL" (
+				call %%c
+			) else (
+				echo:%%s
+			)
+			endlocal
+		) || exit /b 1
+	) else (
+		(
+			setlocal disabledelayedexpansion
+			if "%%b" == "::PIE-ECHO" (
+				call echo:%%~c
+			) else if "%%b" == "::PIE-CALL" (
+				call %%c
+			) else (
+				echo:%%s
+			)
+			endlocal
+		) || exit /b 1
+	)
 )
 
 endlocal
@@ -324,16 +372,10 @@ goto :EOF
 
 :: ========================================================================
 
-:: The following part of the file represents the contents of files that 
-:: will be installed as the part of the sandbox. The beginning of each 
-:: file is marked with "::FILE-BEGIN filename" and the end of the file is 
-:: marked with "::FILE-END". The special marker "::FILE-CALL command" is 
-:: used to put the result of execution of the specified command to the 
-:: result file.
-
-:: ========================================================================
-
-::FILE-BEGIN etc\rc.bat
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\rc.bat"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 :: This file is part of UNIX FS SANDBOX
 @echo off
 
@@ -424,11 +466,14 @@ goto :EOF
 :rc-list-append
 set "rc-list=%rc-list%;%~1"
 goto :EOF
-::FILE-END
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\init.d\vdisk.bat
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\init.d\vdisk.bat"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 :: This file is part of UNIX FS SANDBOX
 @echo off
 
@@ -486,19 +531,22 @@ if "%~1" == "status" (
 :EOS
 endlocal
 goto :EOF
-::FILE-END
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\sandbox-installed.log
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\sandbox-installed.log"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 :: This file is part of UNIX FS SANDBOX
 ::
 :: It was generated automatically while installing sandbox
 
-::FILE-CALL call :sandbox-install-log-reg
-::FILE-CALL call :sandbox-install-log-dirs
-::FILE-CALL call :sandbox-install-log-files
-::FILE-END
+::PIE-CALL	:sandbox-install-log-reg
+::PIE-CALL	:sandbox-install-log-dirs
+::PIE-CALL	:sandbox-install-log-files
+::PIE-END
 
 :sandbox-install-log-reg
 if defined sandbox-persistent echo:REGISTRY %sandbox-disk% %sandbox-reg-device%
@@ -509,29 +557,36 @@ for %%f in (
 	"%sandbox-dirs:;=" "%" 
 	"%sandbox-mandatory-dirs:;=" "%" 
 ) do if not "%%~f" == "" (
-	echo:DIR %%~f
+	echo:DIR %sandbox-path%\%%~f
 )
 goto :EOF
 
 :sandbox-install-log-files
 for /f "tokens=1,*" %%a in ( '
-	findstr /b "::FILE-BEGIN" "%~f0"
+	findstr /b "::PIE-SETFILE" "%~f0"
 ' ) do (
-	echo:FILE %%~b
+	call echo:FILE %%~b
 )
 goto :EOF
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\rc.d\rc.pause
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.pause"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 ## This file is part of UNIX FS SANDBOX
 #
 # To escape pausing, remove this file
-::FILE-END
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\rc.d\rc.list
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.list"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 ## This file is part of UNIX FS SANDBOX
 #
 # There is list of names of scripts from the directory "etc/init.d" to be 
@@ -545,33 +600,42 @@ goto :EOF
 # -- "etc/rc.d/rc.start" for starting
 # -- "etc/rc.d/rc.stop" for stopping
 vdisk
-::FILE-END
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\rc.d\rc.start
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.start"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 ## This file is part of UNIX FS SANDBOX
 #
 # There is list of names of scripts from the directory "etc/init.d" to be 
 # executed while starting the sandbox. One name is per one line. The order 
 # of names corresponds to the order of their execution.
 vdisk
-::FILE-END
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\rc.d\rc.stop
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.stop"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 ## This file is part of UNIX FS SANDBOX
 #
 # There is list of names of scripts from the directory "etc/init.d" to be 
 # executed while stopping the sandbox. One name is per one line. The order 
 # of names corresponds to the order of their execution.
 vdisk
-::FILE-END
+::PIE-END
 
 :: ========================================================================
 
-::FILE-BEGIN etc\sandbox-release
+::PIE-BEGIN	WRITE-FILES
+::PIE-SETFILE	"%sandbox-path%\etc\sandbox-release"
+::PIE-CALL	:sandbox-log-writefile
+::PIE-CREATEFILE
 ## This file is part of UNIX FS SANDBOX
 #
 # This file contains the detailedd information regarding the current 
@@ -579,8 +643,8 @@ vdisk
 # -- the virtual drive to which a path will be assigned;
 # -- the directory where the sandbox is installed;
 # -- the sandbox name.
-::FILE-CALL echo:%sandbox-disk%;%sandbox-path%;%sandbox-name%
-::FILE-END
+::PIE-ECHO	%sandbox-disk%;%sandbox-path%;%sandbox-name%
+::PIE-END
 
 :: ========================================================================
 
