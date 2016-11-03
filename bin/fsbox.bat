@@ -168,6 +168,7 @@ call :sandbox-mkdir-hier "%sandbox-dirs:;=" "%" || exit /b 1
 call :sandbox-log "Create mandatory directories"
 call :sandbox-mkdir-hier "%sandbox-mandatory-dirs:;=" "%" || exit /b 1
 
+set "sandbox-common-header=This file is part of UNIX FS SANDBOX"
 call :sandbox-log "Install mandatory files"
 call :pie "WRITE-FILES" "%~f0" || exit /b 1
 
@@ -376,7 +377,7 @@ goto :EOF
 ::PIE-SETFILE	"%sandbox-path%\etc\rc.bat"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-:: This file is part of UNIX FS SANDBOX
+::PIE-ECHO	:: %sandbox-common-header%
 @echo off
 
 
@@ -474,7 +475,7 @@ goto :EOF
 ::PIE-SETFILE	"%sandbox-path%\etc\init.d\vdisk.bat"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-:: This file is part of UNIX FS SANDBOX
+::PIE-ECHO	:: %sandbox-common-header%
 @echo off
 
 
@@ -539,7 +540,7 @@ goto :EOF
 ::PIE-SETFILE	"%sandbox-path%\etc\sandbox-installed.log"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-:: This file is part of UNIX FS SANDBOX
+::PIE-ECHO	:: %sandbox-common-header%
 ::
 :: It was generated automatically while installing sandbox
 
@@ -568,7 +569,6 @@ for /f "tokens=1,*" %%a in ( '
 	call echo:FILE %%~b
 )
 goto :EOF
-::PIE-END
 
 :: ========================================================================
 
@@ -576,7 +576,7 @@ goto :EOF
 ::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.pause"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-## This file is part of UNIX FS SANDBOX
+::PIE-ECHO	## %sandbox-common-header%
 #
 # To escape pausing, remove this file
 ::PIE-END
@@ -587,7 +587,7 @@ goto :EOF
 ::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.list"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-## This file is part of UNIX FS SANDBOX
+::PIE-ECHO	## %sandbox-common-header%
 #
 # There is list of names of scripts from the directory "etc/init.d" to be 
 # executed while starting and stopping the sandbox. One name is per one 
@@ -608,7 +608,7 @@ vdisk
 ::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.start"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-## This file is part of UNIX FS SANDBOX
+::PIE-ECHO	## %sandbox-common-header%
 #
 # There is list of names of scripts from the directory "etc/init.d" to be 
 # executed while starting the sandbox. One name is per one line. The order 
@@ -622,7 +622,7 @@ vdisk
 ::PIE-SETFILE	"%sandbox-path%\etc\rc.d\rc.stop"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-## This file is part of UNIX FS SANDBOX
+::PIE-ECHO	## %sandbox-common-header%
 #
 # There is list of names of scripts from the directory "etc/init.d" to be 
 # executed while stopping the sandbox. One name is per one line. The order 
@@ -636,7 +636,7 @@ vdisk
 ::PIE-SETFILE	"%sandbox-path%\etc\sandbox-release"
 ::PIE-CALL	:sandbox-log-writefile
 ::PIE-CREATEFILE
-## This file is part of UNIX FS SANDBOX
+::PIE-ECHO	## %sandbox-common-header%
 #
 # This file contains the detailedd information regarding the current 
 # sandbox. It consists of the following fields separated with semicolon:
