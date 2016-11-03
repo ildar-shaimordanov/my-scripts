@@ -266,6 +266,7 @@ goto :EOF
 
 :sandbox-print-settings
 echo:Settings for installation ^(with "--install" option^)
+echo:Run "%~n0 --help" to learn more about options
 echo:
 
 echo:Name  = %sandbox-name%
@@ -638,7 +639,7 @@ vdisk
 ::PIE-CREATEFILE
 ::PIE-ECHO	## %sandbox-common-header%
 #
-# This file contains the detailedd information regarding the current 
+# This file contains the detailed information regarding the current 
 # sandbox. It consists of the following fields separated with semicolon:
 # -- the virtual drive to which a path will be assigned;
 # -- the directory where the sandbox is installed;
