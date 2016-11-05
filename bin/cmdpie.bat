@@ -40,6 +40,7 @@ Command
   and followed by some parameters separated with whitespaces.
 
 There are commands:
+
 ::PIE-ECHO	"  ::PIE-BEGIN label"
 ::PIE-ECHO	"  ::PIE-END [STOP]"
 
@@ -53,14 +54,17 @@ There are commands:
 ::PIE-ECHO	"  ::PIE-COMMENT-BEGIN"
 ::PIE-ECHO	"  ::PIE-COMMENT-END"
 
+::PIE-ECHO	"  ::PIE-CODE-BEGIN"
+::PIE-ECHO	"  ::PIE-CODE-END"
+
 The detailed explanation of each pie-command is given below.
 
 ::PIE-ECHO	"  ::PIE-BEGIN label"
+::PIE-ECHO	"  ::PIE-END [STOP]"
   "::PIE-BEGIN" starts Pie itself. The mandatory "label" is used to 
   identify Pie. This allows to have more than one Pie within a single 
   file.
 
-::PIE-ECHO	"  ::PIE-END [STOP]"
   "::PIE-END" ends the current Pie block. If the argument "STOP" is 
   specified, processing of the rest of input file will not be continued. 
 
@@ -74,17 +78,18 @@ The detailed explanation of each pie-command is given below.
   also available.
 
 ::PIE-ECHO	"  ::PIE-SETFILE "filename""
+::PIE-ECHO	"  ::PIE-OPENFILE"
+::PIE-ECHO	"  ::PIE-CREATEFILE"
   "::PIE-SETFILE" specifies a name of a file to write to. The filename can 
   be relative or absolute file path or can contain environment variables 
   that will be substituted too. The text it is expanded removing leading 
   and trailing quotes "" around the text. This gives ability to indent the 
   echoed text. 
 
-::PIE-ECHO	"  ::PIE-OPENFILE"
-::PIE-ECHO	"  ::PIE-CREATEFILE"
   "::PIE-OPENFILE" and "::PIE-CREATEFILE" initialize writing to the file 
   specified by the command "::PIE-SETFILE". New data are appended to the 
   end of the file. The difference between these commands is that 
+
   "::PIE-CREATEFILE" truncates the file before the real writing. 
 
   Setting of the file and its opening are separated to enable additional 
@@ -96,6 +101,12 @@ The detailed explanation of each pie-command is given below.
   "::PIE-COMMENT-BEGIN" starts and "::PIE-COMMENT-END" ends a block of 
   comments. This could be useful, if you need to escape printing of some 
   text but its removing from the file is unwanted.
+
+::PIE-ECHO	"  ::PIE-CODE-BEGIN"
+::PIE-ECHO	"  ::PIE-CODE-END"
+  "::PIE-CODE-BEGIN" and "::PIE-CODE-END" are reserved for the future use. 
+  By default they do not do anything significant.
+
 
 AUTHORS
 
@@ -112,6 +123,7 @@ set "pie-enabled="
 set "pie-filename="
 set "pie-openfile="
 set "pie-comment="
+set "pie-code="
 
 for /f "delims=] tokens=1,*" %%r in ( '
 	find /n /v "" "%~f2" 
@@ -131,10 +143,16 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-comment=1"
 ) else if "%%b" == "::PIE-COMMENT-END" (
 	set "pie-comment="
+) else if "%%b" == "::PIE-CODE-BEGIN" (
+	set "pie-code=1"
+) else if "%%b" == "::PIE-CODE-END" (
+	set "pie-code="
 ) else if "%%b" == "::PIE-END" (
 	set "pie-enabled="
 	set "pie-filename="
 	set "pie-openfile="
+	set "pie-comment="
+	set "pie-code="
 	if "%%~c" == "STOP" (
 		endlocal
 		goto :EOF

@@ -4,15 +4,7 @@ goto :sandbox-main
 
 :: ========================================================================
 
-::PIE-BEGIN	VERSION
-::PIE-ECHO	%~n0 %sandbox-version%
-::PIE-END	STOP
-
-:: ========================================================================
-
 ::PIE-BEGIN	HELP
-::PIE-ECHO	Usage: %~n0 OPTIONS
-
 Create sandbox for UNIX like filesystem structure
 
 -p PATH       set a directory where the sandbox will be installed
@@ -34,6 +26,9 @@ Create sandbox for UNIX like filesystem structure
 RELEASE NOTES
 
 2016
+
+Version 0.7 Beta
+Improve pie-comments; add support for pie-codes; simplify the code.
 
 Version 0.6 beta
 Introduce PIE (the Plain, Impressive and Executable documentation format).
@@ -90,7 +85,7 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.6 Beta"
+set "sandbox-version=0.7 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -169,6 +164,7 @@ call :sandbox-log "Create mandatory directories"
 call :sandbox-mkdir-hier "%sandbox-mandatory-dirs:;=" "%" || exit /b 1
 
 set "sandbox-common-header=This file is part of UNIX FS SANDBOX"
+
 call :sandbox-log "Install mandatory files"
 call :pie "WRITE-FILES" "%~f0" || exit /b 1
 
@@ -201,12 +197,14 @@ exit /b 0
 if "%~1" == "" goto :sandbox-parse-opts-end
 
 if "%~1" == "--help" (
+	echo:Usage: %~n0 OPTIONS
+	echo:
 	call :pie HELP "%~f0"
 	exit /b 1
 )
 
 if "%~1" == "--version" (
-	call :pie VERSION "%~f0"
+	echo:%~n0 %sandbox-version%
 	exit /b 1
 )
 
@@ -314,6 +312,7 @@ set "pie-enabled="
 set "pie-filename="
 set "pie-openfile="
 set "pie-comment="
+set "pie-code="
 
 for /f "delims=] tokens=1,*" %%r in ( '
 	find /n /v "" "%~f2" 
@@ -333,10 +332,16 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-comment=1"
 ) else if "%%b" == "::PIE-COMMENT-END" (
 	set "pie-comment="
+) else if "%%b" == "::PIE-CODE-BEGIN" (
+	set "pie-code=1"
+) else if "%%b" == "::PIE-CODE-END" (
+	set "pie-code="
 ) else if "%%b" == "::PIE-END" (
 	set "pie-enabled="
 	set "pie-filename="
 	set "pie-openfile="
+	set "pie-comment="
+	set "pie-code="
 	if "%%~c" == "STOP" (
 		endlocal
 		goto :EOF
