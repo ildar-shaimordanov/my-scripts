@@ -131,22 +131,6 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	"LINE %%s"
 ) do if not defined pie-enabled (
 	if "%%b %%~c" == "::PIE-BEGIN %~1" set "pie-enabled=1"
-) else if "%%b" == "::PIE-SETFILE" (
-	call set "pie-filename=%%~c"
-	set "pie-openfile="
-) else if "%%b" == "::PIE-OPENFILE" (
-	set "pie-openfile=1"
-) else if "%%b" == "::PIE-CREATEFILE" (
-	set "pie-openfile=1"
-	type nul >"!pie-filename!" || exit /b 1
-) else if "%%b" == "::PIE-COMMENT-BEGIN" (
-	set "pie-comment=1"
-) else if "%%b" == "::PIE-COMMENT-END" (
-	set "pie-comment="
-) else if "%%b" == "::PIE-CODE-BEGIN" (
-	set "pie-code=1"
-) else if "%%b" == "::PIE-CODE-END" (
-	set "pie-code="
 ) else if "%%b" == "::PIE-END" (
 	set "pie-enabled="
 	set "pie-filename="
@@ -157,7 +141,25 @@ for /f "delims=] tokens=1,*" %%r in ( '
 		endlocal
 		goto :EOF
 	)
-) else if not defined pie-comment (
+) else if "%%b" == "::PIE-COMMENT-BEGIN" (
+	set "pie-comment=1"
+) else if "%%b" == "::PIE-COMMENT-END" (
+	set "pie-comment="
+) else if defined pie-comment (
+	rem
+) else if "%%b" == "::PIE-SETFILE" (
+	call set "pie-filename=%%~c"
+	set "pie-openfile="
+) else if "%%b" == "::PIE-OPENFILE" (
+	set "pie-openfile=1"
+) else if "%%b" == "::PIE-CREATEFILE" (
+	set "pie-openfile=1"
+	type nul >"!pie-filename!" || exit /b 1
+) else if "%%b" == "::PIE-CODE-BEGIN" (
+	set "pie-code=1"
+) else if "%%b" == "::PIE-CODE-END" (
+	set "pie-code="
+) else (
 	if defined pie-openfile (
 		>>"!pie-filename!" (
 			setlocal disabledelayedexpansion

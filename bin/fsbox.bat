@@ -27,6 +27,9 @@ RELEASE NOTES
 
 2016
 
+Version 0.7.2 Beta
+Reorder checking for pie-commands.
+
 Version 0.7.1 Beta
 Fix bug with pie-createfile.
 
@@ -88,7 +91,7 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.7.1 Beta"
+set "sandbox-version=0.7.2 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -323,22 +326,6 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	"LINE %%s"
 ) do if not defined pie-enabled (
 	if "%%b %%~c" == "::PIE-BEGIN %~1" set "pie-enabled=1"
-) else if "%%b" == "::PIE-SETFILE" (
-	call set "pie-filename=%%~c"
-	set "pie-openfile="
-) else if "%%b" == "::PIE-OPENFILE" (
-	set "pie-openfile=1"
-) else if "%%b" == "::PIE-CREATEFILE" (
-	set "pie-openfile=1"
-	type nul >"!pie-filename!" || exit /b 1
-) else if "%%b" == "::PIE-COMMENT-BEGIN" (
-	set "pie-comment=1"
-) else if "%%b" == "::PIE-COMMENT-END" (
-	set "pie-comment="
-) else if "%%b" == "::PIE-CODE-BEGIN" (
-	set "pie-code=1"
-) else if "%%b" == "::PIE-CODE-END" (
-	set "pie-code="
 ) else if "%%b" == "::PIE-END" (
 	set "pie-enabled="
 	set "pie-filename="
@@ -349,7 +336,25 @@ for /f "delims=] tokens=1,*" %%r in ( '
 		endlocal
 		goto :EOF
 	)
-) else if not defined pie-comment (
+) else if "%%b" == "::PIE-COMMENT-BEGIN" (
+	set "pie-comment=1"
+) else if "%%b" == "::PIE-COMMENT-END" (
+	set "pie-comment="
+) else if defined pie-comment (
+	rem
+) else if "%%b" == "::PIE-SETFILE" (
+	call set "pie-filename=%%~c"
+	set "pie-openfile="
+) else if "%%b" == "::PIE-OPENFILE" (
+	set "pie-openfile=1"
+) else if "%%b" == "::PIE-CREATEFILE" (
+	set "pie-openfile=1"
+	type nul >"!pie-filename!" || exit /b 1
+) else if "%%b" == "::PIE-CODE-BEGIN" (
+	set "pie-code=1"
+) else if "%%b" == "::PIE-CODE-END" (
+	set "pie-code="
+) else(
 	if defined pie-openfile (
 		>>"!pie-filename!" (
 			setlocal disabledelayedexpansion
