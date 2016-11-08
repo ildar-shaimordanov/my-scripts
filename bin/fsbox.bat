@@ -27,6 +27,9 @@ RELEASE NOTES
 
 2016
 
+Version 0.8 Beta
+Add new pie-command for setting a variable.
+
 Version 0.7.2 Beta
 Reorder checking for pie-commands.
 
@@ -91,7 +94,7 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.7.2 Beta"
+set "sandbox-version=0.8 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -354,7 +357,9 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-code=1"
 ) else if "%%b" == "::PIE-CODE-END" (
 	set "pie-code="
-) else(
+) else if "%%b" == "::PIE-SET" (
+	call set %%c || exit /b 1
+) else (
 	if defined pie-openfile (
 		>>"!pie-filename!" (
 			setlocal disabledelayedexpansion

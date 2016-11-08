@@ -46,6 +46,7 @@ There are commands:
 
 ::PIE-ECHO	"  ::PIE-ECHO text"
 ::PIE-ECHO	"  ::PIE-CALL command"
+::PIE-ECHO	"  ::PIE-SET expression"
 
 ::PIE-ECHO	"  ::PIE-SETFILE "filename""
 ::PIE-ECHO	"  ::PIE-OPENFILE"
@@ -76,6 +77,12 @@ The detailed explanation of each pie-command is given below.
 ::PIE-ECHO	"  ::PIE-CALL command"
   "::PIE-CALL" calls the specified command or commands. Substitution is 
   also available.
+
+::PIE-ECHO	"  ::PIE-SET expression"
+  "::PIE-SET" sets environment variable. The expression could have 
+  the switches /A (for setting arithmetical expression) or /P (for setting 
+  a variable to a string of input entered by the user). See for details 
+  "SET /?". 
 
 ::PIE-ECHO	"  ::PIE-SETFILE "filename""
 ::PIE-ECHO	"  ::PIE-OPENFILE"
@@ -159,6 +166,8 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-code=1"
 ) else if "%%b" == "::PIE-CODE-END" (
 	set "pie-code="
+) else if "%%b" == "::PIE-SET" (
+	call set %%c || exit /b 1
 ) else (
 	if defined pie-openfile (
 		>>"!pie-filename!" (
