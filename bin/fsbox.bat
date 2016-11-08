@@ -27,6 +27,9 @@ RELEASE NOTES
 
 2016
 
+Version 0.7.1 Beta
+Fix bug with pie-createfile.
+
 Version 0.7 Beta
 Improve pie-comments; add support for pie-codes; simplify the code.
 
@@ -85,7 +88,7 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.7 Beta"
+set "sandbox-version=0.7.1 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -327,7 +330,7 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-openfile=1"
 ) else if "%%b" == "::PIE-CREATEFILE" (
 	set "pie-openfile=1"
-	if "%%~c" == "NEW" type nul >"!pie-filename!" || exit /b 1
+	type nul >"!pie-filename!" || exit /b 1
 ) else if "%%b" == "::PIE-COMMENT-BEGIN" (
 	set "pie-comment=1"
 ) else if "%%b" == "::PIE-COMMENT-END" (

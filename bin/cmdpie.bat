@@ -138,7 +138,7 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-openfile=1"
 ) else if "%%b" == "::PIE-CREATEFILE" (
 	set "pie-openfile=1"
-	if "%%~c" == "NEW" type nul >"!pie-filename!" || exit /b 1
+	type nul >"!pie-filename!" || exit /b 1
 ) else if "%%b" == "::PIE-COMMENT-BEGIN" (
 	set "pie-comment=1"
 ) else if "%%b" == "::PIE-COMMENT-END" (
