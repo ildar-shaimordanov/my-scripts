@@ -27,6 +27,9 @@ RELEASE NOTES
 
 2016
 
+Version 0.8.1 Beta
+Improve the code for better processing pie-set.
+
 Version 0.8 Beta
 Add new pie-command for setting a variable.
 
@@ -94,7 +97,7 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.8 Beta"
+set "sandbox-version=0.8.1 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -315,7 +318,7 @@ goto :EOF
 :: ========================================================================
 
 :pie
-setlocal enabledelayedexpansion
+setlocal disabledelayedexpansion
 
 set "pie-enabled="
 set "pie-filename="
@@ -352,7 +355,9 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-openfile=1"
 ) else if "%%b" == "::PIE-CREATEFILE" (
 	set "pie-openfile=1"
+	setlocal enabledelayedexpansion
 	type nul >"!pie-filename!" || exit /b 1
+	endlocal
 ) else if "%%b" == "::PIE-CODE-BEGIN" (
 	set "pie-code=1"
 ) else if "%%b" == "::PIE-CODE-END" (
@@ -361,8 +366,10 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	call set %%c || exit /b 1
 ) else (
 	if defined pie-openfile (
+		setlocal enabledelayedexpansion
 		>>"!pie-filename!" (
 			setlocal disabledelayedexpansion
+
 			if "%%b" == "::PIE-ECHO" (
 				call echo:%%~c
 			) else if "%%b" == "::PIE-CALL" (
@@ -370,11 +377,12 @@ for /f "delims=] tokens=1,*" %%r in ( '
 			) else (
 				echo:%%s
 			)
+
 			endlocal
 		) || exit /b 1
+		endlocal
 	) else (
 		(
-			setlocal disabledelayedexpansion
 			if "%%b" == "::PIE-ECHO" (
 				call echo:%%~c
 			) else if "%%b" == "::PIE-CALL" (
@@ -382,7 +390,6 @@ for /f "delims=] tokens=1,*" %%r in ( '
 			) else (
 				echo:%%s
 			)
-			endlocal
 		) || exit /b 1
 	)
 )

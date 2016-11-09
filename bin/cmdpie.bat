@@ -124,7 +124,7 @@ AUTHORS
 :: ========================================================================
 
 :pie
-setlocal enabledelayedexpansion
+setlocal disabledelayedexpansion
 
 set "pie-enabled="
 set "pie-filename="
@@ -161,7 +161,9 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	set "pie-openfile=1"
 ) else if "%%b" == "::PIE-CREATEFILE" (
 	set "pie-openfile=1"
+	setlocal enabledelayedexpansion
 	type nul >"!pie-filename!" || exit /b 1
+	endlocal
 ) else if "%%b" == "::PIE-CODE-BEGIN" (
 	set "pie-code=1"
 ) else if "%%b" == "::PIE-CODE-END" (
@@ -170,8 +172,10 @@ for /f "delims=] tokens=1,*" %%r in ( '
 	call set %%c || exit /b 1
 ) else (
 	if defined pie-openfile (
+		setlocal enabledelayedexpansion
 		>>"!pie-filename!" (
 			setlocal disabledelayedexpansion
+
 			if "%%b" == "::PIE-ECHO" (
 				call echo:%%~c
 			) else if "%%b" == "::PIE-CALL" (
@@ -179,11 +183,12 @@ for /f "delims=] tokens=1,*" %%r in ( '
 			) else (
 				echo:%%s
 			)
+
 			endlocal
 		) || exit /b 1
+		endlocal
 	) else (
 		(
-			setlocal disabledelayedexpansion
 			if "%%b" == "::PIE-ECHO" (
 				call echo:%%~c
 			) else if "%%b" == "::PIE-CALL" (
@@ -191,7 +196,6 @@ for /f "delims=] tokens=1,*" %%r in ( '
 			) else (
 				echo:%%s
 			)
-			endlocal
 		) || exit /b 1
 	)
 )
