@@ -27,6 +27,9 @@ RELEASE NOTES
 
 2016
 
+Version 0.8.2 Beta
+Continue improvement for pie-set.
+
 Version 0.8.1 Beta
 Improve the code for better processing pie-set.
 
@@ -97,7 +100,7 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.8.1 Beta"
+set "sandbox-version=0.8.2 Beta"
 set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
@@ -363,7 +366,8 @@ for /f "delims=] tokens=1,*" %%r in ( '
 ) else if "%%b" == "::PIE-CODE-END" (
 	set "pie-code="
 ) else if "%%b" == "::PIE-SET" (
-	call set %%c || exit /b 1
+	call set %%c
+	if errorlevel 1 exit /b 1
 ) else (
 	if defined pie-openfile (
 		setlocal enabledelayedexpansion

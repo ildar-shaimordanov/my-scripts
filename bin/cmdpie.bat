@@ -169,7 +169,8 @@ for /f "delims=] tokens=1,*" %%r in ( '
 ) else if "%%b" == "::PIE-CODE-END" (
 	set "pie-code="
 ) else if "%%b" == "::PIE-SET" (
-	call set %%c || exit /b 1
+	call set %%c
+	if errorlevel 1 exit /b 1
 ) else (
 	if defined pie-openfile (
 		setlocal enabledelayedexpansion
