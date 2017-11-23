@@ -1,0 +1,4 @@
+*.jar
+db/*
+log/*
+sessions/*
