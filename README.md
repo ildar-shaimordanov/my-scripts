@@ -3,6 +3,8 @@
 This is trivial extension for running on Windows platform `CommaFeed`, the 
 Java-based self-hosted RSS reader. 
 
+`CommaFeed` home page is located here: https://github.com/Athou/commafeed. 
+
 ## Installation
 
 1. Download and unzip the latest release of this extension from the page 
