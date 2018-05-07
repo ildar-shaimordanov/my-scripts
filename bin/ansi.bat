@@ -126,7 +126,7 @@ http://www.robvanderwoude.com/ansi.php#AnsiArt
 
 # =========================================================================
 
-$HostColor = @{};
+$Script:HostColor = @{};
 
 function save-host-colors {
 	$Script:HostColor = @{
