@@ -125,7 +125,6 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another 
 :: engine (cscript or wscript). 
 :: The default value is cscript. 
-:: The next label is duplicated intentionally to avoid error if this 
 :: script was saved in unix mode (EOL=LF).
 :cmdize.vbs.h
 set /p "=::'" <nul
