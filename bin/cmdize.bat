@@ -38,6 +38,10 @@
 :: .pl
 :: For details and better support see "pl2bat.bat" from Perl distribution
 ::
+:: .sh, .bash
+:: http://forum.script-coding.com/viewtopic.php?id=11535
+:: http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
+::
 :: .ps1
 :: http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
 :: http://stackoverflow.com/a/2611487/3627676
@@ -55,7 +59,7 @@
 :: .kix
 ::
 :: COPYRIGHTS
-:: Copyright (c) 2014, 2015, 2018 Ildar Shaimordanov
+:: Copyright (c) 2014, 2015, 2016, 2018 Ildar Shaimordanov
 
 @echo off
 
@@ -82,7 +86,7 @@ if not exist "%~f1" (
 	goto :cmdize.loop.continue
 )
 
-for %%x in ( .js .vbs .pl .ps1 .py .hta .htm .html .wsf .kix ) do (
+for %%x in ( .js .vbs .pl .sh .bash .ps1 .py .hta .htm .html .wsf .kix ) do (
 	if /i "%~x1" == "%%~x" (
 		call :cmdize%%~x "%~1" >"%~dpn1.bat"
 		goto :cmdize.loop.continue
@@ -176,6 +180,18 @@ echo:perl -x -S "%%~f0" %%*
 echo:goto :EOF
 echo:@rem ';
 echo:#!perl
+type "%~f1"
+goto :EOF
+
+
+:: Convert Bourne shell and Bash scripts. 
+:cmdize.sh
+:cmdize.bash
+echo:: ^<^< '____CMD____'
+echo:@echo off
+echo:bash "%%~f0" %%*
+echo:goto :eof
+echo:____CMD____
 type "%~f1"
 goto :EOF
 
