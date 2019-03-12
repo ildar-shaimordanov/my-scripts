@@ -1,6 +1,6 @@
 # CommaFeed Windows runner
 
-`commafeed` is the platform-independent Java-bases self-hosted RSS reader. 
+`commafeed` is the platform-independent Java-based self-hosted RSS reader. 
 It is located at https://github.com/Athou/commafeed. 
 
 `commafeed-win` is the trivial extension for controlling `commafeed` from 
