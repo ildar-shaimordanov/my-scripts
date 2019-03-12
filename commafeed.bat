@@ -2,6 +2,9 @@
 
 setlocal
 
+set "jarfile=%~dp0commafeed.jar"
+set "cfgfile=%~dp0config-win.yml"
+
 if /i "%~1" == "start" goto :start
 if /i "%~1" == "stop" goto :stop
 if /i "%~1" == "status" goto :status
@@ -28,9 +31,6 @@ goto :EOF
 
 :starter
 pushd "%~dp0"
-
-set "jarfile=%~dp0commafeed.jar"
-set "cfgfile=%~dp0config-win.yml"
 
 start "Starting" /b ^
 java -Djava.net.preferIPv4Stack=true -jar "%jarfile%" server "%cfgfile%"
@@ -61,10 +61,10 @@ goto :EOF
 set "pid="
 for /f "tokens=1,* delims==" %%a in ( '
 	wmic PROCESS WHERE ^
-	"Caption='java.exe' AND CommandLine LIKE '%%commafeed.jar%%'" ^
+	"Caption='java.exe' AND CommandLine LIKE '%%%jarfile:\=\\%%%'" ^
 	GET ProcessId^,CommandLine /VALUE
 ' ) do (
-	call echo:%%~b
+	echo:%%~b
 	if /i "%%~a" == "ProcessId" set "pid=%%~b"
 )
 goto :EOF
