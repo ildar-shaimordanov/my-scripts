@@ -1,0 +1,71 @@
+
+\ synchronization
+
+sync
+
+
+\ source dirs
+-i C:\Downloads
+
+-i C:\Games
+
+-i C:\Media
+
+
+\ target dirs
+\ -o DIR
+
+
+\ exclusion
+
+\ exclude files
+-x nnsync.bat
+
+-x *.tmp
+-x ~*
+-x Thumbs.db
+-x *picasa.ini
+-x *.exe.stackdump
+
+-x desktop.ini
+-x *.torrent
+
+-x *.vdi
+-x *.vmdk
+
+\ exclude dirs
+
+\ exclude syncup used dirs
+-dx .sync
+-dx tmp
+
+
+\ additional options
+
+\ delete mode
+-delete-before
+
+\ dirs recursively
+-s
+
+\ copy empty dirs
+-e
+
+\ copy files
+\ -ad
+
+\ modification time difference in 2 sec
+-t2
+
+\ create the structure of dirs
+-p
+
+\ verbose
+-v
+
+\ ignore errors
+-c
+
+
+\ emulation
+\ -nocopy
