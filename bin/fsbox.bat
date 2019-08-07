@@ -25,6 +25,12 @@ Create sandbox for UNIX like filesystem structure
 ::PIE-BEGIN	RELEASE-NOTES
 RELEASE NOTES
 
+2019
+
+Version 0.8.3 Beta
+Implement setting the readonly attribute over the installed files.
+Improve the installation reporting.
+
 2016
 
 Version 0.8.2 Beta
@@ -100,8 +106,8 @@ TODO
 
 setlocal
 
-set "sandbox-version=0.8.2 Beta"
-set "sandbox-copyright=Copyright (C) 2008-2010, 2016 Ildar Shaimordanov"
+set "sandbox-version=0.8.3 Beta"
+set "sandbox-copyright=Copyright (C) 2008-2010, 2016, 2019 Ildar Shaimordanov"
 
 set "sandbox-path=C:\sandbox"
 set "sandbox-disk=X:"
@@ -157,6 +163,9 @@ for %%f in ( "%sandbox-path%" ) do set "sandbox-path=%%~ff"
 :: ========================================================================
 
 if not defined sandbox-install (
+	echo:Settings for installation ^(with "--install" option^)
+	echo:Run "%~n0 --help" to learn more about options
+	echo:
 	call :sandbox-print-settings
 	exit /b 0
 )
@@ -190,6 +199,15 @@ if defined sandbox-persistent (
 	reg add "%sandbox-reg-device%" /v "%sandbox-disk%" /t REG_SZ /d "\??\%sandbox-path%" /f
 )
 
+if defined sandbox-readonly (
+	call :sandbox-log "Setting files readonly"
+	attrib +R "%sandbox-path%\*" /S
+)
+
+echo:
+echo:======================================================================
+echo:
+call :sandbox-print-settings
 echo:
 echo:======================================================================
 echo:
@@ -278,10 +296,6 @@ if not defined %~2 echo:No
 goto :EOF
 
 :sandbox-print-settings
-echo:Settings for installation ^(with "--install" option^)
-echo:Run "%~n0 --help" to learn more about options
-echo:
-
 echo:Name  = %sandbox-name%
 echo:Drive = %sandbox-disk%
 echo:Path  = %sandbox-path%
