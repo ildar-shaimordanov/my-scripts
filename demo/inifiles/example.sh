@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source inifiles.sh
+source ../../ini-files/inifiles.sh
 
 ini_eval user 'example.ini'
 

@@ -33,7 +33,7 @@
 # code above because it does control over the actual script). Other 
 # scripts can be sourced after this one. Only in this case we are able to 
 # keep control the script execution including other files. 
-. "${0%/*}/../../bootstrap.sh"
+. "${0%/*}/../../bootstrap/bootstrap.sh"
 
 ###########################################################################
 
