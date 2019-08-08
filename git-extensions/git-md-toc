@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+git-md-toc - generate the table of content from the Markdown file
+
+=head1 SYNOPSIS
+
+  git-md-toc README.md
+
+=head1 DESCRIPTION
+
+Read an input and generate the table of content assuming the file is
+Markdown. The outcome is also formatted as Markdown.
+
+=head1 AUTHORS
+
+Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2019 Ildar Shaimordanov. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+
+pod2usage( -verbose => 2, -noperldoc => 1 ) if -t 0 && ! @ARGV;
+
+# =========================================================================
+
+my $in_code = 0;
+
+my %count = ();
+
+while ( <> ) {
+	# skip code fencing
+	m/^```/ and $in_code = ! $in_code;
+	next if $in_code;
+
+	# skip all except the headers
+	next unless m/^(\#+) \s+ (.+?) \s*$/x;
+
+	my $depth = length($1) - 1;
+	my $indent = "  " x $depth;
+
+	my $title = $2;
+
+	my $anchor = lc $title;
+	$anchor =~ s/\s/-/g;
+	$anchor =~ s/[^\w-]//g;
+
+	$count{$anchor}++;
+
+	printf "%s* [%s](#%s%s)\n", $indent, $title, $anchor, ( 1 - $count{$anchor} or "" );
+}
+
+# =========================================================================
+
+# EOF
