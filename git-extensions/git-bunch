@@ -27,30 +27,42 @@ git_check_unpushed() {
 
 # =========================================================================
 
-bunch_dir="$1"
-shift
+git_bunch() {
+	local bunch_dir
 
-find "$bunch_dir" -maxdepth 1 -type d \
-| while read f
-do
-	[ -d "$f" ] || continue
+	bunch_dir="$1"
+	shift
 
-	(
-		cd "$f"
-		git_check_is_git || exit
+	if [ $# -eq 0 ]
+	then
+		ls "$bunch_dir"
+		return $?
+	fi
 
-		echo "# $f"
+	find "$bunch_dir" -maxdepth 1 -type d \
+	| while read f
+	do
+		(
+			cd "$f"
+			git_check_is_git || exit
 
-		case "$1" in
-		unpushed | check-unpushed | check_unpushed )
-			git_check_unpushed
-			;;
-		* )
-			git "$@"
-			;;
-		esac
-	)
-done
+			echo "#### $f"
+
+			case "$1" in
+			unpushed | check-unpushed | check_unpushed )
+				git_check_unpushed
+				;;
+			* )
+				git "$@"
+				;;
+			esac
+		)
+	done
+}
+
+# =========================================================================
+
+git_bunch "$@"
 
 # =========================================================================
 
