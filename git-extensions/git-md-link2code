@@ -10,7 +10,8 @@ git-md-link2code - translate markdown links to embedded codes
 
 =head1 DESCRIPTION
 
-Read an input and translate links to the files of the repository to the code blocks and embed them replacing the links with codes.
+Read an input and translate links to the files of the repository to the
+code blocks and embed them replacing the links with codes.
 
 =head1 FORMAT
 
@@ -18,13 +19,16 @@ While parsing a file the script looks for the links formatted as follows:
 
   [code=TITLE;url;lang=LANG;numbers;lines=LINES](path)
 
-The C<code> is mandatory as it marks the link specified to be replaced with the content of the specified file.
+The C<code> is mandatory as it marks the link specified to be replaced
+with the content of the specified file.
 
 =over 4
 
 =item B<code>[=I<TITLE>]
 
-Marks the special link. The optional parameter I<TITLE> is a text to be used as a text under link. If it is not specified, the original link will be used.
+Marks the special link. The optional parameter I<TITLE> is a text to
+be used as a text under link. If it is not specified, the original link
+will be used.
 
 =item B<url>
 
@@ -32,7 +36,8 @@ Outputs the link to the original file.
 
 =item B<lang>=I<LANG>
 
-Triggers the markdown system to colorize the embedded code accordingly the specified language.
+Triggers the markdown system to colorize the embedded code accordingly
+the specified language.
 
 =item B<numbers>
 
@@ -40,7 +45,8 @@ Prints the line numbers in the beginning of each line.
 
 =item B<lines>=I<LINES>
 
-Specifies the lines to be printed. This parameter can be either a list separated by comma and/or a range of lines separated by dash.
+Specifies the lines to be printed. This parameter can be either a list
+separated by comma and/or a range of lines separated by dash.
 
 =back
 
@@ -73,7 +79,8 @@ Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
 
 Copyright (c) 2019 Ildar Shaimordanov. All rights reserved.
 
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 
