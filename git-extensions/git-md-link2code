@@ -1,0 +1,161 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+git-md-link2code - translate markdown links to embedded codes
+
+=head1 SYNOPSIS
+
+  git-md-link2code < FILE1 > FILE2
+
+=head1 DESCRIPTION
+
+Read an input and translate links to the files of the repository to the code blocks and embed them replacing the links with codes.
+
+=head1 FORMAT
+
+While parsing a file the script looks for the links formatted as follows:
+
+  [code=TITLE;url;lang=LANG;numbers;lines=LINES](path)
+
+The C<code> is mandatory as it marks the link specified to be replaced with the content of the specified file.
+
+=over 4
+
+=item B<code>[=I<TITLE>]
+
+Marks the special link. The optional parameter I<TITLE> is a text to be used as a text under link. If it is not specified, the original link will be used.
+
+=item B<url>
+
+Outputs the link to the original file.
+
+=item B<lang>=I<LANG>
+
+Triggers the markdown system to colorize the embedded code accordingly the specified language.
+
+=item B<numbers>
+
+Prints the line numbers in the beginning of each line.
+
+=item B<lines>=I<LINES>
+
+Specifies the lines to be printed. This parameter can be either a list separated by comma and/or a range of lines separated by dash.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Example 1
+
+Assume the following link:
+
+  [code;url;lang=perl;number;lines=3-10](../git-md-link2code)
+
+It will be translated into the following code:
+
+  ```perl
+  3: =head1 NAME
+  4:
+  5: git-md-link2code - translate markdown links to embedded codes
+  6:
+  7: =head1 SYNOPSIS
+  8:
+  9:   git-md-link2code < FILE1 > FILE2
+  
+  ```
+
+=head1 AUTHORS
+
+Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2019 Ildar Shaimordanov. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+exit 1 unless GetOptions(
+	"h|help"	=> sub {
+		pod2usage({ -verbose => 2, -noperldoc => 1 });
+	},
+);
+
+# =========================================================================
+
+sub parse_range {
+	my $ranges = shift;
+	my @r = ();
+	my @ranges = split /,/, $ranges // '';
+	foreach ( @ranges ) {
+		m/^(?:(\d+)-(\d+)|(\d+))$/ and do {
+			push @r, [ int $1, int $2 ] if $1;
+			push @r, [ int $3, int $3 ] if $3;
+		}
+	}
+	return sort { $a->[0] <=> $b->[0] } @r;
+}
+
+sub parse_options {
+	my $opts = shift;
+	my %opts = ();
+	foreach ( split ";", $opts ) {
+		my ( $k, $v ) = split "=";
+		$opts{$k} = $v // '';
+	}
+	$opts{ranges} = [ parse_range $opts{lines} ];
+	return %opts;
+}
+
+# =========================================================================
+
+sub number_1 { "$_[0]: $_[1]" }
+sub number_0 { $_[1] }
+sub ranges_1 { grep { $. >= $_->[0] && $. <= $_->[1] } @{ $_[0] } }
+sub ranges_0 { 1 }
+
+sub prepare_code {
+	my $file = shift;
+	my %opts = @_;
+
+	my $number = exists $opts{numbers} ? \&number_1 : \&number_0;
+	my $ranges = @{ $opts{ranges} } ? \&ranges_1 : \&ranges_0;
+
+	my @lines = ();
+
+	open FILE, "$file" or warn "Unable to open file: $file\n" and return;
+	while ( <FILE> ) {
+		push @lines, $number->($., $_) if $ranges->($opts{ranges});
+	}
+	close FILE;
+
+	my $text = $opts{code} || $file;
+
+	return sprintf("%s\n```%s\n%s\n```\n",
+		exists $opts{url} ? "[$text]($file)" : "",
+		$opts{lang} || "",
+		join "", @lines) if @lines;
+}
+
+# =========================================================================
+
+while ( <> ) {
+	m/^\s*\[(code\b.*)\]\(([^()]+)\)\s*$/ and do {
+		my %opts = parse_options $1;
+		my $code = prepare_code $2, %opts;
+		$_ = $code if $code;
+	};
+	print;
+}
+
+# =========================================================================
+
+# EOF

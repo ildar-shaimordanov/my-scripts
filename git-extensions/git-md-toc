@@ -2,16 +2,66 @@
 
 =head1 NAME
 
-git-md-toc - generate the table of content from the Markdown file
+git-md-toc - generate the table of content from the Markdown file(s)
 
 =head1 SYNOPSIS
 
-  git-md-toc README.md
+  git-md-toc [OPTIONS]
 
 =head1 DESCRIPTION
 
-Read an input and generate the table of content assuming the file is
-Markdown. The outcome is also formatted as Markdown.
+Read and input and generate the table of content (TOC) based on the
+markup of the file which is assumed Markdown formatted. The outcome is
+also formatted as Markdown.
+
+If no file specified, the file C<README.md> is assumed.
+
+The following HTML comments are recognized in a special way and handled
+as the markers to insert new TOC or update existing one:
+
+=over 4
+
+=item C<< <!-- md-toc --> >>
+
+is used to point the place in the document where to put a new TOC.
+
+=item C<< <!-- md-toc-begin --> >>, C<< <!-- md-toc-end --> >>
+
+are used to point the beginning and end of the existing TOC.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Print this help and exit.
+
+=item B<-t> I<TITLE>, B<--title>=I<TITLE>
+
+Set the title for the table of content. If not specified, the default
+value C<Table of Content> is assumed.
+
+=item B<-l> I<LEVEL>, B<--level>=I<LEVEL>
+
+Set the header level used for the TOC title. Available values are C<1>
+to C<6>. The default value is C<1>.
+
+=item B<-u>, B<--update>
+
+Update the file with the new table of content.
+
+=back
+
+=head1 SEE ALSO
+
+L<https://daringfireball.net/projects/markdown/>
+
+L<https://metacpan.org/pod/Text::Markdown>
+
+L<https://metacpan.org/pod/Text::MultiMarkdown>
 
 =head1 AUTHORS
 
@@ -29,36 +79,145 @@ under the same terms as Perl itself.
 use strict;
 use warnings;
 
+use Getopt::Long qw( :config no_ignore_case bundling );
 use Pod::Usage;
 
-pod2usage( -verbose => 2, -noperldoc => 1 ) if -t 0 && ! @ARGV;
+my $toc_default_title = "Table of Content";
+my $toc_title;
+my $toc_level = 1;
+my $update;
+
+exit 1 unless GetOptions(
+	"h|help"	=> sub {
+		pod2usage({ -verbose => 2, -noperldoc => 1 });
+	},
+
+	"t|title:s"	=> sub {
+		$toc_title = $_[1] || $toc_default_title;
+	},
+	"l|level=i"	=> sub {
+		( $toc_level = $_[1] ) =~ /^[1-6]$/
+		or die "Integer expected in range [1..6]\n";
+	},
+	"u|update"	=> \$update,
+);
+
+@ARGV = "README.md" if -t 0 && ! @ARGV;
 
 # =========================================================================
 
-my $in_code = 0;
+my $md_toc		= "<!-- md-toc -->";
+my $md_toc_begin	= "<!-- md-toc-begin -->";
+my $md_toc_end		= "<!-- md-toc-end -->";
 
-my %count = ();
+foreach ( @ARGV ) {
+	my $orig_text;
+	{
+		local $/;
+		open F, $_ or die "Unable to open for reading: $_: $!\n";
+		$orig_text = <F>;
+		close F;
+	};
 
-while ( <> ) {
+	my $clean_text = $orig_text;
+
 	# skip code fencing
-	m/^```/ and $in_code = ! $in_code;
-	next if $in_code;
+	$clean_text =~ s{
+		(?:\A|\n) [ \t]* ``` .*? \n [ \t]* ```
+	}{}msgx;
 
-	# skip all except the headers
-	next unless m/^(\#+) \s+ (.+?) \s*$/x;
+	# skip TOC blocks
+	$clean_text =~ s{
+		(?:\A|\n)
+		<!-- [ \t]+ md-toc-begin [ \t]+ --> [ \t\r]* \n
+		[\s\S]*? \n
+		<!-- [ \t]+ md-toc-end   [ \t]+ --> [ \t\r]*
+		(?=\n)
+	}{}msgx;
 
-	my $depth = length($1) - 1;
-	my $indent = "  " x $depth;
+	my %count = ();
 
-	my $title = $2;
+	my @toc = ();
 
-	my $anchor = lc $title;
-	$anchor =~ s/\s/-/g;
-	$anchor =~ s/[^\w-]//g;
+	push @toc, $md_toc_begin;
+	push @toc, "#" x $toc_level . " $toc_title" if $toc_title;
 
-	$count{$anchor}++;
+	while ( $clean_text =~ m{
+		(?:\A|\n)
+		[ \t]*
+		(?:
+			# atx-style headers H1-H6
+			( [#]{1,6} ) [ \t]+ ( .+? ) [ \t]* [#]*
+			|
+			# setext-style headers H1
+			( [^\r\n]+? ) [ \t\r]* \n [ \t]* ( [=] )+
+			|
+			# setext-style header H2
+			( (?![-]+)|[^\r\n]+? ) [ \t\r]* \n [ \t]* ( [-] )+
+		)
+		[ \t\r]*
+		(?=\n)
+	}mgx ) {
+		my $depth;
+		my $indent;
+		my $title;
 
-	printf "%s* [%s](#%s%s)\n", $indent, $title, $anchor, ( 1 - $count{$anchor} or "" );
+		if ( $1 && $2 ) {
+			$depth = length($1) - 1;
+			$title = $2;
+		} elsif ( $4 && $3 ) {
+			$depth = 0;
+			$indent = "";
+			$title = $3;
+		} elsif ( $6 && $5 ) {
+			$depth = 1;
+			$title = $5;
+		}
+
+		next unless $title;
+
+		$indent = "  " x $depth;
+
+		my $anchor = lc $title;
+		$anchor =~ s/\s/-/g;
+		$anchor =~ s/[^\w-]//g;
+
+		$count{$anchor}++;
+
+		$anchor .= ( 1 - $count{$anchor} or "" );
+
+		push @toc, "$indent* [$title](#$anchor)";
+	}
+
+	push @toc, $md_toc_end;
+
+	my $toc = join "\n", @toc;
+
+	unless ( $update ) {
+		print "\n$toc";
+		next;
+	}
+
+	my $updated_text = $orig_text;
+
+	$updated_text =~ s{
+		[\r\n]+
+		(?:
+			<!-- [ \t]+ md-toc [ \t]+ --> [ \t\r]*
+			|
+			<!-- [ \t]+ md-toc-begin [ \t]+ --> [ \t\r]* \n
+			[\s\S]*? \n
+			<!-- [ \t]+ md-toc-end   [ \t]+ --> [ \t]*
+		)
+		[\r\n]+
+
+	}{\n\n$toc\n\n}mgx;
+
+	warn "Updating $_\n";
+
+	open F, ">$_" or die "Unable to open for writing: $_: $!\n";
+	print F $updated_text;
+	close F;
 }
 
 # =========================================================================
