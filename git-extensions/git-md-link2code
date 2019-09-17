@@ -56,7 +56,7 @@ separated by comma and/or a range of lines separated by dash.
 
 Assume the following link:
 
-  [code;url;lang=perl;number;lines=3-10](../git-md-link2code)
+  [code;lang=perl;numbers;lines=3-9](git-md-link2code)
 
 It will be translated into the following code:
 
