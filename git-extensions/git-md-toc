@@ -31,12 +31,12 @@ are used to point the beginning and end of the existing TOC.
 
 =back
 
-Be noticed that these markers themselves must be sticky to the left
-edge of the lines where they are. This rule doesn't affect on the
+Be noticed that these markers themselves must be sticky to the left edge
+of the lines where they are situated. This rule doesn't spread on the
 content within.
 
 The updated TOC is always ended with double new line to separate from
-the further text below. On the same reason, if the TOC is preceeded with
+the further text below. On the same reason, if the TOC is preceded with
 some text above, the double new line is prepended the TOC.
 
 =head1 OPTIONS
@@ -59,7 +59,8 @@ to C<6>. The default value is C<1>.
 
 =item B<-u>, B<--update>
 
-Update the file with the new table of content.
+Update the file with the new table of content. It works even when reading
+from STDIN. In this case the outcome will be printed to STDOUT.
 
 =back
 
