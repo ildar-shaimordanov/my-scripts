@@ -99,7 +99,7 @@ if not defined syncup.drive (
 	goto :EOF
 )
 
-set "syncup.rootdir=%~dp0..\opt\nnSoft\nnBackup"
+set "syncup.rootdir=%~dp0..\opt\nnBackup"
 set "syncup.logfile=%syncup.drive%\.sync\%~2.log"
 set "syncup.lnkfile=%syncup.drive%\.sync\%~2-links.txt"
 goto :starting
