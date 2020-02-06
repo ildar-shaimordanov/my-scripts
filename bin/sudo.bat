@@ -4,9 +4,25 @@
 :: Allow to run a command with the elevated privileges
 @echo off
 
+setlocal
+
+set "SUDO_HIDDEN="
+
 if "%~1" == "" (
-	call "%~f0" cmd.exe "/s /k cd \"%cd%\""
+	call :sudo /s /k cd "%CD%"
 	goto :EOF
 )
 
-PowerShell -Command Start-Process "%~1" -Args '%2 %3 %4 %5 %6 %7 %8 %9' -Verb RunAs
+for %%x in ( .bat .cmd ) do if /i "%~x1" == "%%x" (
+	call :sudo /s /k cd "%CD%" "&&" %*
+	goto :EOF
+)
+
+set "SUDO_HIDDEN=-WindowStyle Hidden"
+call :sudo /c start /d "%CD%" %*
+
+goto :EOF
+
+:sudo
+endlocal && powershell -Command Start-Process "cmd.exe" -Args '%*' %SUDO_HIDDEN% -Verb RunAs
+goto :EOF
