@@ -5,7 +5,7 @@
 @echo off
 
 if "%~1" == "" (
-	call "%~f0" cmd.exe "/s /k pushd \"%cd%\""
+	call "%~f0" cmd.exe "/s /k cd \"%cd%\""
 	goto :EOF
 )
 
