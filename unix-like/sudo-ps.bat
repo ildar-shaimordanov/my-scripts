@@ -59,4 +59,4 @@ for %%p in ( powershell.exe ) do if "%%~$PATH:p" == "" (
 	echo:%%~p is required>&2
 	exit /b 1
 )
-goto :EOF
+exit /b 0
