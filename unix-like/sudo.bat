@@ -29,12 +29,12 @@ setlocal
 set "SUDO_HIDDEN="
 
 if "%~1" == "" (
-	call :sudo /s /k cd "%CD%"
+	call :sudo /s /k cd /d "%CD%"
 	goto :EOF
 )
 
 for %%x in ( .bat .cmd ) do if /i "%~x1" == "%%x" (
-	call :sudo /s /k cd "%CD%" "&&" %*
+	call :sudo /s /k cd /d "%CD%" "&&" %*
 	goto :EOF
 )
 
