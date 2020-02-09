@@ -14,8 +14,9 @@
 ::command interpreter. The command can be any of binary executables,
 ::batch scripts or documents supposed to be open.
 ::
-::Based on the solution suggested in this thread:
-::https://www.dostips.com/forum/viewtopic.php?f=3&t=9212
+::REQUIREMENTS
+::
+::The script requires PowerShell to be installed on the system.
 @echo off
 
 if /i "%~1" == "/?" goto :print_usage
@@ -23,15 +24,28 @@ if /i "%~1" == "/h" goto :print_usage
 
 call :check_reqs || goto :EOF
 
-type nul >"%TEMP%\%~n0.elevate"
+setlocal
 
-reg add "HKCU\Software\Classes\.elevate\shell\runas\command" /ve /d "cmd.exe /c cd /d \"%%w\" & start %%*" /f >nul
+set "SUDO_HIDDEN="
 
-"%TEMP%\%~n0.elevate" %*
+if "%~1" == "" (
+	call :sudo /s /k cd /d "%CD%"
+	goto :EOF
+)
 
-reg delete "HKCU\Software\Classes\.elevate" /f >nul
-del /q "%TEMP%\%~n0.elevate"
+for %%x in ( .bat .cmd ) do if /i "%~x1" == "%%x" (
+	call :sudo /s /k cd /d "%CD%" "&&" %*
+	goto :EOF
+)
 
+set "SUDO_HIDDEN=-WindowStyle Hidden"
+call :sudo /c start /d "%CD%" %*
+
+goto :EOF
+
+
+:sudo
+endlocal && powershell -Command Start-Process "cmd.exe" -Args '%*' %SUDO_HIDDEN% -Verb RunAs
 goto :EOF
 
 
@@ -41,7 +55,7 @@ goto :EOF
 
 
 :check_reqs
-for %%p in ( reg.exe ) do if "%%~$PATH:p" == "" (
+for %%p in ( powershell.exe ) do if "%%~$PATH:p" == "" (
 	echo:%%~p is required>&2
 	exit /b 1
 )
