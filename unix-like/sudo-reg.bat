@@ -23,14 +23,14 @@ if /i "%~1" == "/h" goto :print_usage
 
 call :check_reqs || goto :EOF
 
-type nul >"%TEMP%\%~n0.elevate"
+type nul >"%TEMP%\%~n0.%USERNAME%.elevate"
 
 reg add "HKCU\Software\Classes\.elevate\shell\runas\command" /ve /d "cmd.exe /c cd /d \"%%w\" & start \"%~n0\" %%*" /f >nul
 
-"%TEMP%\%~n0.elevate" %*
+"%TEMP%\%~n0.%USERNAME%.elevate" %*
 
 reg delete "HKCU\Software\Classes\.elevate" /f >nul
-del /q "%TEMP%\%~n0.elevate"
+del /q "%TEMP%\%~n0.%USERNAME%.elevate"
 
 goto :EOF
 
