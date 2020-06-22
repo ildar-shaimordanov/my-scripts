@@ -22,7 +22,7 @@
 if /i "%~1" == "/?" goto :print_usage
 if /i "%~1" == "/h" goto :print_usage
 
-call :check_reqs || goto :EOF
+call :check_reqs powershell.exe || goto :EOF
 
 setlocal
 
@@ -55,7 +55,7 @@ goto :EOF
 
 
 :check_reqs
-for %%p in ( powershell.exe ) do if "%%~$PATH:p" == "" (
+for %%p in ( "%~1" ) do if "%%~$PATH:p" == "" (
 	echo:%%~p is required>&2
 	exit /b 1
 )
