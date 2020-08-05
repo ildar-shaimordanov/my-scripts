@@ -46,6 +46,14 @@ goto :run_help
 :run_install
 if /i "%run_menu%" == "cmd" goto :run_forbidden
 
+:: [/K iconfile]
+set "run_iconfile="
+if /i "%~1" == "/K" (
+	set "run_iconfile=%~2"
+	shift
+	shift
+)
+
 :: [/NO-CHECK]
 set "run_nocheck="
 if /i "%~1" == "/NO-CHECK" (
@@ -101,6 +109,10 @@ set "run_arguments=%run_arguments:"=\"%"
 for %%s in ( %run_subkey1% ) do (
 	reg add "%run_classkey%\%%s\shell\%run_menu%\command" /ve /d "\"%run_progpath%\"%run_arguments%" /f
 )
+
+if defined run_iconfile for %%s in ( %run_subkey1% ) do (
+	reg add "%run_classkey%\%%s\shell\%run_menu%" /v Icon /t REG_SZ /d "%run_iconfile%" /f
+)
 goto :EOF
 
 
@@ -128,7 +140,7 @@ goto :EOF
 :run_help
 echo:Open the command identified by the menu over the folder. 
 echo:
-echo:%~n0 [/A] /I "menu" [/NO-CHECK] command [arguments]
+echo:%~n0 [/A] /I "menu" [/K iconfile] [/NO-CHECK] command [arguments]
 echo:%~n0 [/A] /U "menu"
 echo:%~n0 [/A] /S "menu"
 echo:
@@ -139,6 +151,7 @@ echo:/A         Apply for all users. By default, for the current user only.
 echo:/I         Install the menu item.
 echo:/U         Uninstall the existing item. 
 echo:/S         Show the Registry entries if they exist.
+echo:/K icon    Set the menu icon.
 echo:/NO-CHECK  Do not check the path to the command when installing.
 goto :EOF
 
