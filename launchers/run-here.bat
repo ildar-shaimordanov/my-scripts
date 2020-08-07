@@ -4,6 +4,11 @@ setlocal
 
 if /i "%~1" == "" goto :run_help
 
+:: See also
+:: https://www.howtogeek.com/165268/how-to-add-open-powershell-here-to-the-context-menu-in-windows/
+:: https://www.tenforums.com/tutorials/60175-open-powershell-window-here-context-menu-add-windows-10-a.html
+:: https://gist.github.com/davecan/f3045266aa9e3441211ab55f9db70c2b
+
 :: Current user
 :: HKEY_CURRENT_USER\Software\Classes\Drive\shell\<menu>\command
 :: HKEY_CURRENT_USER\Software\Classes\Directory\shell\<menu>\command
