@@ -39,12 +39,18 @@ if not defined run_menu (
 	goto :run_help
 )
 
-set "run_subkey1=Drive Directory Directory\Background"
+if not "%run_menu%" == "%run_menu:\=%" (
+	>&2 echo:Incorrect menu: %run_menu%
+	goto :EOF
+)
+
+set "run_subkey_list=Drive Directory Directory\Background"
 
 if /i "%run_action%" == "/I" goto :run_install
 if /i "%run_action%" == "/U" goto :run_uninstall
 if /i "%run_action%" == "/S" goto :run_show
 
+>&2 echo:Unknown action: %run_action%
 goto :run_help
 
 
@@ -87,7 +93,7 @@ for /f "tokens=*" %%c in ( "%run_command%" ) do (
 )
 
 if not defined run_progpath (
-	>&2 echo:"%run_command%" not found
+	>&2 echo:Command not found: %run_command%
 	goto :run_help
 )
 
@@ -111,11 +117,11 @@ if not defined run_arguments set "run_arguments= "%%V""
 :: Escape quotes before enclosing within quotes
 set "run_arguments=%run_arguments:"=\"%"
 
-for %%s in ( %run_subkey1% ) do (
+for %%s in ( %run_subkey_list% ) do (
 	reg add "%run_classkey%\%%s\shell\%run_menu%\command" /ve /d "\"%run_progpath%\"%run_arguments%" /f
 )
 
-if defined run_iconfile for %%s in ( %run_subkey1% ) do (
+if defined run_iconfile for %%s in ( %run_subkey_list% ) do (
 	reg add "%run_classkey%\%%s\shell\%run_menu%" /v Icon /t REG_SZ /d "%run_iconfile%" /f
 )
 goto :EOF
@@ -124,14 +130,14 @@ goto :EOF
 :run_uninstall
 if /i "%run_menu%" == "cmd" goto :run_forbidden
 
-for %%s in ( %run_subkey1% ) do (
+for %%s in ( %run_subkey_list% ) do (
 	reg delete "%run_classkey%\%%s\shell\%run_menu%" /f
 )
 goto :EOF
 
 
 :run_show
-for %%s in ( %run_subkey1% ) do (
+for %%s in ( %run_subkey_list% ) do (
 	reg query "%run_classkey%\%%s\shell\%run_menu%" /s
 )
 goto :EOF
