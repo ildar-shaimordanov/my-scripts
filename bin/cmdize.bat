@@ -129,24 +129,17 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another 
 :: engine (cscript or wscript). 
 :: The default value is cscript. 
-:: script was saved in unix mode (EOL=LF).
-:cmdize.vbs.h
-set /p "=::'" <nul
-type "%TEMP%\%~n0.$$"
-echo:%*
-goto :EOF
-
-
 :cmdize.vbs
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
-
-call :cmdize.vbs.h @echo off
-call :cmdize.vbs.h %CMDIZE_ENGINE% //nologo //e:vbscript "%%%%~f0" %%%%*
-call :cmdize.vbs.h goto :EOF
-
+for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
+	echo:::'%%~s@echo off
+	echo:::'%%~scscript //nologo //e:vbscript "%%~f0" %%*
+	echo:::'%%~sgoto :EOF
+)
 del /q "%TEMP%\%~n0.$$"
+
 rem type "%~f1"
 for /f "tokens=1,* delims=]" %%r in ( ' call "%windir%\System32\find.exe" /n /v "" ^<"%~f1" ' ) do (
 	rem Filtering and commenting "Option Explicit". 
