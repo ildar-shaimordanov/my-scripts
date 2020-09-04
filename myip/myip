@@ -11,7 +11,7 @@
 # External IP address is the IP address that is visible by external 
 # servers that you connect to over Internet.
 #
-# Copyright (C) 2016 Ildar Shaimordanov
+# Copyright (C) 2016, 2020 Ildar Shaimordanov
 #
 # =========================================================================
 
@@ -128,8 +128,8 @@ resolveip() {
 internalip() {
 	[ -n "$show_verbose" ] && printf "Internal: "
 
-	case "$( uname | tr '[:upper:]' '[:lower:]' )" in
-	cygwin* | mingw* | msys* )
+	case "$( uname | tr 'A-Z' 'a-z' )" in
+	cygwin* | mingw* | msys* | win* )
 		netstat -rn \
 		| grep -w '0.0.0.0' \
 		| awk '{ print $4 }'
