@@ -1,0 +1,11 @@
+## to show entries
+
+```
+for %s in ( Drive Directory Directory\Background ) do @reg query HKEY_CURRENT_USER\Software\Classes\%s\shell
+```
+
+## to add Shield on icon
+
+```
+reg add "HKEY_CURRENT_USER\Software\Classes\Directory\shell\Run Cmd Here" /v HasLUAShield /t REG_SZ
+```
