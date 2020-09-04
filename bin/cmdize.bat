@@ -59,7 +59,7 @@
 :: .kix
 ::
 :: COPYRIGHTS
-:: Copyright (c) 2014, 2015, 2016, 2018 Ildar Shaimordanov
+:: Copyright (c) 2014, 2015, 2016, 2018, 2020 Ildar Shaimordanov
 
 @echo off
 
