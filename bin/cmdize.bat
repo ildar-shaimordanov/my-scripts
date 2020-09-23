@@ -76,11 +76,12 @@ setlocal
 :cmdize.loop.begin
 if "%~1" == "" goto :cmdize.loop.end
 
+set "CMDIZE_ENGINE="
+
 if /i "%~1" == "/e" (
-	set "CMDIZE_ENGINE="
 	if /i not "%~2" == "default" set "CMDIZE_ENGINE=%~2"
-	shift
-	goto :cmdize.loop.continue
+	shift /1
+	shift /1
 )
 
 if not exist "%~f1" (
@@ -104,6 +105,7 @@ goto :cmdize.loop.begin
 
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the javascript file. 
 :: The environment variable %CMDIZE_ENGINE% allows to declare another 
@@ -124,6 +126,7 @@ echo:goto :EOF */0;
 type "%~f1"
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the vbscript file. 
 :: The environment variable %CMDIZE_ENGINE% allows to declare another 
@@ -158,6 +161,7 @@ for /f "tokens=1,* delims=]" %%r in ( 'find /n /v "" ^<"%~f1"' ) do (
 )
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the perl file.
 :cmdize.pl
@@ -176,6 +180,7 @@ echo:#!perl
 type "%~f1"
 goto :EOF
 
+:: ========================================================================
 
 :: Convert Bourne shell and Bash scripts. 
 :cmdize.sh
@@ -188,6 +193,7 @@ echo:____CMD____
 type "%~f1"
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the powershell file. 
 :cmdize.ps1
@@ -203,6 +209,7 @@ echo:#^>
 type "%~f1"
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the python file.
 :cmdize.py
@@ -220,6 +227,7 @@ echo:"""
 type "%~f1"
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the html file. 
 :: Supportable file extensions are .hta, .htm and .html. 
@@ -234,6 +242,7 @@ echo:--^>
 type "%~f1"
 goto :EOF
 
+:: ========================================================================
 
 :: Convert the wsf file. 
 :: The environment variable %CMDIZE_ENGINE% allows to declare another 
@@ -257,6 +266,7 @@ for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*"
 )
 goto :EOF
 
+:: ========================================================================
 
 :: Comvert KiXtart file.
 :cmdize.kix
@@ -265,5 +275,6 @@ echo:;kix32 "%%~f0" %%*
 echo:;goto :EOF
 type "%~f1"
 
+:: ========================================================================
 
-rem EOF
+:: EOF
