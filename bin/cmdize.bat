@@ -64,6 +64,9 @@
 ::
 :: .php
 ::
+:: .jl
+:: https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
+::
 :: COPYRIGHTS
 :: Copyright (c) 2014, 2015, 2016, 2018, 2020 Ildar Shaimordanov
 
@@ -313,6 +316,18 @@ echo:@echo off
 echo:php -n -q "%%~f0" %%*
 echo:goto :EOF
 echo:*/ ?^>
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:: Convert Julia file.
+:cmdize.jl
+echo::"""
+echo:@echo off
+echo:julia "%%~f0" %%*
+echo:goto :EOF
+echo:"""
 type "%~f1"
 goto :EOF
 
