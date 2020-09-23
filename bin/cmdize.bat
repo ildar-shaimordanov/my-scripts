@@ -58,6 +58,12 @@
 ::
 :: .kix
 ::
+:: .au3, .a3x
+::
+:: .ahk
+::
+:: .php
+::
 :: COPYRIGHTS
 :: Copyright (c) 2014, 2015, 2016, 2018, 2020 Ildar Shaimordanov
 
@@ -274,6 +280,42 @@ echo:;@echo off
 echo:;kix32 "%%~f0" %%*
 echo:;goto :EOF
 type "%~f1"
+
+:: ========================================================================
+
+:: Convert AutoIt file.
+:cmdize.au3
+:cmdize.a3x
+echo:;@echo off
+echo:;AutoIt3 "%%~f0" %%*
+echo:;goto :EOF
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:: Convert AutoHotKey file.
+:cmdize.ahk
+echo:;@echo off
+echo:;AutoHotKey "%%~f0" %%*
+echo:;goto :EOF
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:: Convert PHP file.
+:: PHP is supposed to be used as a scripting language in Web. So to avoid
+:: possible conflicts with paths to dynamic libraries and to suppress HTTP
+:: headers, we use two options "-n" and "-q", respectively.
+:cmdize.php
+echo:^<^?php/* :
+echo:@echo off
+echo:php -n -q "%%~f0" %%*
+echo:goto :EOF
+echo:*/ ?^>
+type "%~f1"
+goto :EOF
 
 :: ========================================================================
 
