@@ -206,10 +206,9 @@ goto :EOF
 echo:^<# :
 echo:@echo off
 echo:setlocal
-echo:set "POWERSHELL_BAT_ARGS=%%*"
-echo:if defined POWERSHELL_BAT_ARGS set "POWERSHELL_BAT_ARGS=%%POWERSHELL_BAT_ARGS:"=\"%%"
-echo:endlocal ^& powershell -NoLogo -NoProfile -Command "$_ = $input; Invoke-Expression $( '$input = $_; $_ = \"\"; $args = @( &{ $args } %%POWERSHELL_BAT_ARGS%% );' + [String]::Join( [char]10, $( Get-Content \"%%~f0\" ) ) )"
-echo:rem endlocal ^& powershell -NoLogo -NoProfile -Command "$input | &{ [ScriptBlock]::Create( ( Get-Content \"%%~f0\" ) -join [char]10 ).Invoke( @( &{ $args } %%POWERSHELL_BAT_ARGS%% ) ) }"
+echo:set "PS1_ARGS=%%*"
+echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches.Value|%%%%{$_ -Replace '^\"','' -Replace '\"$',''};$i=$input;iex $('$input=$i;$args=$a;rv i,a;'+((gc \"%%~f0\" ) -join [char]10))"
+echo:rem powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches.Value|%%%%{$_ -Replace '^\"','' -Replace '\"$',''};$input|&{[ScriptBlock]::Create((gc \"%%~f0\" ) -join [char]10).Invoke(@(&{$args+$a}))}"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
