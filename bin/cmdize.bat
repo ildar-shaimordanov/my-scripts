@@ -71,6 +71,8 @@ if "%~1" == "" (
 	goto :EOF
 )
 
+setlocal
+
 :cmdize.loop.begin
 if "%~1" == "" goto :cmdize.loop.end
 
@@ -86,14 +88,12 @@ if not exist "%~f1" (
 	goto :cmdize.loop.continue
 )
 
-for %%x in ( .js .vbs .pl .sh .bash .ps1 .py .hta .htm .html .wsf .kix ) do (
-	if /i "%~x1" == "%%~x" (
-		call :cmdize%%~x "%~1" >"%~dpn1.bat"
-		goto :cmdize.loop.continue
-	)
+findstr /i /r /c:"^:cmdize%~x1$" "%~f0" >nul || (
+	echo:%~n0: Unsupported extension: "%~1">&2
+	goto :cmdize.loop.continue
 )
 
-echo:%~n0: Unsupported extension: "%~1">&2
+call :cmdize%~x1 "%~1" >"%~dpn1.bat"
 
 :cmdize.loop.continue
 
@@ -141,7 +141,7 @@ for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
 del /q "%TEMP%\%~n0.$$"
 
 rem type "%~f1"
-for /f "tokens=1,* delims=]" %%r in ( ' call "%windir%\System32\find.exe" /n /v "" ^<"%~f1" ' ) do (
+for /f "tokens=1,* delims=]" %%r in ( 'find /n /v "" ^<"%~f1"' ) do (
 	rem Filtering and commenting "Option Explicit". 
 	rem This ugly code tries as much as possible to recognize and 
 	rem comment this directive. It fails if "Option" and "Explicit" 
