@@ -210,8 +210,8 @@ echo:^<# :
 echo:@echo off
 echo:setlocal
 echo:set "PS1_ARGS=%%*"
-echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches.Value|%%%%{$_ -Replace '^\"','' -Replace '\"$',''};$i=$input;iex $('$input=$i;$args=$a;rv i,a;'+((gc \"%%~f0\" ) -join [char]10))"
-echo:rem powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches.Value|%%%%{$_ -Replace '^\"','' -Replace '\"$',''};$input|&{[ScriptBlock]::Create((gc \"%%~f0\" ) -join [char]10).Invoke(@(&{$args+$a}))}"
+echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches.Value|%%%%{$_ -Replace '^\"','' -Replace '\"$',''};$i=$input;iex $('$input=$i;$args=$a;rv i,a;'+(gc \"%%~f0\"|Out-String))"
+echo:rem powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches.Value|%%%%{$_ -Replace '^\"','' -Replace '\"$',''};$input|&{[ScriptBlock]::Create((gc \"%%~f0\"|Out-String)).Invoke($a)}"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
