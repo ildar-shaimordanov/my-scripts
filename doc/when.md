@@ -1,4 +1,4 @@
-_This page tells about `test` script introducing more usability and flexibility to Windows batch script._
+_This page tells about `when` script introducing more usability and flexibility to Windows batch script._
 
 # Conditionals on steroids #
 
@@ -20,7 +20,7 @@ Expression could be in the standard form for the `IF` operator used in
 batch scenarios. For the details of the syntax read the help page by
 the `IF /?` command.
 
-The second form came from the Bash's `test` builtin command that
+The second form came from the Bash's `when` builtin command that
 extends capabilities of the standard operator in batches. In other
 words, there are **steroids**.
 
@@ -30,14 +30,14 @@ words, there are **steroids**.
 Run the following command to see this page
 
 ```
-    test HELP
+    when HELP
 ```
 
 Execute the following command to embed the functionality into your script
 "filename"
 
 ```
-    test APPEND-TO filename
+    when APPEND-TO filename
 ```
 
 After that you can get all these features in your script as below:
@@ -51,7 +51,7 @@ Put this script to some place on your system declared in the `%PATH%`
 variable and call the functions as it is shown below:
 
 ```
-    call test :if -f "%COMSPEC%" && echo FILE
+    call when :if -f "%COMSPEC%" && echo FILE
 ```
 
 
@@ -62,7 +62,7 @@ expression is true, otherwise (1). Returns the status of (2) if an
 invalid arguments are given.
 
 
-_UNLESS works similar to IF but the sense of the test is reversed._
+_UNLESS works similar to IF but the sense of the when is reversed._
 
 
 To perform extended conditional operators this solution considers some
@@ -267,24 +267,24 @@ Do something depending on a file attribute
     )
 ```
 
-Full test example
+Full when example
 ```
     set "f=%~1"
     set "a=%~a1"
     echo FILE: "%f%"
     echo ATTR: "%a%"
-    call test :if -a "%f%" && echo -a
-    call test :if -b "%f%" && echo -b
-    call test :if -c "%f%" && echo -c
-    call test :if -d "%f%" && echo -d
-    call test :if -e "%f%" && echo -e
-    call test :if -f "%f%" && echo -f
-    call test :if -h "%f%" && echo -h
-    call test :if -L "%f%" && echo -L
-    call test :if -r "%f%" && echo -r
-    call test :if -s "%f%" && echo -s
-    call test :if -w "%f%" && echo -w
-    call test :if -x "%f%" && echo -x
+    call when :if -a "%f%" && echo -a
+    call when :if -b "%f%" && echo -b
+    call when :if -c "%f%" && echo -c
+    call when :if -d "%f%" && echo -d
+    call when :if -e "%f%" && echo -e
+    call when :if -f "%f%" && echo -f
+    call when :if -h "%f%" && echo -h
+    call when :if -L "%f%" && echo -L
+    call when :if -r "%f%" && echo -r
+    call when :if -s "%f%" && echo -s
+    call when :if -w "%f%" && echo -w
+    call when :if -x "%f%" && echo -x
 ```
 
 
