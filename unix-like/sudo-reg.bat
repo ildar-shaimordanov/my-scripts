@@ -56,7 +56,7 @@ exit /b 0
 
 :check_priv
 for /f "tokens=3 delims=\ " %%a in ( '
-	whoami /groups ^| findstr /b /c:"Mandatory Label"
+	call "%SystemRoot%\system32\whoami.exe" /groups ^| findstr /b /c:"Mandatory Label"
 ' ) do if /i "%%~a" == "system" (
 	echo:system
 ) else if /i "%%~a" == "high" (
