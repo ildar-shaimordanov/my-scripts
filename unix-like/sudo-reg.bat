@@ -1,9 +1,13 @@
 ::NAME
 ::
-::    sudo - execute a command with the elevated privileges
+::    sudo - check privileges or run a command with the elevated privileges
 ::
 ::SYNOPSIS
 ::
+::Check privileges
+::    sudo /c
+::
+::Run a command with the elevated privileges
 ::    sudo
 ::    sudo COMMAND [OPTIONS]
 ::
@@ -14,12 +18,14 @@
 ::command interpreter. The command can be any of binary executables,
 ::batch scripts or documents supposed to be open.
 ::
-::Based on the solution suggested in this thread:
+::Based on the solutions suggested in these threads:
 ::https://www.dostips.com/forum/viewtopic.php?f=3&t=9212
+::https://stackoverflow.com/a/27717205/3627676
 @echo off
 
 if /i "%~1" == "/?" goto :print_usage
 if /i "%~1" == "/h" goto :print_usage
+if /i "%~1" == "/c" goto :check_priv
 
 call :check_reqs reg.exe || goto :EOF
 
@@ -46,3 +52,18 @@ for %%p in ( "%~1" ) do if "%%~$PATH:p" == "" (
 	exit /b 1
 )
 exit /b 0
+
+
+:check_priv
+for /f "tokens=3 delims=\ " %%a in ( '
+	whoami /groups ^| findstr /b /c:"Mandatory Label"
+' ) do if /i "%%~a" == "system" (
+	echo:system
+) else if /i "%%~a" == "high" (
+	echo:admin
+) else if /i "%%~a" == "medium" (
+	echo:user
+) else (
+	echo:others
+)
+goto :EOF
