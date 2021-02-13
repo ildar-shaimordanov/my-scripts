@@ -50,6 +50,9 @@
 :: http://stackoverflow.com/a/29881143/3627676
 :: http://stackoverflow.com/a/17468811/3627676
 ::
+:: .rb
+:: https://stackoverflow.com/questions/35094778
+::
 :: .hta and .html?
 :: http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
 ::
@@ -68,7 +71,7 @@
 :: https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
 ::
 :: COPYRIGHTS
-:: Copyright (c) 2014, 2015, 2016, 2018, 2020 Ildar Shaimordanov
+:: Copyright (c) 2014-2021 Ildar Shaimordanov
 
 @echo off
 
@@ -232,6 +235,19 @@ echo:@echo off
 echo:python "%%~f0" %%*
 echo:goto :EOF
 echo:"""
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:: Convert the ruby file.
+:cmdize.rb
+echo:@break #^^
+echo:=begin
+echo:@echo off
+echo:ruby "%%~f0" %%*
+echo:goto :EOF
+echo:=end
 type "%~f1"
 goto :EOF
 
