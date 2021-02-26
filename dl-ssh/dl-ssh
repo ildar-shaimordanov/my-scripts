@@ -83,7 +83,7 @@ dl() {
 
 	# archive with tar to STDOUT
 	cd "$( dirname "$WDIR" )"
-	tar -cf - "$( basename "$WDIR" )"
+	tar --dereference --hard-dereference -cf - "$( basename "$WDIR" )"
 }
 
 # =========================================================================
