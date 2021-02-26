@@ -88,6 +88,12 @@ dl() {
 
 # =========================================================================
 
+if printf '%s\n' "$@" | grep -qE '^(-h|--help)$'
+then
+	print_usage
+	exit
+fi
+
 # on errors stop execution immediately
 set -o pipefail
 set -o errexit
@@ -103,8 +109,6 @@ esac
 while [ $# -gt 0 ]
 do
 	case "$1" in
-	-h | --help		) print_usage ; exit ;;
-
 	-u | --username		) RUSER="$2" ; shift ;;
 	-H | --host		) RHOST="$2" ; shift ;;
 	-p | --port		) RPORT="$2" ; shift ;;
