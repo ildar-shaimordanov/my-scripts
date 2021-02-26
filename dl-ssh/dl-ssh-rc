@@ -1,0 +1,82 @@
+# dl-ssh-rc
+
+# =========================================================================
+#
+# ssh downloader
+#
+# https://github.com/ildar-shaimordanov/bash.scripts/tree/master/dl-ssh
+#
+# =========================================================================
+#
+# This file is the part of dl-ssh, the shell script developed in the
+# purpose to automate downloading, comparing and committing updates from
+# the remote host.
+#
+# This file consists of two logical parts.
+#
+# The first part defines the parameters used to connect to the remote
+# host and the function for executing when downloading completed.
+#
+# The second part declares the mandatory functions to be executed on
+# the renote host and other stuff that can be used there.
+#
+# =========================================================================
+#
+# This part declares the variables and functions to be executed locally
+#
+# =========================================================================
+
+# The username to login to remotely
+RUSER=
+
+# The remote host name or IP address
+RHOST=
+
+# The remote port, set if port differs the default 22
+RPORT=
+
+# Specify the shell to be run on the remote host
+RSHELL=bash
+
+# Set to any non-empty value, if you need to invoke shell as login shell
+# (to read and execute commands from shell profile scripts)
+RLOGIN=
+
+# Set to any non-empty value, if you need to print all user-defined
+# commands executed both remotely and locally
+VERBOSE_EXEC=1
+
+# Set to any non-empty value, if you need to print all commands and
+# their arguments executed on the remote host (including the commands
+# from the profile scripts)
+VERBOSE_REMOTE=
+
+# The function for execution locally after collecting and downloading
+# data. Use $DLDIR to refer to the name of the downloaded directory.
+POSTPROCESS() {
+	return
+}
+
+# =========================================================================
+#
+# This part declares the variables and functions to be executed locally
+#
+# =========================================================================
+
+# If declared, this function is called immediately before exiting the
+# remote session. It can be used to specify additional commands to
+# cleanup after ourselves.
+CLEANUP() {
+	return
+}
+
+# The main function performing collection data. It should store data
+# under the $WDIR directory. When collection is completed, everything will
+# be archived and downloaded automatically.
+COLLECT() {
+	return
+}
+
+# =========================================================================
+
+# EOF
