@@ -13,7 +13,7 @@
 ::HELP -d DIR     use DIR for storing temp files
 ::HELP -n NAME    use NAME as the name of temp file
 ::HELP --debug    turn on debug information
-::HELP --dry-run  don't invoke a command, display only
+::HELP --check    don't invoke a command, display only
 ::HELP
 ::HELP
 ::HELP DESCRIPTION
@@ -49,6 +49,14 @@
 ::HELP extension (without the leading "dot" symbol), the script does
 ::HELP attempt to find an executable command (using "assoc" and "ftype")
 ::HELP and prepare invocation of the command found by these commands.
+::HELP
+::HELP
+::HELP CONFIGURATION
+::HELP
+::HELP Using the file "2-settings.bat" located in the same directory
+::HELP allows to configure the global environment variables of the main
+::HELP script. It is good place for setting such kind of variables as
+::HELP %pipetmpdir%, %pipetmpname% and %pipetmpsave%.
 ::HELP
 ::HELP
 ::HELP ENVIRONMENT
@@ -87,14 +95,6 @@
 ::HELP another tool to capture input.
 ::HELP
 ::HELP
-::HELP CONFIGURATION
-::HELP
-::HELP Using the file "2-settings.bat" located in the same directory
-::HELP allows to configure the global environment variables of the main
-::HELP script. It is good place for setting such kind of variables as
-::HELP %pipetmpdir%, %pipetmpname% and %pipetmpsave%.
-::HELP
-::HELP
 ::HELP SEE ALSO
 ::HELP
 ::HELP ASSOC /?
@@ -114,7 +114,7 @@ timeout /t 0 >nul 2>&1 && (
 setlocal
 
 set "pipedbg="
-set "pipedry="
+set "pipecheck="
 
 set "pipetmpdir=%TEMP%"
 set "pipetmpname=pipe.%RANDOM%"
@@ -145,8 +145,8 @@ if "%~1" == "-d" (
 ) else if "%~1" == "--debug" (
 	set "pipedbg=1"
 	shift /1
-) else if "%~1" == "--dry-run" (
-	set "pipedry=1"
+) else if "%~1" == "--check" (
+	set "pipecheck=1"
 	shift /1
 ) else (
 	goto :pipe-options-end
@@ -255,8 +255,8 @@ endlocal & set "pipecmd=%pipecmd%" & set "pipeext=%pipeext%" & set "pipetmpsave=
 goto :EOF
 
 :pipe-invoke
-if defined pipedry (
-	echo:Invocation ^(dry-run^)
+if defined pipecheck (
+	echo:Invocation ^(check^)
 	echo:call %pipetmpsave% ^> "%pipetmpfile%"
 	echo:call start "Starting %pipetitle%" %pipecmd%
 	goto :EOF
