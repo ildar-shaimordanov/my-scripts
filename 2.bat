@@ -99,6 +99,10 @@
 ::HELP
 ::HELP ASSOC /?
 ::HELP FTYPE /?
+::HELP
+::HELP
+::HELP COPYRIGHT
+::HELP Copyright (c) 2014-2021 Ildar Shaimordanov
 
 :: ========================================================================
 
