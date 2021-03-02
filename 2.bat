@@ -18,37 +18,37 @@
 ::HELP
 ::HELP DESCRIPTION
 ::HELP
-::HELP The script is flexible enough to enable many ways to invoke GUI 
-::HELP applications. Which GUI application would be invoked is defined by 
-::HELP the arguments. Depending on what is this, it will be called to 
-::HELP declare few specific environment variables. 
+::HELP The script is flexible enough to enable many ways to invoke GUI
+::HELP applications. Which GUI application would be invoked is defined by
+::HELP the arguments. Depending on what is this, it will be called to
+::HELP declare few specific environment variables.
 ::HELP
 ::HELP
 ::HELP INVOCATION
 ::HELP
 ::HELP commands | 2
 ::HELP
-::HELP With no parameters runs Notepad. Always. 
+::HELP With no parameters runs Notepad. Always.
 ::HELP
 ::HELP commands | 2 APP
 ::HELP
-::HELP "APP" is the parameter defining an application or a family of 
-::HELP applications or an extension (without the leading "dot" symbol). 
-::HELP The script looks around for the file called as "2.APP.bat". If the 
-::HELP file exists, invokes it to set the needful environment variables. 
-::HELP The script should declare few specific environment variables (see 
-::HELP the "ENVIRONMENT" section below). 
+::HELP "APP" is the parameter defining an application or a family of
+::HELP applications or an extension (without the leading "dot" symbol).
+::HELP The script looks around for the file called as "2.APP.bat". If the
+::HELP file exists, invokes it to set the needful environment variables.
+::HELP The script should declare few specific environment variables (see
+::HELP the "ENVIRONMENT" section below).
 ::HELP
 ::HELP commands | 2 APP.EXT
 ::HELP
-::HELP The same as above but ".EXT" overrides early declared extension. 
+::HELP The same as above but ".EXT" overrides early declared extension.
 ::HELP
 ::HELP commands | 2 EXT
 ::HELP
-::HELP If there is no file "2.APP.bat", the argument is assumed as the 
-::HELP extension (without the leading "dor" symbol), the script does 
-::HELP attempt to find an executable command (using "assoc" and "ftype") 
-::HELP and prepare invocation of the command found by these commands. 
+::HELP If there is no file "2.APP.bat", the argument is assumed as the
+::HELP extension (without the leading "dot" symbol), the script does
+::HELP attempt to find an executable command (using "assoc" and "ftype")
+::HELP and prepare invocation of the command found by these commands.
 ::HELP
 ::HELP
 ::HELP ENVIRONMENT
@@ -56,33 +56,43 @@
 ::HELP %pipecmd%
 ::HELP
 ::HELP (Mandatory)
-::HELP Invocation string for the application. It could or could not 
-::HELP contain additional parameters supported by the application. 
+::HELP Invocation string for the application. It could or could not
+::HELP contain additional parameters supported by the application.
 ::HELP
 ::HELP %pipeext%
 ::HELP
 ::HELP (Optional, but recommended to set)
-::HELP Extenstion (like ".txt" or ".html" etc). It can be useful in the 
-::HELP case if the application is able to handle different data files. 
+::HELP Extenstion (like ".txt" or ".html" etc). It can be useful in the
+::HELP case if the application is able to handle different data files.
+::HELP
+::HELP %pipetmpdir%
+::HELP
+::HELP (Optional)
+::HELP The directory for storing temporary file. Defaults to %TEMP%.
+::HELP
+::HELP %pipetmpname%
+::HELP
+::HELP (Optional)
+::HELP The name for temporary file. Defaults to pipe.%RANDOM%.
 ::HELP
 ::HELP %pipetmpsave%
 ::HELP
 ::HELP (Optional)
-::HELP The command line tool used for capturing the output of commands and 
-::HELP redirecting to a resulting file. By default it is set as follows: 
+::HELP The command line tool used for capturing the output of commands and
+::HELP redirecting to a resulting file. By default it is set as follows:
 ::HELP
 ::HELP set "pipetmpsave=cscript //nologo //e:javascript "%~f0""
 ::HELP
-::HELP You don't need to modify this variable, unless you need to specify 
+::HELP You don't need to modify this variable, unless you need to specify
 ::HELP another tool to capture input.
 ::HELP
 ::HELP
 ::HELP CONFIGURATION
 ::HELP
-::HELP Using the file "2-settings.bat" located in the same directory 
-::HELP allows to configure the global environment variables of the main 
-::HELP script. It is good place for setting such kind of variables as 
-::HELP %pipetmpdir%, %pipetmpname% and %pipetmpsave%. 
+::HELP Using the file "2-settings.bat" located in the same directory
+::HELP allows to configure the global environment variables of the main
+::HELP script. It is good place for setting such kind of variables as
+::HELP %pipetmpdir%, %pipetmpname% and %pipetmpsave%.
 ::HELP
 ::HELP
 ::HELP SEE ALSO
@@ -273,7 +283,10 @@ echo:
 goto :EOF
 
 */0;
-WScript.StdOut.Write(WScript.StdIn.ReadAll());
+
+while ( ! WScript.StdIn.AtEndOfStream ) {
+	WScript.StdOut.WriteLine(WScript.StdIn.ReadLine());
+}
 
 // ========================================================================
 
