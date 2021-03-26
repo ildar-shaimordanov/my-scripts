@@ -1,13 +1,14 @@
 0</*! ::
 @echo off
 
-if "%~1" == "" (
-	echo:Usage: %~n0 [msi-file [target-dir]]
-	goto :EOF
-)
-
-for %%f in ( "%~1" ) do for %%d in ( "%~2" ) do if "%%~d" == "" (
-	cscript //nologo //e:javascript "%~f0" "%%~ff"
+for %%f in ( "%~1" ) do for %%d in ( "%~2" ) do if /i "%%~d" == "" (
+	echo:Usage: %~n0 msi-file /LIST
+	echo:Usage: %~n0 msi-file /PROPERTY
+	echo:Usage: %~n0 msi-file target-dir
+) else if /i "%%~d" == "/LIST" (
+	cscript //nologo //e:javascript "%~f0" "%%~ff" /LIST
+) else if /i "%%~d" == "/PROPERTY" (
+	cscript //nologo //e:javascript "%~f0" "%%~ff" /PROPERTY
 ) else (
 	echo:Executing...
 	echo:msiexec /quiet /a "%%~ff" TARGETDIR="%%~fd"
@@ -21,8 +22,12 @@ goto :EOF
 
 try {
 	var msiFile = WScript.Arguments.item(0);
-	var msiProps = getMsiProperty(msiFile);
-	WScript.StdOut.WriteLine(msiProps);
+	var mode = WScript.Arguments.item(1);
+	var msiInfo =
+		mode.match(/^\/LIST$/i) ? getMsiListing(msiFile) :
+		mode.match(/^\/PROPERTY$/i) ? getMsiProperty(msiFile) :
+		'/LIST or /PROPERTY required';
+	WScript.StdOut.WriteLine(msiInfo);
 } catch(e) {
 	WScript.StdErr.WriteLine('Cannot probe file: ' + msiFile);
 	WScript.StdErr.WriteLine('Error: ' + e.message);
@@ -34,6 +39,21 @@ try {
 // JS code was adapted from VBS implementation found by these links:
 // https://serverfault.com/a/465717/423234
 // http://scriptbox.toll.at/index.php?showcontent=Get%20MSI-File%20properties.vbs&list=1
+// https://www.hanselman.com/blog/how-to-list-all-the-files-in-an-msi-installer-using-vbsciript
+
+function getMsiListing(filename) {
+	var r = getMsiView(filename, 'Select FileSize, FileName From File');
+
+	var c = getColumnWidth(r, 0);
+
+	for (var i = 0; i < r.length; i++) {
+		r[i][0] = ( c.padding + r[i][0] ).slice(-c.width);
+		r[i] = r[i].join(' : ');
+	}
+
+	return r.join('\n');
+}
+
 function getMsiProperty(filename) {
 	var r = getMsiView(filename, 'Select * From Property');
 
@@ -50,7 +70,7 @@ function getMsiProperty(filename) {
 function getMsiView(filename, sql) {
 	var installer = new ActiveXObject('WindowsInstaller.Installer');
 	var installerDatabase = installer.OpenDatabase(filename, 0);
-	var installerView = installerDatabase.OpenView('Select * From Property');
+	var installerView = installerDatabase.OpenView(sql);
 	installerView.Execute();
 
 	var installerRecord;
