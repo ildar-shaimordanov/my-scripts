@@ -21,7 +21,7 @@ goto :EOF
 
 try {
 	var msiFile = WScript.Arguments.item(0);
-	var msiProps = getMsiProperties(msiFile, 'text');
+	var msiProps = getMsiProperty(msiFile);
 	WScript.StdOut.WriteLine(msiProps);
 } catch(e) {
 	WScript.StdErr.WriteLine('Cannot probe file: ' + msiFile);
@@ -34,16 +34,28 @@ try {
 // JS code was adapted from VBS implementation found by these links:
 // https://serverfault.com/a/465717/423234
 // http://scriptbox.toll.at/index.php?showcontent=Get%20MSI-File%20properties.vbs&list=1
-function getMsiProperties(filename, mode) {
+function getMsiProperty(filename) {
+	var r = getMsiView(filename, 'Select * From Property');
+
+	var c = getColumnWidth(r, 0);
+
+	for (var i = 0; i < r.length; i++) {
+		r[i][0] = ( r[i][0] + c.padding ).slice(0, c.width);
+		r[i] = r[i].join(' : ');
+	}
+
+	return r.join('\n');
+}
+
+function getMsiView(filename, sql) {
 	var installer = new ActiveXObject('WindowsInstaller.Installer');
-	var installerDatabase = installer.OpenDatabase(filename, 2);
+	var installerDatabase = installer.OpenDatabase(filename, 0);
 	var installerView = installerDatabase.OpenView('Select * From Property');
 	installerView.Execute();
 
 	var installerRecord;
 
 	var r = [];
-	var maxLen = 0;
 
 	while ( installerRecord = installerView.Fetch() ) {
 		var n = installerRecord.FieldCount;
@@ -51,21 +63,23 @@ function getMsiProperties(filename, mode) {
 		for (var i = 1; i <= n; i++) {
 			s.push(installerRecord.StringData(i));
 		}
-		maxLen = Math.max(s[0].length, maxLen);
 		r.push(s);
 	}
 
-	if ( mode != 'text' ) {
-		return r;
-	}
+	return r;
+}
 
-	var pad = new Array(maxLen + 1).join(' ');
+function getColumnWidth(r, j) {
+	var maxLen = 0;
 
 	for (var i = 0; i < r.length; i++) {
-		r[i][0] = ( r[i][0] + pad ).slice(0, maxLen);
-		r[i] = r[i].join(' : ');
+		maxLen = Math.max(maxLen, r[i][j].length);
 	}
-	return r.join('\n');
+
+	return {
+		width: maxLen,
+		padding: new Array(maxLen + 1).join(' ')
+	};
 }
 
 // ========================================================================
