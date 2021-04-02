@@ -12,6 +12,7 @@
 ::HELP
 ::HELP -d DIR     use DIR for storing temp files
 ::HELP -n NAME    use NAME as the name of temp file
+::HELP -s DIRNAME save the file as DIRNAME (overrides both -d and -n)
 ::HELP --debug    turn on debug information
 ::HELP --check    don't invoke a command, display only
 ::HELP
@@ -123,6 +124,7 @@ set "pipecheck="
 set "pipetmpdir=%TEMP%"
 set "pipetmpname=pipe.%RANDOM%"
 set "pipetmpfile="
+set "pipesavfile="
 set "pipetmpsave=cscript //nologo //e:javascript "%~f0""
 
 if exist "%~dpn0-settings.bat" call "%~dpn0-settings.bat"
@@ -144,6 +146,10 @@ if "%~1" == "-d" (
 	shift /1
 ) else if "%~1" == "-n" (
 	set "pipetmpname=%~2"
+	shift /1
+	shift /1
+) else if "%~1" == "-s" (
+	set "pipesavfile=%~2"
 	shift /1
 	shift /1
 ) else if "%~1" == "--debug" (
@@ -217,6 +223,8 @@ if not defined pipeext set "pipeext=.txt"
 if not defined pipetitle set "pipetitle=[%pipeext%]"
 
 for %%f in ( "%pipetmpdir%" ) do set "pipetmpfile=%%~ff\%pipetmpname%%pipeext%"
+
+if defined pipesavfile set "pipetmpfile=%pipesavfile%"
 
 :: ========================================================================
 
