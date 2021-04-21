@@ -12,7 +12,7 @@
 ::HELP
 ::HELP -d DIR     use DIR for storing temp files
 ::HELP -n NAME    use NAME as the name of temp file
-::HELP -s DIRNAME save the file as DIRNAME (overrides both -d and -n)
+::HELP -s DIRNAME save the file as DIRNAME (overrides all -d, -n and EXT)
 ::HELP --debug    turn on debug information
 ::HELP --check    don't invoke a command, display only
 ::HELP
