@@ -35,7 +35,7 @@
 ::HELP
 ::HELP ... | 2 EXT
 ::HELP
-::HELP "EXT" stands for the name of the application or the application
+::HELP The "EXT" stands for the name of the application or the application
 ::HELP family supposed to be launched with this file, or (the more
 ::HELP relevant) the shorthand for ".EXT", the extension (without the
 ::HELP leading "." character).
