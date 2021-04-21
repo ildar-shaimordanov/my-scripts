@@ -5,7 +5,7 @@
 ::HELP
 ::HELP USAGE
 ::HELP
-::HELP ... | 2 [OPTIONS] [EXT[.ALT] | EXT] [APP-OPTIONS]
+::HELP ... | 2 [OPTIONS] [EXT[.ALT] [APP-OPTIONS]]
 ::HELP
 ::HELP
 ::HELP OPTIONS
@@ -29,20 +29,24 @@
 ::HELP
 ::HELP ... | 2
 ::HELP
-::HELP With no parameters runs Notepad. Always.
+::HELP With no parameters runs an application for viewing text files:
+::HELP either Notepad as a default application or any other one installed
+::HELP and configured to working with ".txt" files.
 ::HELP
 ::HELP ... | 2 EXT
 ::HELP
-::HELP "EXT" is the parameter defining an application or a family of
-::HELP applications or an extension (without the leading "." character).
+::HELP "EXT" stands for the name of the application or the application
+::HELP family supposed to be launched with this file, or (the more
+::HELP relevant) the shorthand for ".EXT", the extension (without the
+::HELP leading "." character).
 ::HELP
-::HELP The script looks around for the file called as "2.EXT.bat". If the
-::HELP file exists, invokes it to set the needful environment variables.
-::HELP The script should declare few specific environment variables (see
-::HELP the "ENVIRONMENT" section below).
+::HELP The script looks around for the file called as "2.EXT.bat". If
+::HELP the file exists, invokes it to set the needful environment
+::HELP variables. The script should declare few specific environment
+::HELP variables (see the "ENVIRONMENT" section below).
 ::HELP
-::HELP If there is no file "2.EXT.bat", the argument is assumed as the
-::HELP extension (without the leading "." symbol), the script does
+::HELP If there is no file "2.EXT.bat", the argument is assumed as
+::HELP the extension (without the leading "." symbol), the script does
 ::HELP attempt to find an executable command (using "assoc" and "ftype")
 ::HELP and prepare invocation of the command found by these commands.
 ::HELP
@@ -170,9 +174,7 @@ if "%~1" == "" (
 
 	rem ... | 2
 
-	set "pipecmd=notepad"
-	set "pipetitle=[app = notepad]"
-	set "pipeext=.txt"
+	call :pipe-lookup txt
 
 ) else if exist "%~dpn0.%~n1.bat" (
 
@@ -188,20 +190,9 @@ if "%~1" == "" (
 
 ) else (
 
-	rem ... | 2 EXT
+	rem ... | 2 EXT[.ALT]
 
-	for /f "tokens=1,* delims==" %%a in ( '
-		2^>nul assoc ".%~n1"
-	' ) do for /f "tokens=1,* delims==" %%c in ( '
-		2^>nul ftype "%%b"
-	' ) do (
-
-		set "pipecmd=%%d"
-		set "pipetitle=[%%a = %%b]"
-		set "pipeext=%%a"
-
-	)
-	if not "%~x1" == "" set "pipeext=%~x1"
+	call :pipe-lookup "%~1"
 
 	shift /1
 
@@ -255,6 +246,23 @@ if defined pipedebug call :pipe-debug "Before invocation"
 call :pipe-invoke %pipecmdopts%
 
 endlocal
+goto :EOF
+
+:: ========================================================================
+
+:pipe-lookup
+for /f "tokens=1,* delims==" %%a in ( '
+	2^>nul assoc ".%~n1"
+' ) do for /f "tokens=1,* delims==" %%c in ( '
+	2^>nul ftype "%%b"
+' ) do (
+
+	set "pipecmd=%%d"
+	set "pipetitle=[%%a = %%b]"
+	set "pipeext=%%a"
+
+)
+if not "%~x1" == "" set "pipeext=%~x1"
 goto :EOF
 
 :: ========================================================================
