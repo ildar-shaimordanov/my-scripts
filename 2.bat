@@ -5,7 +5,7 @@
 ::HELP
 ::HELP USAGE
 ::HELP
-::HELP command | 2 [OPTIONS] [APP[.EXT] | EXT] [APP-OPTIONS]
+::HELP ... | 2 [OPTIONS] [EXT[.ALT] | EXT] [APP-OPTIONS]
 ::HELP
 ::HELP
 ::HELP OPTIONS
@@ -27,29 +27,28 @@
 ::HELP
 ::HELP INVOCATION
 ::HELP
-::HELP commands | 2
+::HELP ... | 2
 ::HELP
 ::HELP With no parameters runs Notepad. Always.
 ::HELP
-::HELP commands | 2 APP
+::HELP ... | 2 EXT
 ::HELP
-::HELP "APP" is the parameter defining an application or a family of
-::HELP applications or an extension (without the leading "dot" symbol).
-::HELP The script looks around for the file called as "2.APP.bat". If the
+::HELP "EXT" is the parameter defining an application or a family of
+::HELP applications or an extension (without the leading "." character).
+::HELP
+::HELP The script looks around for the file called as "2.EXT.bat". If the
 ::HELP file exists, invokes it to set the needful environment variables.
 ::HELP The script should declare few specific environment variables (see
 ::HELP the "ENVIRONMENT" section below).
 ::HELP
-::HELP commands | 2 APP.EXT
-::HELP
-::HELP The same as above but ".EXT" overrides early declared extension.
-::HELP
-::HELP commands | 2 EXT
-::HELP
-::HELP If there is no file "2.APP.bat", the argument is assumed as the
-::HELP extension (without the leading "dot" symbol), the script does
+::HELP If there is no file "2.EXT.bat", the argument is assumed as the
+::HELP extension (without the leading "." symbol), the script does
 ::HELP attempt to find an executable command (using "assoc" and "ftype")
 ::HELP and prepare invocation of the command found by these commands.
+::HELP
+::HELP ... | 2 EXT.ALT
+::HELP
+::HELP The same as above but ".ALT" overrides the early declared extension.
 ::HELP
 ::HELP
 ::HELP CONFIGURATION
@@ -57,7 +56,7 @@
 ::HELP Using the file "2-settings.bat" located in the same directory
 ::HELP allows to configure the global environment variables of the main
 ::HELP script. It is good place for setting such kind of variables as
-::HELP %pipetmpdir%, %pipetmpname% and %pipetmpsave%.
+::HELP %pipetmpdir%, %pipetmpname% and %pipeslurp%.
 ::HELP
 ::HELP
 ::HELP ENVIRONMENT
@@ -84,13 +83,13 @@
 ::HELP (Optional)
 ::HELP The name for temporary file. Defaults to pipe.%RANDOM%.
 ::HELP
-::HELP %pipetmpsave%
+::HELP %pipeslurp%
 ::HELP
 ::HELP (Optional)
 ::HELP The command line tool used for capturing the output of commands and
 ::HELP redirecting to a resulting file. By default it is set as follows:
 ::HELP
-::HELP set "pipetmpsave=cscript //nologo //e:javascript "%~f0""
+::HELP set "pipeslurp=cscript //nologo //e:javascript "%~f0""
 ::HELP
 ::HELP You don't need to modify this variable, unless you need to specify
 ::HELP another tool to capture input.
@@ -118,14 +117,14 @@ timeout /t 0 >nul 2>&1 && (
 
 setlocal
 
-set "pipedbg="
+set "pipedebug="
 set "pipecheck="
 
 set "pipetmpdir=%TEMP%"
 set "pipetmpname=pipe.%RANDOM%"
 set "pipetmpfile="
 set "pipesavfile="
-set "pipetmpsave=cscript //nologo //e:javascript "%~f0""
+set "pipeslurp=cscript //nologo //e:javascript "%~f0""
 
 if exist "%~dpn0-settings.bat" call "%~dpn0-settings.bat"
 
@@ -153,7 +152,7 @@ if "%~1" == "-d" (
 	shift /1
 	shift /1
 ) else if "%~1" == "--debug" (
-	set "pipedbg=1"
+	set "pipedebug=1"
 	shift /1
 ) else if "%~1" == "--check" (
 	set "pipecheck=1"
@@ -169,7 +168,7 @@ goto :pipe-options-begin
 
 if "%~1" == "" (
 
-	rem command | 2
+	rem ... | 2
 
 	set "pipecmd=notepad"
 	set "pipetitle=[app = notepad]"
@@ -177,7 +176,7 @@ if "%~1" == "" (
 
 ) else if exist "%~dpn0.%~n1.bat" (
 
-	rem command | 2 app[.ext]
+	rem ... | 2 EXT[.ALT]
 
 	call :pipe-configure "%~dpn0.%~n1.bat" "%~x1"
 
@@ -189,7 +188,7 @@ if "%~1" == "" (
 
 ) else (
 
-	rem command | 2 ext
+	rem ... | 2 EXT
 
 	for /f "tokens=1,* delims==" %%a in ( '
 		2^>nul assoc ".%~n1"
@@ -208,7 +207,7 @@ if "%~1" == "" (
 
 )
 
-if defined pipedbg call :pipe-debug "After parsing options"
+if defined pipedebug call :pipe-debug "After parsing options"
 
 :: ========================================================================
 
@@ -251,7 +250,7 @@ endlocal & set "pipecmd=%pipecmd%" & set "pipecmdopts=%pipecmdopts%"
 
 :: ========================================================================
 
-if defined pipedbg call :pipe-debug "Before invocation"
+if defined pipedebug call :pipe-debug "Before invocation"
 
 call :pipe-invoke %pipecmdopts%
 
@@ -263,18 +262,20 @@ goto :EOF
 :pipe-configure
 setlocal
 call "%~1" "%~2"
-endlocal & set "pipecmd=%pipecmd%" & set "pipeext=%pipeext%" & set "pipetmpsave=%pipetmpsave%"
+endlocal & set "pipecmd=%pipecmd%" & set "pipeext=%pipeext%" & set "pipeslurp=%pipeslurp%"
 goto :EOF
+
+:: ========================================================================
 
 :pipe-invoke
 if defined pipecheck (
 	echo:Invocation ^(check^)
-	echo:call %pipetmpsave% ^> "%pipetmpfile%"
+	echo:call %pipeslurp% ^> "%pipetmpfile%"
 	echo:call start "Starting %pipetitle%" %pipecmd%
 	goto :EOF
 )
 
-call %pipetmpsave% > "%pipetmpfile%"
+call %pipeslurp% > "%pipetmpfile%"
 call start "Starting %pipetitle%" %pipecmd%
 goto :EOF
 

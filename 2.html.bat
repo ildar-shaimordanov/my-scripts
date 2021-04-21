@@ -19,7 +19,7 @@ set "pipecmd="%~dp0..\GUI\FirefoxPortable\App\Firefox\firefox.exe" -profile "%~d
 :: ========================================================================
 
 :: Set the alternative tempfile saver
-::set "pipetmpsave=findstr "$""
+::set "pipeslurp=findstr "$""
 
 :: ========================================================================
 
