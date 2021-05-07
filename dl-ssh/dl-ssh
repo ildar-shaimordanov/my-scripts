@@ -8,12 +8,14 @@
 #
 # =========================================================================
 #
-# This script was developed in the purpose to automate downloading,
-# comparing and committing updates from the remote hosts.
+# This script was developed in the purpose to automate performing remotely
+# such actions as executing commands, collecting data, downloading them
+# and then handling with data locally.
 #
-# It logins to the remote host, collects data and delivers via SSH to
-# the local host. Further the script can perform additional actions like
-# reordering, comparing and committing in a local storage.
+# It logins to the remote host via SSH, executes commands remotely,
+# collects data, if needs, and delivers via SSH to the local host. Further
+# the script can perform additional actions like reordering, comparing
+# and committing in a local storage.
 #
 # To enable the script working properly, it requires the additional
 # file defining the parameters to connect to the remote host and the
