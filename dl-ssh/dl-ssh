@@ -84,8 +84,8 @@ dl() {
 	COLLECT >&2 || return $?
 
 	# archive with tar to STDOUT
-	cd "$( dirname "$WDIR" )"
-	tar --dereference --hard-dereference -cf - "$( basename "$WDIR" )"
+	cd  "$WDIR"
+	tar --dereference --hard-dereference -cf - *
 }
 
 # =========================================================================
@@ -104,7 +104,7 @@ case "$1" in
 -f | --rcfile ) RCFILE="$2" ; shift ; shift ;;
 esac
 
-: "${RCFILE:=dl-ssh-rc}"
+: "${RCFILE:=./dl-ssh-rc}"
 
 . "$RCFILE"
 
@@ -134,6 +134,13 @@ done
 : "${RHOST:?name or address required}"
 : "${RSHELL:=bash}"
 
+# destination directory
+DLDIR="dl-$RHOST"
+
+# it's ok to fail here, if directory exists
+# a user should handle with it manually
+mkdir "$DLDIR"
+
 # deliver commands for execution
 # and download data
 {
@@ -144,12 +151,14 @@ done
 } \
 | ssh "$RUSER@$RHOST" ${RPORT:+-p $RPORT} \
 	$RSHELL ${RLOGIN:+-l} ${VERBOSE_REMOTE:+-x} \
-| tar --warning=no-timestamp -xf -
+| {
+	# there is no subshell, so verbosity set here is propagated further
+	${VERBOSE_EXEC:+set -x}
 
-${VERBOSE_EXEC:+set -x}
+	tar -C "$DLDIR" -xf -
+}
 
 # run commands locally, when downloading completed
-DLDIR="$( ls -dt dl-* | head -1 )"
 eval "$( command -v POSTPROCESS )"
 
 # =========================================================================
