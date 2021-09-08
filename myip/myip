@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # =========================================================================
 #
@@ -11,7 +11,7 @@
 # External IP address is the IP address that is visible by external 
 # servers that you connect to over Internet.
 #
-# Copyright (C) 2016, 2020 Ildar Shaimordanov
+# Copyright (C) 2016, 2020, 2021 Ildar Shaimordanov
 #
 # =========================================================================
 
@@ -31,6 +31,7 @@ for f in \
 	/etc/myip.conf
 do
 	[ -f "$f" ] && {
+		# shellcheck source=/dev/null
 		. "$f"
 		break
 	}
@@ -56,7 +57,7 @@ HELP
 }
 
 die() {
-	echo "$( basename "$0" ): $@" >&2
+	echo "$( basename "$0" ): $*" >&2
 	exit 2
 }
 
@@ -87,7 +88,7 @@ do
 	esac
 done
 
-if [ -z "$show_internal" -a -z "$show_external" ]
+if [ -z "$show_internal" ] && [ -z "$show_external" ]
 then
 	show_internal=1
 	show_external=1
@@ -128,7 +129,7 @@ resolveip() {
 internalip() {
 	[ -n "$show_verbose" ] && printf "Internal: "
 
-	case "$( uname | tr 'A-Z' 'a-z' )" in
+	case "$( uname | tr '[:upper:]' '[:lower:]' )" in
 	cygwin* | mingw* | msys* | win* )
 		netstat -rn \
 		| grep -w '0.0.0.0' \
@@ -137,8 +138,9 @@ internalip() {
 		;;
 	esac
 
-	local t="$( resolveip "$TARGETADDR" )"
+	t="$( resolveip "$TARGETADDR" )"
 	[ -n "$t" ] || die "Cannot resolve $TARGETADDR"
+
 	ip route get "$t" \
 	| awk '{ print $NF; exit }'
 }
@@ -146,7 +148,7 @@ internalip() {
 externalip() {
 	[ -n "$show_verbose" ] && printf "External: "
 
-	eval $IPCMD "$IPURL" $IPOPEN
+	eval "$IPCMD '$IPURL' $IPOPEN"
 }
 
 # =========================================================================
