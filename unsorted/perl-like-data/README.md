@@ -1,6 +1,8 @@
 # Perl-like data
 
-Perl has a builtin feature allowing to store data blocks within a script. They are marked with the `__DATA__` and `__END__` tokens indicating the logical end of script before the actual end of file. The text following the tokens is ignored by the interpreter but get be read via the special file handler `DATA`. More details available at [perldoc/perldata](https://perldoc.perl.org/perldata#Special-Literals) and [Inline::Files](https://metacpan.org/pod/Inline::Files).
+Perl has a builtin feature allowing to store data blocks within a script. They are marked with the `__DATA__` and `__END__` tokens indicating the logical end of script before the actual end of file. The text following the tokens is ignored by the interpreter but get be read via the special file handler `DATA`.
+
+More useful details are available at [perldoc/perldata](https://perldoc.perl.org/perldata#Special-Literals) and [Inline::Files](https://metacpan.org/pod/Inline::Files).
 
 There are two implementations in Batch focusing on different aspects:
 
@@ -26,7 +28,7 @@ __DATA__
 ...
 ```
 
-The full example is here: [](01-unsafe.bat)
+The full example is here: [01-unsafe.bat](01-unsafe.bat)
 
 ## Safety over simplicity
 
@@ -44,4 +46,4 @@ goto :EOF & DATA
 ...
 ```
 
-The full example is here: [](02-safe.bat)
+The full example is here: [02-safe.bat](02-safe.bat)
