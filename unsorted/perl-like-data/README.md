@@ -32,7 +32,7 @@ The full example is here: [01-unsafe.bat](01-unsafe.bat)
 
 ## Safety over simplicity
 
-Data blocks are defined stricter:
+Data blocks are defined stricter (so no attempts to execute anything from data block):
 
 ```
 <beginning of string> goto <space> :EOF <space> & <space> :<digits, latin letters, underscore> <end of string>
@@ -42,7 +42,7 @@ Example:
 ```
 call :extract_data DATA
 ...
-goto :EOF & DATA
+goto :EOF & :DATA
 ...
 ```
 
