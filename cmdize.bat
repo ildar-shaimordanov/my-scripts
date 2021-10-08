@@ -156,7 +156,7 @@ for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
 del /q "%TEMP%\%~n0.$$"
 
 rem type "%~f1"
-for /f "tokens=1,* delims=]" %%r in ( '%SYSTEMROOT%\System32\find /n /v "" ^<"%~f1"' ) do (
+for /f "tokens=1,* delims=]" %%r in ( '"%SYSTEMROOT%\System32\find.exe" /n /v "" ^<"%~f1"' ) do (
 	rem Filtering and commenting "Option Explicit". 
 	rem This ugly code tries as much as possible to recognize and 
 	rem comment this directive. It fails if "Option" and "Explicit" 
