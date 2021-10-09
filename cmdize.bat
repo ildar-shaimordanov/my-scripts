@@ -12,6 +12,8 @@
 :: to be a valid code both for a batch and wrapper code.
 ::
 :: FEATURES
+:: Use /L to display the list of supported extensions
+::
 :: It looks for and comments "Option Explicit" in VBScript.
 ::
 :: "<?xml?>" declaration for wsf-files is required.
@@ -90,6 +92,11 @@ if "%~1" == "" (
 		if /i "%%s" == "@echo off" goto :EOF
 		echo:%%s
 	)
+	goto :EOF
+)
+
+if /i "%~1" == "/L" (
+	for /f "tokens=2 delims=." %%x in ( 'findstr /r "^:cmdize[.][a-z0-9_]*$" "%~f0"' ) do echo:.%%~x
 	goto :EOF
 )
 
