@@ -271,10 +271,13 @@ goto :EOF
 :cmdize.wsf
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do if /i "%%a?%%d" == "<?xml" (
-	rem We use this code to transform the "<?xml?>" declaration
-	rem located at the very beginning of the file to the "polyglot"
-	rem form to do it acceptable by the batch file.
+for /f "tokens=1,* delims=:" %%n in ( 'findstr /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do if %%~n neq 1 (
+	echo:Incorrect XML declaration: it must be at the beginning of the script>&2
+	exit /b 1
+) else for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
+	rem We sure that the XML declaration is located on the first
+	rem line of the script. Now we can transform it to the "polyglot"
+	rem form acceptable by the batch file also.
 	echo:%%a?%%d :
 	echo:: %%e ?^>^<!--
 
