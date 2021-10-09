@@ -14,11 +14,16 @@
 :: FEATURES
 :: Use /L to display the list of supported extensions
 ::
-:: It looks for and comments "Option Explicit" in VBScript.
+:: The tool looks for the directive "Option Explicit" and comments it
+:: out while creating the batch file.
 ::
 :: "<?xml?>" declaration for wsf-files is required.
 ::
-:: "Option Explicit" and "<?xml?>" are supported on a single line only.
+:: If "<?xml?>" is recognized as the first element of the file, it is
+:: parsed and modified to avoid execution error.
+::
+:: Both "Option Explicit" and "<?xml?>" are supported as placed on a
+:: single line only.
 ::
 :: BOM (Byte Order Mark) are not supported at all.
 ::
@@ -282,6 +287,14 @@ for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*"
 	more +1 <"%~f1"
 	goto :EOF
 )
+
+rem Don't use "call :print-prolog" to keep "?.wsf" in place
+echo:^<!-- :
+echo:@echo off
+echo:%CMDIZE_ENGINE% //nologo "%%~f0?.wsf" %%*
+echo:goto :EOF
+echo:--^>
+type "%~f1"
 goto :EOF
 
 :: ========================================================================
