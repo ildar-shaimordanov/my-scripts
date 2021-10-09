@@ -135,15 +135,9 @@ goto :EOF
 :: The default value is cscript.
 :cmdize.js
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
-for %%d in ( cscript wscript ) do ^
-for %%e in ( "%CMDIZE_ENGINE%" ) do ^
-if /i "%%d" == "%%~ne" set "CMDIZE_ENGINE=%CMDIZE_ENGINE% //nologo //e:javascript"
+for %%d in ( cscript wscript ) do for %%e in ( "%CMDIZE_ENGINE%" ) do if /i "%%d" == "%%~ne" set "CMDIZE_ENGINE=%CMDIZE_ENGINE% //nologo //e:javascript"
 
-echo:0^</*! ::
-echo:@echo off
-echo:%CMDIZE_ENGINE% %CMDIZE_ENGINE_OPTS% "%%~f0" %%*
-echo:goto :EOF
-echo:*/0;
+call :print-prolog "%CMDIZE_ENGINE%" "0</*! ::" "*/0;"
 type "%~f1"
 goto :EOF
 
@@ -158,9 +152,7 @@ if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
 for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
-	echo:::'%%~s@echo off
-	echo:::'%%~scscript //nologo //e:vbscript "%%~f0" %%*
-	echo:::'%%~sgoto :EOF
+	call :print-prolog "%CMDIZE_ENGINE% //nologo //e:vbscript" "" "" "::'%%~s"
 )
 del /q "%TEMP%\%~n0.$$"
 
@@ -193,11 +185,7 @@ if /i "%CMDIZE_ENGINE%" == "cmdonly" (
 	goto :EOF
 )
 
-echo:@rem = '--*-Perl-*--
-echo:@echo off
-echo:perl -x -S "%%~f0" %%*
-echo:goto :EOF
-echo:@rem ';
+call :print-prolog "perl -x -S" "@rem = '--*-Perl-*--" "@rem ';"
 echo:#!perl
 type "%~f1"
 goto :EOF
@@ -207,11 +195,7 @@ goto :EOF
 :: Convert Bourne shell and Bash scripts.
 :cmdize.sh
 :cmdize.bash
-echo:: ^<^< '____CMD____'
-echo:@echo off
-echo:bash "%%~f0" %%*
-echo:goto :eof
-echo:____CMD____
+call :print-prolog bash ": << '____CMD____'" "____CMD____"
 type "%~f1"
 goto :EOF
 
@@ -241,9 +225,7 @@ if /i "%CMDIZE_ENGINE%" == "short" (
 )
 echo:0^<0# : ^^
 echo:"""
-echo:@echo off
-echo:python "%%~f0" %%*
-echo:goto :EOF
+call :print-prolog python
 echo:"""
 type "%~f1"
 goto :EOF
@@ -253,11 +235,7 @@ goto :EOF
 :: Convert the ruby file.
 :cmdize.rb
 echo:@break #^^
-echo:=begin
-echo:@echo off
-echo:ruby "%%~f0" %%*
-echo:goto :EOF
-echo:=end
+call :print-prolog ruby "=begin" "=end"
 type "%~f1"
 goto :EOF
 
@@ -268,11 +246,7 @@ goto :EOF
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
-echo:^<!-- :
-echo:@echo off
-echo:start "" mshta "%%~f0" %%*
-echo:goto :EOF
-echo:--^>
+call :print-prolog "start "" mshta" "<!-- :" "-->"
 type "%~f1"
 goto :EOF
 
@@ -292,6 +266,7 @@ for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*"
 	echo:%%a?%%d :
 	echo:: %%e ?^>^<!--
 
+	rem Don't use "call :print-prolog" to keep "?.wsf" in place
 	echo:@echo off
 	echo:%CMDIZE_ENGINE% //nologo "%%~f0?.wsf" %%*
 	echo:goto :EOF
@@ -306,9 +281,7 @@ goto :EOF
 
 :: Comvert KiXtart file.
 :cmdize.kix
-echo:;@echo off
-echo:;kix32 "%%~f0" %%*
-echo:;goto :EOF
+call :print-prolog kix32 "" "" ";"
 type "%~f1"
 goto :EOF
 
@@ -317,9 +290,7 @@ goto :EOF
 :: Convert AutoIt file.
 :cmdize.au3
 :cmdize.a3x
-echo:;@echo off
-echo:;AutoIt3 "%%~f0" %%*
-echo:;goto :EOF
+call :print-prolog AutoIt3 "" "" ";"
 type "%~f1"
 goto :EOF
 
@@ -327,9 +298,7 @@ goto :EOF
 
 :: Convert AutoHotKey file.
 :cmdize.ahk
-echo:;@echo off
-echo:;AutoHotKey "%%~f0" %%*
-echo:;goto :EOF
+call :print-prolog AutoHotKey "" "" ";"
 type "%~f1"
 goto :EOF
 
@@ -340,11 +309,7 @@ goto :EOF
 :: possible conflicts with paths to dynamic libraries and to suppress HTTP
 :: headers, we use two options "-n" and "-q", respectively.
 :cmdize.php
-echo:^<^?php/* :
-echo:@echo off
-echo:php -n -q "%%~f0" %%*
-echo:goto :EOF
-echo:*/ ?^>
+call :print-prolog "php -n -q" "<?php/* :" "*/ ?>"
 type "%~f1"
 goto :EOF
 
@@ -353,11 +318,43 @@ goto :EOF
 :: Convert Julia file.
 :cmdize.jl
 echo::"""
-echo:@echo off
-echo:julia "%%~f0" %%*
-echo:goto :EOF
+call :print-prolog julia
 echo:"""
 type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:: call :print-prolog engine
+:: call :print-prolog engine tag1 tag2
+:: call :print-prolog engine "" "" prefix
+::
+:: %1 - engine (the command to invoke the script)
+:: %2 - opening tag (used to hide batch commands wrapping them within tags)
+:: %3 - closing tag
+:: %4 - prefix (used to hide batch commands in place)
+:print-prolog
+setlocal
+
+set "tag=%~2"
+if defined tag (
+	setlocal enabledelayedexpansion
+	echo:!tag!
+	setlocal
+)
+
+echo:%~4@echo off
+echo:%~4%~1 "%%~f0" %%*
+echo:%~4goto :EOF
+
+set "tag=%~3"
+if defined tag (
+	setlocal enabledelayedexpansion
+	echo:!tag!
+	setlocal
+)
+
+endlocal
 goto :EOF
 
 :: ========================================================================
