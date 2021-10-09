@@ -271,29 +271,21 @@ goto :EOF
 :cmdize.wsf
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
+for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do if /i "%%a?%%d" == "<?xml" (
 	rem We use this code to transform the "<?xml?>" declaration
 	rem located at the very beginning of the file to the "polyglot"
 	rem form to do it acceptable by the batch file.
 	echo:%%a?%%d :
 	echo:: %%e ?^>^<!--
 
-	rem Don't use "call :print-prolog" to keep "?.wsf" in place
-	echo:@echo off
-	echo:%CMDIZE_ENGINE% //nologo "%%~f0?.wsf" %%*
-	echo:goto :EOF
+	call :print-prolog "%CMDIZE_ENGINE% //nologo" "" "" "" "?.wsf"
 
 	echo:: --%%c
 	more +1 <"%~f1"
 	goto :EOF
 )
 
-rem Don't use "call :print-prolog" to keep "?.wsf" in place
-echo:^<!-- :
-echo:@echo off
-echo:%CMDIZE_ENGINE% //nologo "%%~f0?.wsf" %%*
-echo:goto :EOF
-echo:--^>
+call :print-prolog "%CMDIZE_ENGINE% //nologo" "<!-- :" "-->" "" "?.wsf"
 type "%~f1"
 goto :EOF
 
@@ -353,6 +345,7 @@ goto :EOF
 :: %2 - opening tag (used to hide batch commands wrapping them within tags)
 :: %3 - closing tag
 :: %4 - prefix (used to hide batch commands in place)
+:: %5 - "?.wsf" for wsf files only
 :print-prolog
 setlocal
 
@@ -364,7 +357,7 @@ if defined tag (
 )
 
 echo:%~4@echo off
-echo:%~4%~1 "%%~f0" %%*
+echo:%~4%~1 "%%~f0%~5" %%*
 echo:%~4goto :EOF
 
 set "tag=%~3"
