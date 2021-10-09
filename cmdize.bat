@@ -132,7 +132,7 @@ call :cmdize%~x1 "%~1" >"%~dpn1.bat"
 
 :cmdize_loop_continue
 
-shift
+shift /1
 
 goto :cmdize_loop_begin
 :cmdize_loop_end
