@@ -1,27 +1,37 @@
 :: USAGE
 ::     cmdize name [...]
 ::
-:: This tool converts a supported code into a batch file that can be 
-:: executed without explicit invoking the executable engine. The script 
-:: creates new file and places it under the same directory as the original 
-:: one with the same name, replacing the original extension with ".bat". 
-:: The content of the new file consists of the original file and the 
-:: special header that being the "polyglot" and having some tricks to be a 
-:: valid code in batch file and the wrapped code at the same time. 
+:: This tool converts a script into a batch file allowing to use the
+:: script like regular programs and batch scripts without invoking an
+:: executable engine explicitly and just typing the script name without
+:: extension. The resulting batch file is placed next to the original
+:: script.
+::
+:: The new file consist of the body of the script prepended with the
+:: special header (or prolog) being the "polyglot" and having some tricks
+:: to be a valid code both for a batch and wrapper code.
 ::
 :: FEATURES
-:: It does comment on "Option Explicit" in VBScript.
-:: "<?xml?>" declaration for wsf-files is expected.
-:: "Option Explicit" and "<?xml?>" in a single line only are supported.
-:: BOM is not supported at all.
+:: It looks for and comments "Option Explicit" in VBScript.
 ::
-:: It is possible to select an engine for JavaScript, VBScript and WSF via 
-:: the command line options /E. If it is not pointed especially, CSCRIPT 
-:: is used as the default engine for all JavaScript, VBScript and WSF 
-:: files. Another valid engine is WSCRIPT. Additionally for JavaScript 
-:: files it is possible to set another engine such as NodeJS, Rhino etc. 
-:: The predefined option /E DEFAULT resets any previously set engines to 
-:: the default value. 
+:: "<?xml?>" declaration for wsf-files is required.
+::
+:: "Option Explicit" and "<?xml?>" are supported on a single line only.
+::
+:: BOM (Byte Order Mark) are not supported at all.
+::
+:: JavaScript, VBScript and WSF defaults an engine to CSCRIPT. Another
+:: engine can be specified with the /E option. For example WSCRIPT for
+:: those above or NODE for JavaScript. /E DEFAULT is the special option
+:: that resets any previously set engines to the default value.
+::
+:: /E CMDONLY is for Perl only. It creates the pure batch file without
+:: merging with the original Perl script. It can be useful in some
+:: cases. The original Perl script and the newly created batch file
+:: should be placed together and visible via PATH.
+::
+:: /E SHORT is for Python only. It creates ascetic prolog which is
+:: shorter and less flexible.
 ::
 :: SEE ALSO
 :: Proceed the following links to learn more the origins
@@ -85,8 +95,8 @@ if "%~1" == "" (
 
 setlocal
 
-:cmdize.loop.begin
-if "%~1" == "" goto :cmdize.loop.end
+:cmdize_loop_begin
+if "%~1" == "" goto :cmdize_loop_end
 
 set "CMDIZE_ENGINE="
 
@@ -98,52 +108,51 @@ if /i "%~1" == "/e" (
 
 if not exist "%~f1" (
 	echo:%~n0: File not found: "%~1">&2
-	goto :cmdize.loop.continue
+	goto :cmdize_loop_continue
 )
 
 findstr /i /r /c:"^:cmdize%~x1$" "%~f0" >nul || (
 	echo:%~n0: Unsupported extension: "%~1">&2
-	goto :cmdize.loop.continue
+	goto :cmdize_loop_continue
 )
 
 call :cmdize%~x1 "%~1" >"%~dpn1.bat"
 
-:cmdize.loop.continue
+:cmdize_loop_continue
 
 shift
 
-goto :cmdize.loop.begin
-:cmdize.loop.end
+goto :cmdize_loop_begin
+:cmdize_loop_end
 
 goto :EOF
 
 :: ========================================================================
 
-:: Convert the javascript file. 
-:: The environment variable %CMDIZE_ENGINE% allows to declare another 
-:: engine (cscript, wscript, node etc). 
+:: Convert the javascript file.
+:: The environment variable %CMDIZE_ENGINE% allows to declare another
+:: engine (cscript, wscript, node etc).
 :: The default value is cscript.
 :cmdize.js
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
-set "CMDIZE_ENGINE_OPTS="
-for %%e in ( "%CMDIZE_ENGINE%" ) do (
-	if /i "%%~ne" == "cscript" set "CMDIZE_ENGINE_OPTS=//nologo //e:javascript"
-	if /i "%%~ne" == "wscript" set "CMDIZE_ENGINE_OPTS=//nologo //e:javascript"
-)
+for %%d in ( cscript wscript ) do ^
+for %%e in ( "%CMDIZE_ENGINE%" ) do ^
+if /i "%%d" == "%%~ne" set "CMDIZE_ENGINE=%CMDIZE_ENGINE% //nologo //e:javascript"
 
 echo:0^</*! ::
 echo:@echo off
 echo:%CMDIZE_ENGINE% %CMDIZE_ENGINE_OPTS% "%%~f0" %%*
-echo:goto :EOF */0;
+echo:goto :EOF
+echo:*/0;
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
 
-:: Convert the vbscript file. 
-:: The environment variable %CMDIZE_ENGINE% allows to declare another 
-:: engine (cscript or wscript). 
-:: The default value is cscript. 
+:: Convert the vbscript file.
+:: The environment variable %CMDIZE_ENGINE% allows to declare another
+:: engine (cscript or wscript).
+:: The default value is cscript.
 :cmdize.vbs
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
@@ -157,16 +166,17 @@ del /q "%TEMP%\%~n0.$$"
 
 rem type "%~f1"
 for /f "tokens=1,* delims=:" %%r in ( 'findstr /n /r "^" "%~f1"' ) do (
-	rem Filtering and commenting "Option Explicit". 
-	rem This ugly code tries as much as possible to recognize and 
-	rem comment this directive. It fails if "Option" and "Explicit" 
-	rem are located on two neighbor lines, consecutively, one by one. 
-	rem But it is too hard to imagine that there is someone who 
-	rem practices such a strange coding style. 
+	rem Filtering and commenting "Option Explicit".
+	rem This ugly code tries as much as it can to recognize and
+	rem comment out this directive. It's flexible enough to find
+	rem the directive even the string contains an arbitrary amount
+	rem of whitespaces. It fails if both "Option" and "Explicit"
+	rem are located on different lines. But it's too hard to imagine
+	rem that someone practices such a strange coding style.
 	for /f "usebackq tokens=1,2" %%a in ( '%%s' ) do if /i "%%~a" == "Option" for /f "usebackq tokens=1,* delims=:'" %%i in ( 'x%%b' ) do if /i "%%~i" == "xExplicit" (
 		echo:%~n0: Commenting Option Explicit in "%~1">&2
-		echo:rem To prevent compilation error due to embedding into a batch file, 
-		echo:rem the following line was commented automatically.
+		echo:rem To avoid compilation error due to embedding into a batch file,
+		echo:rem the following line was commented out automatically.
 		set /p "=rem " <nul
 	)
 	echo:%%s
@@ -177,7 +187,7 @@ goto :EOF
 
 :: Convert the perl file.
 :cmdize.pl
-if /i "%CMDIZE_ENGINE%" == "cmd" (
+if /i "%CMDIZE_ENGINE%" == "cmdonly" (
 	echo:@echo off
 	echo:perl -x -S "%%~dpn0.pl" %%*
 	goto :EOF
@@ -194,7 +204,7 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert Bourne shell and Bash scripts. 
+:: Convert Bourne shell and Bash scripts.
 :cmdize.sh
 :cmdize.bash
 echo:: ^<^< '____CMD____'
@@ -207,7 +217,7 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the powershell file. 
+:: Convert the powershell file.
 :cmdize.ps1
 echo:^<# :
 echo:@echo off
@@ -224,11 +234,11 @@ goto :EOF
 
 :: Convert the python file.
 :cmdize.py
-:: Ascetic way is shorter but less flexible
-:: Uncomment the following 3 lines if it is more preferrable
-:: echo:@python -x "%%~f0" %%* ^& @goto :EOF
-:: type "%~f1"
-:: goto :EOF
+if /i "%CMDIZE_ENGINE%" == "short" (
+	echo:@python -x "%%~f0" %%* ^& @goto :EOF
+	type "%~f1"
+	goto :EOF
+)
 echo:0^<0# : ^^
 echo:"""
 echo:@echo off
@@ -253,8 +263,8 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the html file. 
-:: Supportable file extensions are .hta, .htm and .html. 
+:: Convert the html file.
+:: Supportable file extensions are .hta, .htm and .html.
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
@@ -268,22 +278,24 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the wsf file. 
-:: The environment variable %CMDIZE_ENGINE% allows to declare another 
-:: engine (cscript or wscript). 
+:: Convert the wsf file.
+:: The environment variable %CMDIZE_ENGINE% allows to declare another
+:: engine (cscript or wscript).
 :: The default value is cscript.
 :cmdize.wsf
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
 for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
-	rem We use this code to transform the "<?xml?>" declaration 
-	rem located at the very beginning of the file to the "polyglot" 
+	rem We use this code to transform the "<?xml?>" declaration
+	rem located at the very beginning of the file to the "polyglot"
 	rem form to do it acceptable by the batch file.
 	echo:%%a?%%d :
 	echo:: %%e ?^>^<!--
+
 	echo:@echo off
 	echo:%CMDIZE_ENGINE% //nologo "%%~f0?.wsf" %%*
 	echo:goto :EOF
+
 	echo:: --%%c
 	more +1 <"%~f1"
 	goto :EOF
