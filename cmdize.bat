@@ -12,7 +12,8 @@
 :: to be a valid code both for a batch and wrapper code.
 ::
 :: FEATURES
-:: Use /L to display the list of supported extensions
+:: Use /L to display the list of supported file extensions and set of
+:: applicable values for /E.
 ::
 :: The tool looks for the directive "Option Explicit" and comments it
 :: out while creating the batch file.
@@ -101,7 +102,7 @@ if "%~1" == "" (
 )
 
 if /i "%~1" == "/L" (
-	for /f "tokens=2 delims=." %%x in ( 'findstr /r "^:cmdize[.][a-z0-9_]*$" "%~f0"' ) do echo:.%%~x
+	for /f "tokens=1,* delims=." %%x in ( 'findstr /i /r "^:cmdize[.][0-9a-z_][0-9a-z_]*\>" "%~f0"' ) do echo:.%%~y
 	goto :EOF
 )
 
@@ -123,7 +124,7 @@ if not exist "%~f1" (
 	goto :cmdize_loop_continue
 )
 
-findstr /i /r /c:"^:cmdize%~x1$" "%~f0" >nul || (
+findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
 	echo:%~n0: Unsupported extension: "%~1">&2
 	goto :cmdize_loop_continue
 )
@@ -145,7 +146,7 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another
 :: engine (cscript, wscript, node etc).
 :: The default value is cscript.
-:cmdize.js
+:cmdize.js	[/e cscript|wscript|node|...]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 for %%d in ( cscript wscript ) do for %%e in ( "%CMDIZE_ENGINE%" ) do if /i "%%d" == "%%~ne" set "CMDIZE_ENGINE=%CMDIZE_ENGINE% //nologo //e:javascript"
 
@@ -159,7 +160,7 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another
 :: engine (cscript or wscript).
 :: The default value is cscript.
-:cmdize.vbs
+:cmdize.vbs	[/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
@@ -190,7 +191,7 @@ goto :EOF
 :: ========================================================================
 
 :: Convert the perl file.
-:cmdize.pl
+:cmdize.pl	[/e cmdonly]
 if /i "%CMDIZE_ENGINE%" == "cmdonly" (
 	echo:@echo off
 	echo:perl -x -S "%%~dpn0.pl" %%*
@@ -229,7 +230,7 @@ goto :EOF
 :: ========================================================================
 
 :: Convert the python file.
-:cmdize.py
+:cmdize.py	[/e short]
 if /i "%CMDIZE_ENGINE%" == "short" (
 	echo:@python -x "%%~f0" %%* ^& @goto :EOF
 	type "%~f1"
@@ -268,18 +269,18 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another
 :: engine (cscript or wscript).
 :: The default value is cscript.
-:cmdize.wsf
+:cmdize.wsf	[/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-for /f "tokens=1,* delims=:" %%n in ( 'findstr /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do if %%~n neq 1 (
+for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do if %%~n neq 1 (
 	echo:Incorrect XML declaration: it must be at the beginning of the script>&2
 	exit /b 1
-) else for /f "usebackq tokens=1,2,* delims=?" %%a in ( "%~f1" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
+) else for /f "tokens=1,*" %%d in ( "%%b" ) do (
 	rem We sure that the XML declaration is located on the first
 	rem line of the script. Now we can transform it to the "polyglot"
 	rem form acceptable by the batch file also.
 	echo:%%a?%%d :
-	echo:: %%e ?^>^<!--
+	echo:: %%e?^>^<!--
 
 	call :print-prolog "%CMDIZE_ENGINE% //nologo" "" "" "" "?.wsf"
 
