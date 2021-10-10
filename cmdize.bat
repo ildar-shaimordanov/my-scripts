@@ -9,7 +9,7 @@
 ::
 :: The new file consist of the body of the script prepended with the
 :: special header (or prolog) being the "polyglot" and having some tricks
-:: to be a valid code both for a batch and wrapper code.
+:: to be a valid code both for the batch and original script.
 ::
 :: FEATURES
 :: Use /L to display the list of supported file extensions and set of
@@ -18,10 +18,8 @@
 :: The tool looks for the directive "Option Explicit" and comments it
 :: out while creating the batch file.
 ::
-:: "<?xml?>" declaration for wsf-files is required.
-::
-:: If "<?xml?>" is recognized as the first element of the file, it is
-:: parsed and modified to avoid execution error.
+:: If "<?xml?>" is recognized as the first element of the wsf file,
+:: it is parsed and modified to avoid execution error.
 ::
 :: Both "Option Explicit" and "<?xml?>" are supported as placed on a
 :: single line only.
