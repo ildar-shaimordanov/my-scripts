@@ -167,22 +167,47 @@ for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
 )
 del /q "%TEMP%\%~n0.$$"
 
-rem type "%~f1"
 for /f "tokens=1,* delims=:" %%r in ( 'findstr /n /r "^" "%~f1"' ) do (
 	rem Filtering and commenting "Option Explicit".
+
+	rem Weird and insane attempt to implement it using capabilities
+	rem of batch scripting only.
+
 	rem This ugly code tries as much as it can to recognize and
 	rem comment out this directive. It's flexible enough to find
 	rem the directive even the string contains an arbitrary amount
 	rem of whitespaces. It fails if both "Option" and "Explicit"
 	rem are located on different lines. But it's too hard to imagine
 	rem that someone practices such a strange coding style.
-	for /f "usebackq tokens=1,2" %%a in ( '%%s' ) do if /i "%%~a" == "Option" for /f "usebackq tokens=1,* delims=:'" %%i in ( 'x%%b' ) do if /i "%%~i" == "xExplicit" (
-		echo:%~n0: Commenting Option Explicit in "%~1">&2
+
+	rem In the other hand, it still tries to recognize the rest of
+	rem the line after the directive and put it to the next line,
+	rem if it contains an executable code.
+
+	if "%%s" == "" (
+		echo:%%s
+	) else for /f "tokens=1,*" %%a in ( "%%s" ) do if /i not "%%a" == "Option" (
+		echo:%%s
+	) else for /f "tokens=1,* delims=':	 " %%i in ( "%%b" ) do if /i not "%%i" == "Explicit" (
+		echo:%%s
+	) else (
+		echo:%~n0: Commenting "Option Explicit" in "%~1">&2
 		echo:rem To avoid compilation error due to embedding into a batch file,
 		echo:rem the following line was commented out automatically.
 		set /p "=rem " <nul
+
+		if /i "%%b" == "Explicit" (
+			rem Option Explicit
+			echo:%%s
+		) else for /f "tokens=1,* delims='" %%i in ( "%%b" ) do if /i "%%i" == "Explicit" (
+			rem Option Explicit {QUOTE} ...
+			echo:%%s
+		) else for /f "tokens=1,* delims=:	 " %%i in ( "%%b" ) do if /i "%%i" == "Explicit" (
+			rem Option Explicit {COLON|TAB|SPACE} ...
+			echo:%%a %%i
+			echo:%%j
+		)
 	)
-	echo:%%s
 )
 goto :EOF
 
