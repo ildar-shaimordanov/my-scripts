@@ -24,8 +24,7 @@ echo:==== %~1 [%~2] ====
 echo:
 
 > "%test_dir%\z%~1" (
-	if "%~1" == ".vbs" echo:Option Explicit
-	if "%~1" == ".wsf" echo:^<?xml?^>^<job^>^<script^>WScript.Echo^("Hello"^)^</script^>^</job^>
+	for /f "tokens=1,*" %%a in ( 'findstr /i /b /l "::test%~1" "%~f0"' ) do echo:%%b
 )
 
 call "%~dp0..\cmdize.bat" %~2 "%test_dir%\z%~1"
@@ -37,3 +36,8 @@ echo:
 echo:
 
 goto :EOF
+
+::test.vbs	Option Explicit:Dim a:a = 1
+
+::test.wsf	<?xml?>
+::test.wsf	<job><script>WScript.Echo^("Hello"^)</script></job>
