@@ -242,9 +242,10 @@ goto :EOF
 echo:^<# :
 echo:@echo off
 echo:setlocal
+echo:set "PS1_FILE=%%~f0"
 echo:set "PS1_ARGS=%%*"
-echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -replace '^\"','' -replace '\"$',''})}else{$a=@()};$i=$input;iex $('$input=$i;$args=$a;rv i,a;'+(gc \"%%~f0\" -raw))"
-echo:rem powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -replace '^\"','' -replace '\"$',''})}else{$a=@()};$input|&{[ScriptBlock]::Create('rv a -scope script;'+(gc \"%%~f0\" -raw)).Invoke($a)}"
+echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -replace '^\"','' -replace '\"$',''})}else{$a=@()};$f=gc $Env:PS1_FILE -raw;$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)"
+echo:rem powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -replace '^\"','' -replace '\"$',''})}else{$a=@()};$f=gc $Env:PS1_FILE -raw;$input|&{[ScriptBlock]::Create('rv f,a -scope script;'+$f).Invoke($a)}"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
