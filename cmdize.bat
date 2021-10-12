@@ -242,10 +242,12 @@ goto :EOF
 echo:^<# :
 echo:@echo off
 echo:setlocal
+echo:rem Any non-empty value changes the script invocation: the script is
+echo:rem executed using ScriptBlock instead of Invoke-Expression as default.
+echo:set "PS1_ISB="
 echo:set "PS1_FILE=%%~f0"
 echo:set "PS1_ARGS=%%*"
-echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -replace '^\"','' -replace '\"$',''})}else{$a=@()};$f=gc $Env:PS1_FILE -raw;$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)"
-echo:rem powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -replace '^\"','' -replace '\"$',''})}else{$a=@()};$f=gc $Env:PS1_FILE -raw;$input|&{[ScriptBlock]::Create('rv f,a -scope script;'+$f).Invoke($a)}"
+echo:powershell -NoLogo -NoProfile -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;if($a.length){$a=@($a|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''})}else{$a=@()};$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
