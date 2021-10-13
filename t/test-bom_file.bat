@@ -13,13 +13,20 @@ $dir = $env:TEMP
 
 $str = "In math the Greek letter $([char]0x03C0) stands for 3.1415926"
 
-$files = @( "utf8 utf32 unicode bigendianunicode".Split(" ") | % {
+$files = @( "ascii default oem utf8 utf32 unicode bigendianunicode".Split(" ") | % {
 	$file = "$dir\z-$_.txt"
 	Write-Output $str | Out-File -Encoding $_ $file
 	$file
 } )
 
+"
+Default usage:
+"
 & ..\bom_file $files
+"
+Using the '-b' option:
+"
+& ..\bom_file -b $files
 
 # Comment this line out to prevent deletion of the files
 Remove-Item $dir\z-*.txt

@@ -63,6 +63,8 @@ if defined bom_%bom_bytes% (
 	call echo:%%bom_%bom_bytes:~0,6%%%
 ) else if defined bom_%bom_bytes:~0,4% (
 	call echo:%%bom_%bom_bytes:~0,4%%%
+) else (
+	if not defined bom_brief echo:
 )
 
 shift /1
