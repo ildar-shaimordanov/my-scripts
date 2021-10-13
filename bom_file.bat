@@ -18,17 +18,17 @@ setlocal enabledelayedexpansion
 
 :: The following settings are based on information from the table
 :: https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding
-set "bom_EFBBBF=UTF-8"
-set "bom_FEFF=UTF-16BE"
-set "bom_FFFE=UTF-16LE"
-set "bom_0000FEFF=UTF-32BE"
-set "bom_FFFE0000=UTF-32LE"
-set "bom_2B2F76=UTF-7"
-set "bom_F7644C=UTF-1"
-set "bom_DD736673=UTF-EBCDIC"
-set "bom_0EFEFF=SCSU"
-set "bom_FBEE28=BOCU-1"
-set "bom_84319533=GB-18030"
+set "bom_val_EFBBBF=UTF-8"
+set "bom_val_FEFF=UTF-16BE"
+set "bom_val_FFFE=UTF-16LE"
+set "bom_val_0000FEFF=UTF-32BE"
+set "bom_val_FFFE0000=UTF-32LE"
+set "bom_val_2B2F76=UTF-7"
+set "bom_val_F7644C=UTF-1"
+set "bom_val_DD736673=UTF-EBCDIC"
+set "bom_val_0EFEFF=SCSU"
+set "bom_val_FBEE28=BOCU-1"
+set "bom_val_84319533=GB-18030"
 
 :: ========================================================================
 
@@ -57,12 +57,12 @@ if "%%a" leq "00000003:" set "bom_bytes=!bom_bytes!%%c"
 
 if not defined bom_brief set /p "=%~1: " <nul
 
-if defined bom_%bom_bytes% (
-	call echo:%%bom_%bom_bytes%%%
-) else if defined bom_%bom_bytes:~0,6% (
-	call echo:%%bom_%bom_bytes:~0,6%%%
-) else if defined bom_%bom_bytes:~0,4% (
-	call echo:%%bom_%bom_bytes:~0,4%%%
+if defined bom_val_%bom_bytes% (
+	call echo:%%bom_val_%bom_bytes%%%
+) else if defined bom_val_%bom_bytes:~0,6% (
+	call echo:%%bom_val_%bom_bytes:~0,6%%%
+) else if defined bom_val_%bom_bytes:~0,4% (
+	call echo:%%bom_val_%bom_bytes:~0,4%%%
 ) else if not defined bom_brief (
 	echo:
 )
