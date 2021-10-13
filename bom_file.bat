@@ -52,8 +52,12 @@ if "%~1" == "" (
 )
 
 set "bom_bytes="
-for /f "skip=1 tokens=1,2,3" %%a in ( 'fc /b "%bom_cmpfile%" "%~1"' ) do ^
-if "%%a" leq "00000003:" set "bom_bytes=!bom_bytes!%%c"
+for /f "tokens=1,2,3,4 delims=: " %%a in ( '
+	fc /b "%bom_cmpfile%" "%~1" ^| findstr /n /r "^00*[0-3]"
+' ) do (
+	set /a bom_diff=%%a-%%b
+	if !bom_diff! equ 2 set "bom_bytes=!bom_bytes!%%d"
+)
 
 set "bom_found="
 for /l %%n in ( 8, -2, 4 ) do if not defined bom_found ^
