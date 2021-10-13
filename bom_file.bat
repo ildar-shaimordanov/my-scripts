@@ -55,16 +55,19 @@ set "bom_bytes="
 for /f "skip=1 tokens=1,2,3" %%a in ( 'fc /b "%bom_cmpfile%" "%~1"' ) do ^
 if "%%a" leq "00000003:" set "bom_bytes=!bom_bytes!%%c"
 
-if not defined bom_brief set /p "=%~1: " <nul
-
+set "bom_found="
 if defined bom_val_%bom_bytes% (
-	call echo:%%bom_val_%bom_bytes%%%
+	set "bom_found=!bom_val_%bom_bytes%!"
 ) else if defined bom_val_%bom_bytes:~0,6% (
-	call echo:%%bom_val_%bom_bytes:~0,6%%%
+	set "bom_found=!bom_val_%bom_bytes:~0,6%!"
 ) else if defined bom_val_%bom_bytes:~0,4% (
-	call echo:%%bom_val_%bom_bytes:~0,4%%%
-) else if not defined bom_brief (
-	echo:
+	set "bom_found=!bom_val_%bom_bytes:~0,4%!"
+)
+
+if defined bom_brief (
+	if defined bom_found echo:%bom_found%
+) else (
+	echo:%~1: %bom_found%
 )
 
 shift /1
