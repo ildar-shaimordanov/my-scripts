@@ -23,14 +23,14 @@ $files = @( "ascii default oem utf8 utf32 unicode bigendianunicode".Split(" ") |
 Default usage:
 "
 (Get-Date).ToString('hh:mm:ss.ms')
-& ..\bom_file $files
+& ..\file-detect-bom $files
 (Get-Date).ToString('hh:mm:ss.ms')
 
 "
 Using the '-b' option:
 "
 (Get-Date).ToString('hh:mm:ss.ms')
-& ..\bom_file -b $files
+& ..\file-detect-bom -b $files
 (Get-Date).ToString('hh:mm:ss.ms')
 
 # Comment this line out to prevent deletion of the files
