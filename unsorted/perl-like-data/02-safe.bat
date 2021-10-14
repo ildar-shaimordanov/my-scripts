@@ -31,13 +31,11 @@ for /f "tokens=1,* delims=:" %%a in ( '
 	set "DATA_THIS=%~1"
 ) else if defined DATA_THIS (
 	for %%c in ( %DATA_NAMES% ) do if "%%b" == "goto :EOF & :%%c" goto :EOF
-	setlocal disabledelayedexpansion
 	if "%~2" == "" (
 		echo:%%b
 	) else (
 		call %~2 "%%b"
 	)
-	endlocal
 )
 goto :EOF
 
