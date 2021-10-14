@@ -6,15 +6,16 @@
 
 @echo off
 
-if "%~1" == "" (
-	for /f "usebackq tokens=* delims=:" /f %%s in ( "%~f0" ) do (
-		if /i "%%s" == "@echo off" goto :EOF
-		echo:%%s
-	)
-	goto :EOF
-)
-
 setlocal enabledelayedexpansion
+
+set "bom_brief="
+if /i "%~1" == "-b"      set "bom_brief=1"
+if /i "%~1" == "--brief" set "bom_brief=1"
+if defined bom_brief shift /1
+
+if "%~1" == "" goto :print_usage
+
+:: ========================================================================
 
 :: The following settings are based on information from the table
 :: https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding
@@ -32,22 +33,12 @@ set "bom_val_84319533=GB-18030"
 
 :: ========================================================================
 
-set "bom_brief="
-if /i "%~1" == "-b"      set "bom_brief=1"
-if /i "%~1" == "--brief" set "bom_brief=1"
-if defined bom_brief shift /1
-
-:: ========================================================================
-
 set "bom_cmpfile=%TEMP%\bom_cmpfile"
-
 set /p "=@@@@" <nul >"%bom_cmpfile%"
-
-:: ========================================================================
 
 :bom_begin_loop
 if "%~1" == "" (
-	del "%bom_cmpfile%"
+	del /f /q "%bom_cmpfile%"
 	goto :EOF
 )
 
@@ -71,6 +62,15 @@ if defined bom_brief (
 
 shift /1
 goto :bom_begin_loop
+
+:: ========================================================================
+
+:print_usage
+for /f "usebackq tokens=* delims=:" /f %%s in ( "%~f0" ) do (
+	if /i "%%s" == "@echo off" goto :EOF
+	echo:%%s
+)
+goto :EOF
 
 :: ========================================================================
 
