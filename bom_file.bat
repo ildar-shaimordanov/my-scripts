@@ -38,7 +38,7 @@ set /p "=@@@@" <nul >"%bom_cmpfile%"
 
 :bom_begin_loop
 if "%~1" == "" (
-	del /f /q "%bom_cmpfile%"
+	del /f /q "%bom_cmpfile%" 2>nul
 	goto :EOF
 )
 
