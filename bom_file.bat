@@ -42,22 +42,14 @@ if "%~1" == "" (
 	goto :EOF
 )
 
-set "bom_bytes="
-for /f "tokens=1,2,3,4 delims=: " %%a in ( '
-	fc /b "%bom_cmpfile%" "%~1" ^| findstr /n /r "^00*[0-3]"
-' ) do (
-	set /a bom_diff=%%a-%%b
-	if !bom_diff! equ 2 set "bom_bytes=!bom_bytes!%%d"
-)
+for %%f in ( "%~1" ) do (
+	call :detect_type "%%~f"
 
-set "bom_found="
-for /l %%n in ( 8, -2, 4 ) do if not defined bom_found ^
-for %%s in ( bom_val_!bom_bytes:~0^,%%n! ) do set "bom_found=!%%s!"
-
-if defined bom_brief (
-	if defined bom_found echo:%bom_found%
-) else (
-	echo:%~1: %bom_found%
+	if defined bom_brief (
+		if defined bom_found echo:!bom_found!
+	) else (
+		echo:%%~f: !bom_found!
+	)
 )
 
 shift /1
@@ -70,6 +62,38 @@ for /f "usebackq tokens=* delims=:" /f %%s in ( "%~f0" ) do (
 	if /i "%%s" == "@echo off" goto :EOF
 	echo:%%s
 )
+goto :EOF
+
+:: ========================================================================
+
+:detect_type
+set "bom_found="
+
+set "bom_srcfile=%~1"
+
+if not exist "%~1" (
+	echo:File not found: "%~1">&2
+	exit /b 1
+)
+if exist "%~1\" (
+	set "bom_found=directory"
+	goto :EOF
+)
+if %~z1 equ 0 (
+	set "bom_found=empty"
+	goto :EOF
+)
+
+set "bom_bytes="
+for /f "tokens=1,2,3,4 delims=: " %%a in ( '
+	fc /b "%bom_cmpfile%" "%~1" ^| findstr /n /r "^00*[0-3]"
+' ) do (
+	set /a bom_diff=%%a-%%b
+	if !bom_diff! equ 2 set "bom_bytes=!bom_bytes!%%d"
+)
+
+for /l %%n in ( 8, -2, 4 ) do if not defined bom_found ^
+for %%s in ( bom_val_!bom_bytes:~0^,%%n! ) do set "bom_found=!%%s!"
 goto :EOF
 
 :: ========================================================================
