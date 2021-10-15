@@ -144,9 +144,16 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another
 :: engine (cscript, wscript, node etc).
 :: The default value is cscript.
-:cmdize.js	[/e cscript|wscript|node|...]
+:cmdize.js	[/e cscript|wscript|chakra-cscript|chakra-wscript|ch|node|...]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
-for %%d in ( cscript wscript ) do for %%e in ( "%CMDIZE_ENGINE%" ) do if /i "%%d" == "%%~ne" set "CMDIZE_ENGINE=%CMDIZE_ENGINE% //nologo //e:javascript"
+for %%e in ( "%CMDIZE_ENGINE%" ) do for %%s in (
+	"cscript	cscript //e:javascript"
+	"wscript	wscript //e:javascript"
+	"chakra-cscript	cscript //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}"
+	"chakra-wscript	wscript //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}"
+) do for /f "tokens=1,2,3" %%a in ( "%%~s" ) do if "%%~e" == "%%~a" (
+	set "CMDIZE_ENGINE=%%~b //nologo %%~c"
+)
 
 call :print-prolog "%CMDIZE_ENGINE%" "0</*! ::" "*/0;"
 type "%~f1"
