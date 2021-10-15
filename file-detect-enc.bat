@@ -106,10 +106,11 @@ for /f "usebackq delims=" %%s in ( "%enc_hexfile%" ) do (
 		set "enc_firstline="
 		set "enc_bytes=%%a%%b%%c%%d"
 
-		for /l %%n in ( 8, -2, 4 ) do if defined enc_found (
-			goto :EOF
-		) else for %%s in ( enc_val_!enc_bytes:~0^,%%n! ) do (
+		for /l %%n in ( 8, -2, 4 ) do for %%s in (
+			enc_val_!enc_bytes:~0^,%%n!
+		) do (
 			set "enc_found=!%%s!"
+			if defined enc_found goto :EOF
 		)
 	)
 

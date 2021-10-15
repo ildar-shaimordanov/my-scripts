@@ -92,8 +92,10 @@ for /f "tokens=1,2,3,4 delims=: " %%a in ( '
 	if !bom_diff! equ 2 set "bom_bytes=!bom_bytes!%%d"
 )
 
-for /l %%n in ( 8, -2, 4 ) do if not defined bom_found ^
-for %%s in ( bom_val_!bom_bytes:~0^,%%n! ) do set "bom_found=!%%s!"
+for /l %%n in ( 8, -2, 4 ) do for %%s in ( bom_val_!bom_bytes:~0^,%%n! ) do (
+	set "bom_found=!%%s!"
+	if defined bom_found goto :EOF
+)
 goto :EOF
 
 :: ========================================================================
