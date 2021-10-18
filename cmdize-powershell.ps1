@@ -44,6 +44,10 @@ $executor = {
 	} else {
 		$a = @()
 	};
+# next update to cmdize.bat the above "if/else" should be replaced with the code below
+#	$a = @( @( if ( $a.length ) { $a } else { @() } ) | ForEach-Object {
+#		$_.value -Replace '^"', '' -Replace '"$', ''
+#	} );
 
 	# read the batch file
 	$f = Get-Content $Env:PS1_FILE -Raw;
@@ -79,7 +83,8 @@ $percent = if ( $standalone ) { '%%' } else { '%%%%' }
 
 $minified = $executor.ToString()
 
-$minified = $minified -Split "``?`r?`n"
+$minified = $minified -Replace "```r?`n\s*", ''
+$minified = $minified -Split "`r?`n"
 $minified = $minified | Where-Object { $_ -notmatch '^\s*#' }
 $minified = $minified -Join "`n"
 
