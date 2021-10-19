@@ -51,40 +51,35 @@ try {
 // https://www.hanselman.com/blog/how-to-list-all-the-files-in-an-msi-installer-using-vbsciript
 
 function getMsiListing(filename) {
-	var r = getMsiView(filename, 'Select FileSize, FileName From File');
-
-	var c = getColumnWidth(r, 0);
-
-	for (var i = 0; i < r.length; i++) {
-		r[i][0] = ( c.padding + r[i][0] ).slice(-c.width);
-		r[i] = r[i].join(' : ');
-	}
-
-	return r.join('\n');
+	return getMsiView(filename, {
+		header: 'FileSize FileName'.split(' '),
+		sql: 'Select FileSize, FileName From File',
+		align: function(value, width, padding) {
+			return ( padding + value ).slice(-width);
+		}
+	});
 }
 
 function getMsiProperty(filename) {
-	var r = getMsiView(filename, 'Select * From Property');
-
-	var c = getColumnWidth(r, 0);
-
-	for (var i = 0; i < r.length; i++) {
-		r[i][0] = ( r[i][0] + c.padding ).slice(0, c.width);
-		r[i] = r[i].join(' : ');
-	}
-
-	return r.join('\n');
+	return getMsiView(filename, {
+		header: 'Property Value'.split(' '),
+		sql: 'Select * From Property',
+		align: function(value, width, padding) {
+			return ( value + padding ).slice(0, width);
+		}
+	});
 }
 
-function getMsiView(filename, sql) {
+function getMsiView(filename, options) {
 	var installer = new ActiveXObject('WindowsInstaller.Installer');
 	var installerDatabase = installer.OpenDatabase(filename, 0);
-	var installerView = installerDatabase.OpenView(sql);
+	var installerView = installerDatabase.OpenView(options.sql);
 	installerView.Execute();
 
 	var installerRecord;
 
 	var r = [];
+	var maxLen = 0;
 
 	while ( installerRecord = installerView.Fetch() ) {
 		var n = installerRecord.FieldCount;
@@ -92,23 +87,20 @@ function getMsiView(filename, sql) {
 		for (var i = 1; i <= n; i++) {
 			s.push(installerRecord.StringData(i));
 		}
+		maxLen = Math.max(maxLen, s[0].length);
 		r.push(s);
 	}
 
-	return r;
-}
+	var padding = new Array(maxLen + 1).join(' ');
 
-function getColumnWidth(r, j) {
-	var maxLen = 0;
+	r.unshift(options.header);
 
 	for (var i = 0; i < r.length; i++) {
-		maxLen = Math.max(maxLen, r[i][j].length);
+		r[i][0] = options.align(r[i][0], maxLen, padding);
+		r[i] = r[i].join(' : ');
 	}
 
-	return {
-		width: maxLen,
-		padding: new Array(maxLen + 1).join(' ')
-	};
+	return r.join('\n');
 }
 
 // ========================================================================
