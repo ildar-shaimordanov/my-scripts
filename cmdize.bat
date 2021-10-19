@@ -318,7 +318,9 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	call :print-prolog "%CMDIZE_ENGINE% //nologo" "" "" "" "?.wsf"
 
 	echo:: --%%c
-	more +1 <"%~f1"
+	for /f "tokens=1,* delims=:" %%a in ( 'findstr /n /r "^" "%~f1"' ) do (
+		if %%a gtr 1 echo:%%b
+	)
 	goto :EOF
 )
 
