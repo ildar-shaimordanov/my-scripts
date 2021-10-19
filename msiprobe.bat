@@ -9,20 +9,22 @@
 
 @echo off
 
-for %%f in ( "%~1" ) do for %%d in ( "%~2" ) do if /i "%%~d" == "" (
+if /i "%~2" == "" (
 	for /f "usebackq tokens=* delims=:" %%s in ( "%~f0" ) do (
 		if /i "%%s" == "@echo off" goto :EOF
 		if not "%%s" == "0</*! ::" echo:%%s
 	)
-) else if /i "%%~d" == "/LIST" (
-	cscript //nologo //e:javascript "%~f0" "%%~ff" /LIST
-) else if /i "%%~d" == "/PROPERTY" (
-	cscript //nologo //e:javascript "%~f0" "%%~ff" /PROPERTY
-) else (
-	echo:Executing...
-	echo:msiexec /quiet /a "%%~ff" TARGETDIR="%%~fd"
-	call msiexec /quiet /a "%%~ff" TARGETDIR="%%~fd"
+	goto :EOF
 )
+
+for %%o in ( LIST PROPERTY ) do if /i "%~2" == "/%%~o" (
+	cscript //nologo //e:javascript "%~f0" %*
+	goto :EOF
+)
+
+echo:Executing...
+echo:msiexec /quiet /a "%~f1" TARGETDIR="%~f2"
+call msiexec /quiet /a "%~f1" TARGETDIR="%~f2"
 
 goto :EOF
 */0;
