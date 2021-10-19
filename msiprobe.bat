@@ -1,10 +1,19 @@
 0</*! ::
+
+::Probe and unpack a MSI file.
+::
+::Usage:
+::    msiprobe msi-file /LIST
+::    msiprobe msi-file /PROPERTY
+::    msiprobe msi-file target-dir
+
 @echo off
 
 for %%f in ( "%~1" ) do for %%d in ( "%~2" ) do if /i "%%~d" == "" (
-	echo:Usage: %~n0 msi-file /LIST
-	echo:Usage: %~n0 msi-file /PROPERTY
-	echo:Usage: %~n0 msi-file target-dir
+	for /f "usebackq tokens=* delims=:" %%s in ( "%~f0" ) do (
+		if /i "%%s" == "@echo off" goto :EOF
+		if not "%%s" == "0</*! ::" echo:%%s
+	)
 ) else if /i "%%~d" == "/LIST" (
 	cscript //nologo //e:javascript "%~f0" "%%~ff" /LIST
 ) else if /i "%%~d" == "/PROPERTY" (
