@@ -45,7 +45,16 @@ are part of the heredoc content within parantheses of the script block.
 :: http://stackoverflow.com/a/15032476/3627676
 :heredoc LABEL
 setlocal enabledelayedexpansion
+if not defined CMDCALLER set "CMDCALLER=%~f2"
 if not defined CMDCALLER set "CMDCALLER=%~f0"
+if exist "!CMDCALLER!\" (
+	echo:Not a file: "!CMDCALLER!" >&2
+	exit /b 1
+)
+if not exist "!CMDCALLER!" (
+	echo:File not found: "!CMDCALLER!" >&2
+	exit /b 1
+)
 set go=
 for /f "delims=" %%A in ( '
 	findstr /n "^" "%CMDCALLER%"
