@@ -52,8 +52,8 @@ try {
 
 function getMsiListing(filename) {
 	return getMsiView(filename, {
-		header: 'FileSize FileName'.split(' '),
 		sql: 'Select FileSize, FileName From File',
+		header: 'FileSize FileName'.split(' '),
 		align: function(value, width, padding) {
 			return ( padding + value ).slice(-width);
 		}
@@ -62,8 +62,8 @@ function getMsiListing(filename) {
 
 function getMsiProperty(filename) {
 	return getMsiView(filename, {
-		header: 'Property Value'.split(' '),
 		sql: 'Select * From Property',
+		header: 'Property Value'.split(' '),
 		align: function(value, width, padding) {
 			return ( value + padding ).slice(0, width);
 		}
