@@ -305,10 +305,16 @@ goto :EOF
 :cmdize.wsf	[/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do if %%~n neq 1 (
-	echo:Incorrect XML declaration: it must be at the beginning of the script>&2
-	exit /b 1
-) else for /f "tokens=1,*" %%d in ( "%%b" ) do (
+set "CMDIZE_ERROR="
+
+for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
+	if %%n neq 1 set "CMDIZE_ERROR=1"
+	if not "%%a" == "<" set "CMDIZE_ERROR=1"
+	if defined CMDIZE_ERROR (
+		echo:Incorrect XML declaration: it must be at the beginning of the script>&2
+		exit /b 1
+	)
+
 	rem We sure that the XML declaration is located on the first
 	rem line of the script. Now we can transform it to the "polyglot"
 	rem form acceptable by the batch file also.
