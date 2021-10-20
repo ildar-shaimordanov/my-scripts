@@ -70,7 +70,7 @@ are part of the heredoc content within parentheses of the script block.
 ::
 :: :: Everything below can be copied-and-pasted in to your scripts.
 
-:heredoc LABEL
+:heredoc [:]LABEL [FILENAME]
 setlocal enabledelayedexpansion
 set "HERE_FILE=%~f2"
 if not defined HERE_FILE set "HERE_FILE=%~f0"
@@ -80,6 +80,10 @@ if exist "!HERE_FILE!\" (
 )
 if not exist "!HERE_FILE!" (
 	echo:File not found: "!HERE_FILE!">&2
+	exit /b 1
+)
+if "%~1" == "" (
+	echo:Empty label not permitted>&2
 	exit /b 1
 )
 set HERE_LABEL=
@@ -104,9 +108,7 @@ for /f "delims=" %%A in ( '
 		)
 	)
 )
-if "%HERE_LABEL%" == ":" (
-	echo:Heredoc terminated abnormally: wanted any label>&2
-) else (
-	echo:Heredoc terminated abnormally: wanted "%HERE_LABEL%">&2
-)
+if "%HERE_LABEL%" == ":"  set "HERE_LABEL="
+if not defined HERE_LABEL set "HERE_LABEL=any label"
+echo:Heredoc terminated abnormally: wanted %HERE_LABEL%>&2
 goto :EOF
