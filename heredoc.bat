@@ -16,7 +16,7 @@ if defined CMDCALLER (
 )
 
 
-call :heredoc :HEREDOCHELP & goto :EOF
+call :heredoc :help & goto :EOF
 heredoc: attempt to embed the idea of heredoc to batch scripts.
 
 There are few ways for using this solution:
@@ -39,7 +39,7 @@ caret "^".
 
 Additionally, parantheses "(" and ")" should be escaped, as well, if they 
 are part of the heredoc content within parantheses of the script block.
-:HEREDOCHELP
+:help
 
 
 :: http://stackoverflow.com/a/15032476/3627676
@@ -48,11 +48,11 @@ setlocal enabledelayedexpansion
 if not defined CMDCALLER set "CMDCALLER=%~f2"
 if not defined CMDCALLER set "CMDCALLER=%~f0"
 if exist "!CMDCALLER!\" (
-	echo:Not a file: "!CMDCALLER!" >&2
+	echo:Not a file: "!CMDCALLER!">&2
 	exit /b 1
 )
 if not exist "!CMDCALLER!" (
-	echo:File not found: "!CMDCALLER!" >&2
+	echo:File not found: "!CMDCALLER!">&2
 	exit /b 1
 )
 set go=
@@ -74,4 +74,5 @@ for /f "delims=" %%A in ( '
 		)
 	)
 )
+echo:Heredoc terminated abnormally: wanted "%go%">&2
 goto :EOF
