@@ -1,20 +1,19 @@
 :: http://forum.script-coding.com/viewtopic.php?pid=94390#p94390
-@if not defined CMDCALLER @(
-	(echo on & goto) 2>nul
-	call set "CMDCALLER=%%~f0"
-	call "%~f0" %*
-	set "CMDCALLER="
-)
-@if /i "%CMDCALLER%" == "%%~f0" set "CMDCALLER="
-
-
-@echo off
-
-if defined CMDCALLER (
+@if not "%~2" == "" (
+	rem call heredoc :LABEL FILENAME
+	echo off
 	call :heredoc %*
 	goto :EOF
 )
 
+@if not "%~1" == "" (
+	rem call heredoc :LABEL
+	(echo on & goto) 2>nul
+	for /f "tokens=*" %%f in ( 'call echo:%%~f0' ) do @call "%~f0" %* "%%~f"
+)
+
+@rem call heredoc
+@echo off
 
 call :heredoc :help & goto :EOF
 heredoc: attempt to embed the idea of heredoc to batch scripts.
@@ -45,7 +44,7 @@ are part of the heredoc content within parantheses of the script block.
 :: http://stackoverflow.com/a/15032476/3627676
 :heredoc LABEL
 setlocal enabledelayedexpansion
-if not defined CMDCALLER set "CMDCALLER=%~f2"
+set "CMDCALLER=%~f2"
 if not defined CMDCALLER set "CMDCALLER=%~f0"
 if exist "!CMDCALLER!\" (
 	echo:Not a file: "!CMDCALLER!">&2
@@ -67,12 +66,19 @@ for /f "delims=" %%A in ( '
 		echo:!line!
 	) else (
 		rem delims are @ ( ) > & | TAB , ; = SPACE
-		for /f "tokens=1-3 delims=@()>&|	,;= " %%i in ( "!line!" ) do (
-			if /i "%%i %%j %%k" == "call :heredoc %1" set "go=%%k"
-			if /i "%%i %%j %%k" == "call heredoc %1" set "go=%%k"
-			if defined go if not "!go:~0,1!" == ":" set "go=:!go!"
+		for /f "tokens=1-3 delims=@()>&|	,;= " %%i in (
+			"!line!"
+		) do for /f "tokens=1,2,3 delims=:" %%p in (
+			"%%~i:%%~j:%%~k"
+		) do (
+			if /i "%%p:%%q:%%r" == "call:heredoc:%~1" set "go=:%%r"
+			if /i "%%p:%%q:%%r" == "call:heredoc%~1"  set "go=:%%r"
 		)
 	)
 )
-echo:Heredoc terminated abnormally: wanted "%go%">&2
+if "%go%" == ":" (
+	echo:Heredoc terminated abnormally: wanted any label>&2
+) else (
+	echo:Heredoc terminated abnormally: wanted "%go%">&2
+)
 goto :EOF
