@@ -1,47 +1,75 @@
-:: http://forum.script-coding.com/viewtopic.php?pid=94390#p94390
+:: call heredoc :LABEL FILENAME
+::
+:: Internal use only. It's unlikely necessary to invoke the script this
+:: way explicitly.
 @if not "%~2" == "" (
-	rem call heredoc :LABEL FILENAME
 	echo off
 	call :heredoc %*
 	goto :EOF
 )
 
+:: call heredoc :LABEL
+::
+:: Using the nude "goto" without a label causes the error. However
+:: placing it within the parentheses we can catch this error and continue
+:: executing the script. The sense of this trick is that "heredoc.bat"
+:: escapes the context of the calling parent script, so the callee name
+:: is still available via "%~f0" and the caller name is available now via
+:: "%%~f0". This moment we can invoke ourselves the second time to pass
+:: the caller name correctly. Because the execution context is owned by
+:: the caller, the second invocation returns to the caller directly.
+::
+:: Initially this trick was discussed in this thread:
+:: http://forum.script-coding.com/viewtopic.php?pid=94390#p94390
 @if not "%~1" == "" (
-	rem call heredoc :LABEL
 	(echo on & goto) 2>nul
 	for /f "tokens=*" %%f in ( 'call echo:%%~f0' ) do @call "%~f0" %* "%%~f"
 )
 
-@rem call heredoc
+:: call heredoc
+::
+:: Better use as a standalone script to learn the heredoc usage.
 @echo off
 
 call :heredoc :help & goto :EOF
-heredoc: attempt to embed the idea of heredoc to batch scripts.
+It's attempt to apply the idea of heredoc in batch scripts.
 
-There are few ways for using this solution:
-
-1. call heredoc :LABEL & goto :LABEL
-Calling the external script "heredoc.bat" passing the heredoc LABEL. 
-
-2. call :heredoc :LABEL & goto :LABEL
-Embed the subroutine ":heredoc" into yuor script.
+USAGE:
+    call [:]heredoc [:]LABEL & goto [:]LABEL
+    ...
+    :LABEL
 
 NOTES:
-Both LABEL and :LABEL forms are possible. Instead of "goto :LABEL" it is 
-possible to use "goto" with another label, or "goto :EOF", or "exit /b".
+The form "call heredoc" means calling the external "heredoc.bat" script.
 
-Variables to be evaluated within the heredoc should be called in the 
-delayed expansion style ^("^!var^!" rather than "%var%", for instance^).
+The form "call :heredoc" means calling the internal ":heredoc" subroutine
+placed within your script.
 
-Literal exclamation marks "^!" and carets "^^" must be escaped with a 
-caret "^".
+Both ":LABEL" or "LABEL" forms are possible. Instead of "goto [:]LABEL"
+it's possible to use "goto" to an another label, or "goto :EOF" to quit
+the script or subroutine, or "exit /b ..." for the same purpose. The
+important thing is that you have to bypass the current heredoc block
+to avoid an unexpected script behaviour due to execution of the heredoc
+lines.
 
-Additionally, parantheses "(" and ")" should be escaped, as well, if they 
-are part of the heredoc content within parantheses of the script block.
+To expand variables within heredoc they must be used in the delayed
+expansion style (^!var^! rather than %var%).
+
+The exclamation mark "^!" must be escaped with the caret "^^" always. The
+caret "^" itself can be escaped with the caret "^". Sometimes it is not
+required.
+
+Parentheses "(" and ")" must be escaped with the carets "^", if they
+are part of the heredoc content within parentheses of the script block.
 :help
 
+:: ========================================================================
 
-:: http://stackoverflow.com/a/15032476/3627676
+:: Another heredoc implementations are discussed in this thread:
+:: https://stackoverflow.com/q/1015163/3627676
+::
+:: :: Everything below can be copied-and-pasted in to your scripts.
+
 :heredoc LABEL
 setlocal enabledelayedexpansion
 set "CMDCALLER=%~f2"
