@@ -72,41 +72,41 @@ are part of the heredoc content within parentheses of the script block.
 
 :heredoc LABEL
 setlocal enabledelayedexpansion
-set "CMDCALLER=%~f2"
-if not defined CMDCALLER set "CMDCALLER=%~f0"
-if exist "!CMDCALLER!\" (
-	echo:Not a file: "!CMDCALLER!">&2
+set "HERE_FILE=%~f2"
+if not defined HERE_FILE set "HERE_FILE=%~f0"
+if exist "!HERE_FILE!\" (
+	echo:Not a file: "!HERE_FILE!">&2
 	exit /b 1
 )
-if not exist "!CMDCALLER!" (
-	echo:File not found: "!CMDCALLER!">&2
+if not exist "!HERE_FILE!" (
+	echo:File not found: "!HERE_FILE!">&2
 	exit /b 1
 )
-set go=
+set HERE_LABEL=
 for /f "delims=" %%A in ( '
-	findstr /n "^" "%CMDCALLER%"
+	findstr /n "^" "%HERE_FILE%"
 ' ) do (
-	set "line=%%A"
-	set "line=!line:*:=!"
+	set "HERE_LINE=%%A"
+	set "HERE_LINE=!HERE_LINE:*:=!"
 
-	if defined go (
-		if /i "!line!" == "!go!" goto :EOF
-		echo:!line!
+	if defined HERE_LABEL (
+		if /i "!HERE_LINE!" == "!HERE_LABEL!" goto :EOF
+		echo:!HERE_LINE!
 	) else (
 		rem delims are @ ( ) > & | TAB , ; = SPACE
 		for /f "tokens=1-3 delims=@()>&|	,;= " %%i in (
-			"!line!"
+			"!HERE_LINE!"
 		) do for /f "tokens=1,2,3 delims=:" %%p in (
 			"%%~i:%%~j:%%~k"
 		) do (
-			if /i "%%p:%%q:%%r" == "call:heredoc:%~1" set "go=:%%r"
-			if /i "%%p:%%q:%%r" == "call:heredoc%~1"  set "go=:%%r"
+			if /i "%%p:%%q:%%r" == "call:heredoc:%~1" set "HERE_LABEL=:%%r"
+			if /i "%%p:%%q:%%r" == "call:heredoc%~1"  set "HERE_LABEL=:%%r"
 		)
 	)
 )
-if "%go%" == ":" (
+if "%HERE_LABEL%" == ":" (
 	echo:Heredoc terminated abnormally: wanted any label>&2
 ) else (
-	echo:Heredoc terminated abnormally: wanted "%go%">&2
+	echo:Heredoc terminated abnormally: wanted "%HERE_LABEL%">&2
 )
 goto :EOF
