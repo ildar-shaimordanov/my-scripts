@@ -149,17 +149,17 @@ goto :cmdize_loop_begin
 :: The default value is cscript.
 :cmdize.js	[/e cscript|wscript|cchakra|wchakra|ch|node|...]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+
 for %%e in ( "%CMDIZE_ENGINE%" ) do for %%s in (
-	"cscript	cscript //e:javascript"
-	"wscript	wscript //e:javascript"
-	"cchakra	cscript //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}"
-	"wchakra	wscript //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}"
+	"cscript cscript javascript"
+	"wscript wscript javascript"
+	"cchakra cscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
+	"wchakra wscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
 ) do for /f "tokens=1,2,3" %%a in ( "%%~s" ) do if "%%~e" == "%%~a" (
-	set "CMDIZE_ENGINE=%%~b //nologo %%~c"
+	call :print-prolog "%%~b //nologo //e:%%~c" "0</*! ::" "*/0;"
+	type "%~f1"
 )
 
-call :print-prolog "%CMDIZE_ENGINE%" "0</*! ::" "*/0;"
-type "%~f1"
 goto :EOF
 
 :: ========================================================================
