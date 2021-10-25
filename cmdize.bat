@@ -106,37 +106,40 @@ if /i "%~1" == "/L" (
 
 setlocal
 
-:cmdize_loop_begin
-if "%~1" == "" goto :cmdize_loop_end
-
+set "CMDIZE_ERROR=0"
 set "CMDIZE_ENGINE="
 
+:cmdize_loop_begin
+if "%~1" == "" exit /b %CMDIZE_ERROR%
+
 if /i "%~1" == "/e" (
-	if /i not "%~2" == "default" set "CMDIZE_ENGINE=%~2"
+	if /i "%~2" == "default" (
+		set "CMDIZE_ENGINE="
+	) else (
+		set "CMDIZE_ENGINE=%~2"
+	)
 	shift /1
 	shift /1
+	goto :cmdize_loop_begin
 )
 
 if not exist "%~f1" (
 	echo:%~n0: File not found: "%~1">&2
-	goto :cmdize_loop_continue
+	shift /1
+	set "CMDIZE_ERROR=1"
+	goto :cmdize_loop_begin
 )
 
 findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
 	echo:%~n0: Unsupported extension: "%~1">&2
-	goto :cmdize_loop_continue
+	shift /1
+	set "CMDIZE_ERROR=1"
+	goto :cmdize_loop_begin
 )
 
 call :cmdize%~x1 "%~1" >"%~dpn1.bat"
-
-:cmdize_loop_continue
-
 shift /1
-
 goto :cmdize_loop_begin
-:cmdize_loop_end
-
-goto :EOF
 
 :: ========================================================================
 
