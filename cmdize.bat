@@ -39,6 +39,8 @@
 :: /E SHORT is for Python only. It creates ascetic prolog which is
 :: shorter and less flexible.
 ::
+:: /W enables WSF+BAT alternative for VBScript only.
+::
 :: SEE ALSO
 :: Proceed the following links to learn more the origins
 ::
@@ -107,10 +109,17 @@ if /i "%~1" == "/L" (
 setlocal
 
 set "CMDIZE_ERROR=0"
+set "CMDIZE_WRAP="
 set "CMDIZE_ENGINE="
 
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
+
+if /i "%~1" == "/w" (
+	set "CMDIZE_WRAP=1"
+	shift /1
+	goto :cmdize_loop_begin
+)
 
 if /i "%~1" == "/e" (
 	if /i "%~2" == "default" (
@@ -168,8 +177,13 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another
 :: engine (cscript or wscript).
 :: The default value is cscript.
-:cmdize.vbs	[/e cscript|wscript]
+:cmdize.vbs	[/w] [/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+
+if defined CMDIZE_WRAP (
+	call :print-script-wsf-bat "%~f1" vbscript
+	goto :EOF
+)
 
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
 for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
@@ -381,6 +395,23 @@ echo::"""
 call :print-prolog julia
 echo:"""
 type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:print-script-wsf-bat
+for %%f in ( "%TEMP%\%~n1.wsf" ) do (
+	call :print-script-wsf "%~f1" %~2 >"%%~ff"
+	call :cmdize.wsf "%%~ff"
+	del /f /q "%%~ff"
+)
+goto :EOF
+
+:print-script-wsf
+echo:^<?xml version="1.0" ?^>
+echo:^<package^>^<job id="cmdized"^>^<script language="%~2"^>^<^![CDATA[
+type "%~f1"
+echo:]]^>^</script^>^</job^>^</package^>
 goto :EOF
 
 :: ========================================================================
