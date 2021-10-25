@@ -37,17 +37,9 @@ $executor = {
 	$a = (
 		$Env:PS1_ARGS | Select-String -Pattern '"(.*?)"(?=\s|$)|(\S+)' -AllMatches
 	).Matches;
-	if ( $a.length ) {
-		$a = @( $a | ForEach-Object {
-			$_.value -Replace '^"', '' -Replace '"$', ''
-		} )
-	} else {
-		$a = @()
-	};
-# next update to cmdize.bat the above "if/else" should be replaced with the code below
-#	$a = @( @( if ( $a.length ) { $a } else { @() } ) | ForEach-Object {
-#		$_.value -Replace '^"', '' -Replace '"$', ''
-#	} );
+	$a = @( @( if ( $a.count ) { $a } ) | ForEach-Object {
+		$_.value -Replace '^"', '' -Replace '"$', ''
+	} );
 
 	# read the batch file
 	$f = Get-Content $Env:PS1_FILE -Raw;
