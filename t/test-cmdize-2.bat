@@ -3,70 +3,63 @@
 setlocal
 
 set "test_dir=%TEMP%"
+set "test_dir=."
 
-::.js::	WScript.Echo(WScript.ScriptFullName);
-::.js::	
-::.js::	WScript.Echo( [
-::.js::		ScriptEngine(),
-::.js::		ScriptEngineMajorVersion(),
-::.js::		ScriptEngineMinorVersion(),
-::.js::		ScriptEngineBuildVersion()
-::.js::	].join('.'));
+::test.js::	WScript.Echo(WScript.ScriptFullName);
+::test.js::	WScript.Echo( [
+::test.js::		ScriptEngine(),
+::test.js::		ScriptEngineMajorVersion(),
+::test.js::		ScriptEngineMinorVersion(),
+::test.js::		ScriptEngineBuildVersion()
+::test.js::	].join('.'));
 call :test_ext .js "/e cscript"
 call :test_ext .js "/e cchakra"
 
-::.vbs::	Option Explicit
-::.vbs::	
-::.vbs::	WScript.Echo WScript.ScriptFullName
-::.vbs::	
-::.vbs::	WScript.Echo Join( Array( _ 
-::.vbs::		ScriptEngine, _
-::.vbs::		ScriptEngineMajorVersion, _
-::.vbs::		ScriptEngineMinorVersion, _
-::.vbs::		ScriptEngineBuildVersion _
-::.vbs::	), ".")
+::test.vbs::	Option Explicit
+::test.vbs::
+::test.vbs::	WScript.Echo WScript.ScriptFullName
+::test.vbs::	WScript.Echo Join( Array( _
+::test.vbs::		ScriptEngine, _
+::test.vbs::		ScriptEngineMajorVersion, _
+::test.vbs::		ScriptEngineMinorVersion, _
+::test.vbs::		ScriptEngineBuildVersion _
+::test.vbs::	), ".")
 call :test_ext .vbs "/e cscript"
 call :test_ext .vbs "/w /e cscript"
 
-::.wsf::<?xml version="1.0" ?>
-::.wsf::<package><job id="wsf+bat">
-::.wsf::<script language="javascript"><![CDATA[
-::.wsf::	
-::.wsf::	WScript.Echo(WScript.ScriptFullName);
-::.wsf::	
-::.wsf::	WScript.Echo( [
-::.wsf::		ScriptEngine(),
-::.wsf::		ScriptEngineMajorVersion(),
-::.wsf::		ScriptEngineMinorVersion(),
-::.wsf::		ScriptEngineBuildVersion()
-::.wsf::	].join('.'));
-::.wsf::	
-::.wsf::]]></script>
-::.wsf::<script language="vbscript"><![CDATA[
-::.wsf::	
-::.wsf::	Option Explicit
-::.wsf::	
-::.wsf::	WScript.Echo WScript.ScriptFullName
-::.wsf::	
-::.wsf::	WScript.Echo Join( Array( _ 
-::.wsf::		ScriptEngine, _
-::.wsf::		ScriptEngineMajorVersion, _
-::.wsf::		ScriptEngineMinorVersion, _
-::.wsf::		ScriptEngineBuildVersion _
-::.wsf::	), ".")
-::.wsf::	
-::.wsf::]]></script>
-::.wsf::</job></package>
+::test.wsf::<?xml version="1.0" ?>
+::test.wsf::<package><job id="wsf+bat">
+::test.wsf::<script language="javascript"><![CDATA[
+::test.wsf::	WScript.Echo(WScript.ScriptFullName);
+::test.wsf::	WScript.Echo( [
+::test.wsf::		ScriptEngine(),
+::test.wsf::		ScriptEngineMajorVersion(),
+::test.wsf::		ScriptEngineMinorVersion(),
+::test.wsf::		ScriptEngineBuildVersion()
+::test.wsf::	].join('.'));
+::test.wsf::]]></script>
+::test.wsf::<script language="vbscript"><![CDATA[
+::test.wsf::	Option Explicit
+::test.wsf::
+::test.wsf::	WScript.Echo WScript.ScriptFullName
+::test.wsf::	WScript.Echo Join( Array( _
+::test.wsf::		ScriptEngine, _
+::test.wsf::		ScriptEngineMajorVersion, _
+::test.wsf::		ScriptEngineMinorVersion, _
+::test.wsf::		ScriptEngineBuildVersion _
+::test.wsf::	), ".")
+::test.wsf::]]></script>
+::test.wsf::</job></package>
 call :test_ext .wsf "/e cscript"
 
-::.ps1::	$input | % {
-::.ps1::		"INPUT: [$_]"
-::.ps1::	}
-::.ps1::	
-::.ps1::	"ARG#: $( $args.count )"
-::.ps1::	$args | % {
-::.ps1::		"ARGS: [$_]"
-::.ps1::	}
+::test.ps1::	$input | % {
+::test.ps1::		"INPUT: [$_]"
+::test.ps1::	}
+::test.ps1::
+::test.ps1::	"ARG#: $( $args.count )"
+::test.ps1::	$args | % {
+::test.ps1::		"ARGS: [$_]"
+::test.ps1::	}
 call :test_ext .ps1 "" "some arguments passed"
 
 goto :EOF
@@ -80,7 +73,7 @@ echo:
 
 echo:==== Create file: z%~1
 >"%test_dir%\z%~1" (
-	for /f "tokens=1,* delims=:" %%a in ( 'findstr /i /b /l "::%~1::" "%~f0"' ) do echo:%%b
+	for /f "tokens=1,* delims=:" %%a in ( 'findstr /i /b /l "::test%~1::" "%~f0"' ) do echo:%%b
 )
 
 echo:==== Cmdize z%~1
