@@ -133,16 +133,16 @@ if /i "%~1" == "/e" (
 )
 
 if not exist "%~f1" (
-	echo:%~n0: File not found: "%~1">&2
 	shift /1
 	set "CMDIZE_ERROR=1"
+	call :warn File not found: "%~1"
 	goto :cmdize_loop_begin
 )
 
 findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
-	echo:%~n0: Unsupported extension: "%~1">&2
 	shift /1
 	set "CMDIZE_ERROR=1"
+	call :warn Unsupported extension: "%~1"
 	goto :cmdize_loop_begin
 )
 
@@ -215,7 +215,7 @@ for /f "tokens=1,* delims=:" %%r in ( 'findstr /n /r "^" "%~f1"' ) do (
 	) else for /f "tokens=1,* delims=':	 " %%i in ( "%%b" ) do if /i not "%%i" == "Explicit" (
 		echo:%%s
 	) else (
-		echo:%~n0: Commenting "Option Explicit" in "%~1">&2
+		call :warn Commenting "Option Explicit" in "%~1"
 		echo:rem To avoid compilation error due to embedding into a batch file,
 		echo:rem the following line was commented out automatically.
 		set /p "=rem " <nul
@@ -328,7 +328,7 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	if %%n neq 1 set "CMDIZE_ERROR=1"
 	if not "%%a" == "<" set "CMDIZE_ERROR=1"
 	if defined CMDIZE_ERROR (
-		echo:Incorrect XML declaration: it must be at the beginning of the script>&2
+		call :warn Incorrect XML declaration: it must be at the beginning of the script
 		exit /b 1
 	)
 
@@ -400,6 +400,12 @@ echo::"""
 call :print-prolog julia
 echo:"""
 type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+:warn
+>&2 echo:%~n0: %*
 goto :EOF
 
 :: ========================================================================
