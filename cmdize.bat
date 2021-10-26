@@ -335,12 +335,17 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	rem We sure that the XML declaration is located on the first
 	rem line of the script. Now we can transform it to the "polyglot"
 	rem form acceptable by the batch file also.
+
+	rem <?xml...?>...
+
+	rem <?xml :
+	rem ...?><!-- :
+	rem prolog
+	rem : -->...
+
 	echo:%%a?%%d :
-	echo:: %%e?^>^<!-- :
+	call :print-prolog "%CMDIZE_ENGINE% //nologo" ": %%e?><!-- :" ": --%%c" "" "?.wsf"
 
-	call :print-prolog "%CMDIZE_ENGINE% //nologo" "" "" "" "?.wsf"
-
-	echo:: --%%c
 	for /f "tokens=1,* delims=:" %%a in ( 'findstr /n /r "^" "%~f1"' ) do (
 		if %%a gtr 1 echo:%%b
 	)
