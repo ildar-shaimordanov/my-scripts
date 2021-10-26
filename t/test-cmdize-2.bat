@@ -3,7 +3,7 @@
 setlocal
 
 set "test_dir=%TEMP%"
-set "test_dir=."
+::set "test_dir=."
 
 ::test.js::	WScript.Echo(WScript.ScriptFullName);
 ::test.js::	WScript.Echo( [
@@ -90,7 +90,10 @@ if not "%~3" == "" (
 	call "%test_dir%\z.bat" %~3
 )
 
-pause
+echo:
+:pause
+echo:
+
 goto :EOF
 
 :: ========================================================================
