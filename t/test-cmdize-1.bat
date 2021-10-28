@@ -51,8 +51,8 @@ goto :EOF
 
 ::test.vbs::	Option Explicit:Dim a:a = 1
 
-::test.wsf::	<?xml?>
-::test.wsf::	<job><script>WScript.Echo^("Hello"^)</script></job>
+::test.wsf::<?xml?>
+::test.wsf::<job><script>WScript.Echo^("Hello"^)</script></job>
 
 :: ========================================================================
 

@@ -52,6 +52,8 @@ call :test_ext .vbs "/w /e cscript"
 ::test.wsf::</job></package>
 call :test_ext .wsf "/e cscript"
 
+::test.ps1::	"FILE: $Env:PS1_FILE"
+::test.ps1::
 ::test.ps1::	$input | % {
 ::test.ps1::		"INPUT: [$_]"
 ::test.ps1::	}
