@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $file = 'cmdize.bat';
+my @max = split '' => 0 x 7;
+my $lines;
+
+open my $fh, '<', $file;
+while ( <$fh> ) {
+	next unless /call \s+ :print-prolog/x;
+
+	s/\s*$//;
+
+	# ":: call" -> "::call"
+	s/^:: /::/;
+
+	# call :print-prolog engine tag1 tag2 prefix pattern
+	my @w = ( m/"[^"]*"|\S+/g );
+	for (my $i = 0; $i <= $#w; $i++) {
+		my $l = length $w[$i];
+		$max[$i] = $l if $max[$i] < $l;
+	}
+
+	# align to 7 items
+	push @w, '' while @w < 7;
+
+	push @{ $lines }, \@w;
+}
+close $fh;
+
+my $FMT = ( join '  ' => map { "%-${_}s" } @max ) . "\n";
+for ( @{ $lines } ) {
+	printf $FMT, @{ $_ };
+}
