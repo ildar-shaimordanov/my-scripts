@@ -287,9 +287,7 @@ if /i "%CMDIZE_ENGINE%" == "short" (
 	goto :EOF
 )
 echo:0^<0# : ^^
-echo:"""
-call :print-prolog python
-echo:"""
+call :print-prolog python "'''" "'''"
 type "%~f1"
 goto :EOF
 
