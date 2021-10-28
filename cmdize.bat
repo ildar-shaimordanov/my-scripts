@@ -242,8 +242,7 @@ goto :EOF
 :: Convert the perl file.
 :cmdize.pl	[/e cmdonly]
 if /i "%CMDIZE_ENGINE%" == "cmdonly" (
-	echo:@echo off
-	echo:perl -x -S "%%~dpn0.pl" %%*
+	call :print-prolog "perl -x -S" "" "" "@" "dpn0.pl"
 	goto :EOF
 )
 
@@ -284,7 +283,7 @@ goto :EOF
 :: Convert the python file.
 :cmdize.py	[/e short]
 if /i "%CMDIZE_ENGINE%" == "short" (
-	echo:@python -x "%%~f0" %%* ^& @goto :EOF
+	call :print-prolog "python -x" "" "" "@" "f0"
 	type "%~f1"
 	goto :EOF
 )
@@ -425,16 +424,26 @@ goto :EOF
 
 :: ========================================================================
 
+:: common
 :: call :print-prolog engine
 :: call :print-prolog engine tag1 tag2
 :: call :print-prolog engine "" "" prefix
+::
+:: special
+:: call :print-prolog engine "" "" @ pattern
+:: call :print-prolog engine tag1 tag2 "" "?.wsf"
 ::
 :: %1 - engine (the command to invoke the script)
 :: %2 - opening tag (used to hide batch commands wrapping them within tags)
 :: %3 - closing tag
 :: %4 - prefix (used to hide batch commands in place)
-:: %5 - "?.wsf" for wsf files only
+:: %5 - pattern "f0" or "dpn0.extension" if %4 == "@"; "?.wsf" for wsf files only
 :print-prolog
+if "%~4" == "@" (
+	echo:@%~1 "%%~%~5" %%* ^& @goto :EOF
+	goto :EOF
+)
+
 setlocal
 
 set "tag=%~2"
