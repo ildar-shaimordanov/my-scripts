@@ -309,7 +309,7 @@ goto :EOF
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
-call :print-prolog "start "" mshta" "<!-- :" "-->"
+call :print-prolog "start mshta" "<!-- :" "-->"
 type "%~f1"
 goto :EOF
 
