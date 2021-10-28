@@ -87,6 +87,8 @@
 ::
 :: .jl
 :: https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
+:: https://docs.julialang.org/en/v1/base/punctuation/
+:: https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
 ::
 :: COPYRIGHTS
 :: Copyright (c) 2014-2021 Ildar Shaimordanov
@@ -394,9 +396,7 @@ goto :EOF
 
 :: Convert Julia file.
 :cmdize.jl
-echo::"""
-call :print-prolog julia
-echo:"""
+call :print-prolog julia "0<#= :" "=#0;"
 type "%~f1"
 goto :EOF
 
