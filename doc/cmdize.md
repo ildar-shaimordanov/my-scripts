@@ -20,13 +20,13 @@
   * [.ahk](#ahk)
   * [.php](#php)
   * [.jl](#jl)
-  * [Hybridization in details](#hybridization-in-details)
-    * [`:print-usage`](#print-usage)
-    * [`:warn`](#warn)
-    * [`:print-script-wsf-bat`](#print-script-wsf-bat)
-    * [`:print-script-wsf`](#print-script-wsf)
-    * [`:print-prolog`](#print-prolog)
-    * [HOWTO](#howto)
+* [Hybridization internals](#hybridization-internals)
+  * [`:print-usage`](#print-usage)
+  * [`:warn`](#warn)
+  * [`:print-script-wsf-bat`](#print-script-wsf-bat)
+  * [`:print-script-wsf`](#print-script-wsf)
+  * [`:print-prolog`](#print-prolog)
+  * [HOWTO](#howto)
 <!-- md-toc-end -->
 
 Converts a script into a batch file.
@@ -186,11 +186,11 @@ PHP is supposed to be used as a scripting language in Web. So to avoid possible 
 * https://docs.julialang.org/en/v1/base/punctuation/
 * https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
 
-## Hybridization in details
+# Hybridization internals
 
 This section discovers all guts of the hybridization.
 
-### `:print-usage`
+## `:print-usage`
 
 Prints different parts of the documentation.
 
@@ -203,7 +203,7 @@ Arguments
 
 * `%1` - the marker
 
-### `:warn`
+## `:warn`
 
 A common use subroutine for printing arguments to STDERR.
 
@@ -211,7 +211,7 @@ Arguments
 
 * `%*` - a text for printing
 
-### `:print-script-wsf-bat`
+## `:print-script-wsf-bat`
 
 The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridize it.
 
@@ -222,7 +222,7 @@ Arguments
 * `%1` - filename
 * `%2` - language
 
-### `:print-script-wsf`
+## `:print-script-wsf`
 
 The companion for the above subroutine. It prints the original file surrounded with WSF markup.
 
@@ -231,7 +231,7 @@ Arguments
 * `%1` - filename
 * `%2` - language
 
-### `:print-prolog`
+## `:print-prolog`
 
 This internal subroutine is a workhorse. It creates prologs. Depending on the passed arguments it produces different prologs.
 
@@ -286,7 +286,7 @@ It have higher priority and is processed prior others producing a code similar t
 
     @engine pattern %* & @goto :EOF
 
-### HOWTO
+## HOWTO
 
 This document is the part of the script and generated using the following command:
 

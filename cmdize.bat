@@ -170,11 +170,6 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the vbscript file.
-:: The environment variable %CMDIZE_ENGINE% allows to declare another
-:: engine (cscript or wscript).
-:: The default value is cscript.
-
 ::D>## .vbs
 ::D>
 ::D>* `CSCRIPT` for `cscript //nologo //e:vbscript` (default)
@@ -449,12 +444,12 @@ goto :EOF
 
 :: ========================================================================
 
-::G>## Hybridization in details
+::G># Hybridization internals
 ::G>
 ::G>This section discovers all guts of the hybridization.
 ::G>
 
-::G>### `:print-usage`
+::G>## `:print-usage`
 ::G>
 ::G>Prints different parts of the documentation.
 ::G>
@@ -473,7 +468,7 @@ goto :EOF
 
 :: ========================================================================
 
-::G>### `:warn`
+::G>## `:warn`
 ::G>
 ::G>A common use subroutine for printing arguments to STDERR.
 ::G>
@@ -487,7 +482,7 @@ goto :EOF
 
 :: ========================================================================
 
-::G>### `:print-script-wsf-bat`
+::G>## `:print-script-wsf-bat`
 ::G>
 ::G>The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridize it.
 ::G>
@@ -506,7 +501,7 @@ for %%f in ( "%TEMP%\%~n1.wsf" ) do (
 )
 goto :EOF
 
-::G>### `:print-script-wsf`
+::G>## `:print-script-wsf`
 ::G>
 ::G>The companion for the above subroutine. It prints the original file surrounded with WSF markup.
 ::G>
@@ -524,7 +519,7 @@ goto :EOF
 
 :: ========================================================================
 
-::G>### `:print-prolog`
+::G>## `:print-prolog`
 ::G>
 ::G>This internal subroutine is a workhorse. It creates prologs. Depending on the passed arguments it produces different prologs.
 ::G>
@@ -610,7 +605,7 @@ goto :EOF
 
 :: ========================================================================
 
-::G>### HOWTO
+::G>## HOWTO
 ::G>
 ::G>This document is the part of the script and generated using the following command:
 ::G>
@@ -622,5 +617,7 @@ goto :EOF
 ::G>
 ::G>https://github.com/ildar-shaimordanov/git-markdown-toc
 ::G>
+
+:: ========================================================================
 
 :: EOF
