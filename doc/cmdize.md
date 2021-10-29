@@ -35,7 +35,7 @@ Converts a script into a batch file.
 
     cmdize /HELP | /HELP-DETAIL | /HELP-DEVEL
     cmdize /L
-    cmdize [/W] [/E engine] file ...
+    cmdize [/W] [/E engine] [/P] file ...
 
 # OPTIONS
 
@@ -45,6 +45,7 @@ Converts a script into a batch file.
 * `/L` - Show the list of supported file extensions and applicable options.
 * `/E` - Set an engine for using as a the script runner.
 * `/W` - Set the alternative engine (for VBScript only).
+* `/P` - Display on standard output instead of creating a new file.
 
 # DESCRIPTION
 

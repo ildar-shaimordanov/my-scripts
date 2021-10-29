@@ -4,7 +4,7 @@
 ::U>
 ::U>    cmdize /HELP | /HELP-DETAIL | /HELP-DEVEL
 ::U>    cmdize /L
-::U>    cmdize [/W] [/E engine] file ...
+::U>    cmdize [/W] [/E engine] [/P] file ...
 ::U>
 
 ::H># OPTIONS
@@ -15,6 +15,7 @@
 ::H>* `/L` - Show the list of supported file extensions and applicable options.
 ::H>* `/E` - Set an engine for using as a the script runner.
 ::H>* `/W` - Set the alternative engine (for VBScript only).
+::H>* `/P` - Display on standard output instead of creating a new file.
 ::H>
 ::H># DESCRIPTION
 ::H>
@@ -89,6 +90,7 @@ setlocal
 set "CMDIZE_ERROR=0"
 set "CMDIZE_WRAP="
 set "CMDIZE_ENGINE="
+set "CMDIZE_MAYBE=>"
 
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
@@ -110,6 +112,12 @@ if /i "%~1" == "/E" (
 	goto :cmdize_loop_begin
 )
 
+if /i "%~1" == "/P" (
+	set "CMDIZE_MAYBE=& rem "
+	shift /1
+	goto :cmdize_loop_begin
+)
+
 if not exist "%~f1" (
 	set "CMDIZE_ERROR=1"
 	call :warn File not found: "%~1"
@@ -124,7 +132,7 @@ findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
 	goto :cmdize_loop_begin
 )
 
-call :cmdize%~x1 "%~1" >"%~dpn1.bat"
+call :cmdize%~x1 "%~1" %CMDIZE_MAYBE% "%~dpn1.bat"
 shift /1
 goto :cmdize_loop_begin
 
