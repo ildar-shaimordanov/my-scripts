@@ -336,7 +336,7 @@ goto :EOF
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
-call :print-prolog "start mshta" "<!-- :" "-->"
+call :print-prolog "start mshta" "<!-- :" ": -->"
 type "%~f1"
 goto :EOF
 
@@ -386,7 +386,7 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	goto :EOF
 )
 
-call :print-prolog "%CMDIZE_ENGINE% //nologo" "<!-- :" "-->" "" "?.wsf"
+call :print-prolog "%CMDIZE_ENGINE% //nologo" "<!-- :" ": -->" "" "?.wsf"
 type "%~f1"
 goto :EOF
 
