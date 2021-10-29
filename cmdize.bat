@@ -1,105 +1,81 @@
-:: USAGE
-::     cmdize name [...]
-::
-:: This tool converts a script into a batch file allowing to use the
-:: script like regular programs and batch scripts without invoking an
-:: executable engine explicitly and just typing the script name without
-:: extension. The resulting batch file is placed next to the original
-:: script.
-::
-:: The new file consist of the body of the script prepended with the
-:: special header (or prolog) being the "polyglot" and having some tricks
-:: to be a valid code both for the batch and original script.
-::
-:: FEATURES
-:: Use /L to display the list of supported file extensions and set of
-:: applicable values for /E.
-::
-:: The tool looks for the directive "Option Explicit" and comments it
-:: out while creating the batch file.
-::
-:: If "<?xml?>" is recognized as the first element of the wsf file,
-:: it is parsed and modified to avoid execution error.
-::
-:: Both "Option Explicit" and "<?xml?>" are supported as placed on a
-:: single line only.
-::
-:: BOM (Byte Order Mark) are not supported at all.
-::
-:: JavaScript, VBScript and WSF defaults an engine to CSCRIPT. Another
-:: engine can be specified with the /E option. For example WSCRIPT for
-:: those above or NODE for JavaScript. /E DEFAULT is the special option
-:: that resets any previously set engines to the default value.
-::
-:: /E CMDONLY is for Perl only. It creates the pure batch file without
-:: merging with the original Perl script. It can be useful in some
-:: cases. The original Perl script and the newly created batch file
-:: should be placed together and visible via PATH.
-::
-:: /E SHORT is for Python only. It creates ascetic prolog which is
-:: shorter and less flexible.
-::
-:: /W enables WSF+BAT alternative for VBScript only.
-::
-:: SEE ALSO
-:: Proceed the following links to learn more the origins
-::
-:: .js
-:: http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
-:: http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
-:: https://gist.github.com/ildar-shaimordanov/88d7a5544c0eeacaa3bc
-::
-:: .vbs
-:: http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
-:: http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
-::
-:: .pl
-:: For details and better support see "pl2bat.bat" from Perl distribution
-::
-:: .sh, .bash
-:: http://forum.script-coding.com/viewtopic.php?id=11535
-:: http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
-::
-:: .ps1
-:: http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
-:: http://stackoverflow.com/a/2611487/3627676
-::
-:: .py
-:: http://stackoverflow.com/a/29881143/3627676
-:: http://stackoverflow.com/a/17468811/3627676
-::
-:: .rb
-:: https://stackoverflow.com/questions/35094778
-::
-:: .hta and .html?
-:: http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
-::
-:: .wsf
-:: http://www.dostips.com/forum/viewtopic.php?p=33963#p33963
-::
-:: .kix
-::
-:: .au3, .a3x
-::
-:: .ahk
-::
-:: .php
-::
-:: .jl
-:: https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
-:: https://docs.julialang.org/en/v1/base/punctuation/
-:: https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
-::
-:: COPYRIGHTS
-:: Copyright (c) 2014-2021 Ildar Shaimordanov
+::U>Converts a script into a batch file.
+::U>
+::U># USAGE
+::U>
+::U>    cmdize /H | /HELP | /HELP-FULL
+::U>    cmdize /L
+::U>    cmdize [/W] [/E engine] file ...
+::U>
+
+::H># OPTIONS
+::H>
+::H>* `/H` - Show this help.
+::H>* `/HELP` - Show more details.
+::H>* `/HELP-FULL` - Show full help including internal details.
+::H>* `/L` - Show the list of supported file extensions and applicable options.
+::H>* `/E` - Set an engine for using as a the script runner.
+::H>* `/W` - Set the alternative engine (for VBScript only).
+::H>
+::H># DESCRIPTION
+::H>
+::H>This tool converts a script into a batch file allowing to use the script like regular programs and batch scripts without invoking an executable engine explicitly and just typing the script name without extension. The resulting batch file is placed next to the original script.
+::H>
+::H>The new file consist of the body of the script prepended with the special header (or prolog) being the "polyglot" and having some tricks to be a valid code both for the batch and original script.
+::H>
+::H>This tool is pure batch file. So there is limitation in processing files having Byte Order Mark (BOM). For example, it fail with high probability while processing a unicode encoded WSF-file with XML declaration.
+::H>
+::H>The *engine* term stands for the executable running the script. Not for all languages it's applicable. Depending the language, the engine can be set to any, none or one of predefined values. `/E DEFAULT` is the special engine that resets any previously set engines to the default value.
+::H>
+::H>For WSF-scripts the engine is one of `CSCRIPT` and `WSCRIPT`. If XML declaration is presented (in the form like `<?xml...?>`), it must be in the most beginning of the file. Otherwise error is reported and the script is not cmdized.
+::H>
+::H>For JavaScript/JScript it can be one of `CSCRIPT`, `WSCRIPT` (for JScript5+), `CCHAKRA`, `WCHAKRA` (for JScript9 or Chakra) or any valid command with options to enable running NodeJS, ChakraCore, Rhino and so on (for example, `node`, `ch`, `java -jar rhino.jar`, respectively).
+::H>
+::H>For VBScript there is choice of either `CSCRIPT` or `WSCRIPT`. If the script implements the statement `Option Explicit`, then it is commented to avoid the compilation error. The `/W` option creates the alternative runner embedding the script into a WSF-file. In this case that statement is not commented and left as is.
+::H>
+::H>For Perl `/E CMDONLY` is the only applicable value. It's fake engine that is used for creating the pure batch file for putting it with the original script in PATH.
+::H>
+::H>For Python `/E SHORT` specifies creation of a quite minimalistic runner file. Other values don't make sense.
+::H>
+::H># AUTHORS and CONTRIBUTORS
+::H>
+::H>Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
+::H>
+::H>leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
+::H>
+::H>greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
+::H>
+::H>Residents of the forum https://www.dostips.com/forum/ with whom the author has opportunity to discuss many aspects of batch scripting.
+::H>
+::H># SEE ALSO
+::H>
+::H>Find this text and more details following by this link below.
+::H>
+::H>https://github.com/ildar-shaimordanov/cmd.scripts/blob/master/doc/cmdize.md
+::H>
+::H>Tests are here:
+::H>
+::H>https://github.com/ildar-shaimordanov/cmd.scripts/tree/master/t
+::H>
 
 @echo off
 
 if "%~1" == "" (
-	for /f "usebackq tokens=* delims=:" %%s in ( "%~f0" ) do (
-		if /i "%%s" == "@echo off" goto :EOF
-		echo:%%s
-	)
+	call :print-usage U
+	goto :EOF
+)
+
+if /i "%~1" == "/H" (
+	call :print-usage UH
+	goto :EOF
+)
+
+if /i "%~1" == "/HELP" (
+	call :print-usage UHD
+	goto :EOF
+)
+
+if /i "%~1" == "/HELP-FULL" (
+	call :print-usage UHDG
 	goto :EOF
 )
 
@@ -154,10 +130,29 @@ goto :cmdize_loop_begin
 
 :: ========================================================================
 
-:: Convert the javascript file.
-:: The environment variable %CMDIZE_ENGINE% allows to declare another
-:: engine (cscript, wscript, node etc).
-:: The default value is cscript.
+::D># DETAILS
+::D>
+::D>More description, more links, more details about implementation in this section.
+::D>
+
+::D>## .js
+::D>
+::D>* `CSCRIPT` for `cscript //nologo //e:javascript` (default)
+::D>* `WSCRIPT` for `wscript //nologo //e:javascript`
+::D>* `CCHAKRA` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+::D>* `WCHAKRA` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+::D>
+::D>Unfortunately, no easy way to wrap JScript9 into WSF.
+::D>
+::D>* http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
+::D>* http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
+::D>* https://gist.github.com/ildar-shaimordanov/88d7a5544c0eeacaa3bc
+::D>
+::D>The following two links show my first steps in direction to create this script.
+::D>
+::D>* https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter.html
+::D>* https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter-2.html
+::D>
 :cmdize.js	[/e cscript|wscript|cchakra|wchakra|ch|node|...]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
@@ -179,6 +174,20 @@ goto :EOF
 :: The environment variable %CMDIZE_ENGINE% allows to declare another
 :: engine (cscript or wscript).
 :: The default value is cscript.
+
+::D>## .vbs
+::D>
+::D>* `CSCRIPT` for `cscript //nologo //e:vbscript` (default)
+::D>* `WSCRIPT` for `wscript //nologo //e:vbscript`
+::D>
+::D>With `/W` it is (with some specialties for WSF):
+::D>
+::D>* `CSCRIPT` for `cscript //nologo` (default)
+::D>* `WSCRIPT` for `wscript //nologo`
+::D>
+::D>* http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
+::D>* http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
+::D>
 :cmdize.vbs	[/w] [/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
@@ -239,7 +248,12 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the perl file.
+::D>## .pl
+::D>
+::D>The document below gives more details about `pl2bat.bat` and `runperl.bat`. In fact, those scripts are full-featured prototypes for this script. By default it acts as the first one but without supporting old DOSs. With the `/W` option it creates the tiny batch acting similar to `runperl.bat`.
+::D>
+::D>* https://perldoc.perl.org/perlwin32
+::D>
 :cmdize.pl	[/e cmdonly]
 if /i "%CMDIZE_ENGINE%" == "cmdonly" (
 	call :print-prolog "perl -x -S" "" "" "@" "dpn0.pl"
@@ -253,7 +267,11 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert Bourne shell and Bash scripts.
+::D>## .sh, .bash
+::D>
+::D>* http://forum.script-coding.com/viewtopic.php?id=11535
+::D>* http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
+::D>
 :cmdize.sh
 :cmdize.bash
 call :print-prolog bash ": << '____CMD____'" "____CMD____"
@@ -262,7 +280,13 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the powershell file.
+::D>## .ps1
+::D>
+::D>Very-very-very complicated case. It's impossible to implement hybrid. And too hard to implement chimera. The resulting batch store its filename and passed arguments in two environment variables, `PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes powershell and tries to restore arguments, reads the file and invokes it. Also it is powered to continue working with STDIN properly. Powershell has two (at least known for me) ways to invoke another code: Invoke-Expression and invoke ScriptBlock. Both have their advandages and disadvantages. By default, Invoke-Expression is used. To give the users a choice between both, non-empty value in `PS1_ISB` enables ScriptBlock invocation.
+::D>
+::D>* http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
+::D>* http://stackoverflow.com/a/2611487/3627676
+::D>
 :cmdize.ps1
 echo:^<# :
 echo:@echo off
@@ -280,7 +304,11 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the python file.
+::D>## .py
+::D>
+::D>* http://stackoverflow.com/a/29881143/3627676
+::D>* http://stackoverflow.com/a/17468811/3627676
+::D>
 :cmdize.py	[/e short]
 if /i "%CMDIZE_ENGINE%" == "short" (
 	call :print-prolog "python -x" "" "" "@" "f0"
@@ -294,7 +322,10 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the ruby file.
+::D>## .rb
+::D>
+::D>* https://stackoverflow.com/questions/35094778
+::D>
 :cmdize.rb
 echo:@break #^^
 call :print-prolog ruby "=begin" "=end"
@@ -303,8 +334,10 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the html file.
-:: Supportable file extensions are .hta, .htm and .html.
+::D>## .hta, .htm, .html
+::D>
+::D>* http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
+::D>
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
@@ -314,10 +347,24 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert the wsf file.
-:: The environment variable %CMDIZE_ENGINE% allows to declare another
-:: engine (cscript or wscript).
-:: The default value is cscript.
+::D>## .wsf
+::D>
+::D>Hybridizing WSF the script looks for the XML declaration and makes it valid for running as batch. Also weird and undocumented trick with file extensions (`%~f0?.wsf`) is used to insist WSH to recognize the batch file as the WSF scenario. Honestly, the resulting file stops being well-formed XML file. However WSH chews it silently.
+::D>
+::D>Assuming the original XML declaration is as follows:
+::D>
+::D>    <?xml...?>...
+::D>
+::D>further it becomes:
+::D>
+::D>    <?xml :
+::D>    ...?><!-- :
+::D>    prolog
+::D>    : -->...
+::D>    the rest of WSF
+::D>
+::D>* http://www.dostips.com/forum/viewtopic.php?p=33963#p33963
+::D>
 :cmdize.wsf	[/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
@@ -335,13 +382,6 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	rem line of the script. Now we can transform it to the "polyglot"
 	rem form acceptable by the batch file also.
 
-	rem <?xml...?>...
-
-	rem <?xml :
-	rem ...?><!-- :
-	rem prolog
-	rem : -->...
-
 	echo:%%a?%%d :
 	call :print-prolog "%CMDIZE_ENGINE% //nologo" ": %%e?><!-- :" ": --%%c" "" "?.wsf"
 
@@ -357,7 +397,8 @@ goto :EOF
 
 :: ========================================================================
 
-:: Comvert KiXtart file.
+::D>## .kix
+::D>
 :cmdize.kix
 call :print-prolog kix32 "" "" ";"
 type "%~f1"
@@ -365,7 +406,8 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert AutoIt file.
+::D>## .au3, .a3x
+::D>
 :cmdize.au3
 :cmdize.a3x
 call :print-prolog AutoIt3 "" "" ";"
@@ -374,7 +416,8 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert AutoHotKey file.
+::D>## .ahk
+::D>
 :cmdize.ahk
 call :print-prolog AutoHotKey "" "" ";"
 type "%~f1"
@@ -382,10 +425,10 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert PHP file.
-:: PHP is supposed to be used as a scripting language in Web. So to avoid
-:: possible conflicts with paths to dynamic libraries and to suppress HTTP
-:: headers, we use two options "-n" and "-q", respectively.
+::D>## .php
+::D>
+::D>PHP is supposed to be used as a scripting language in Web. So to avoid possible conflicts with paths to dynamic libraries and to suppress HTTP headers, we use two options "-n" and "-q", respectively.
+::D>
 :cmdize.php
 call :print-prolog "php -n -q" "<?php/* :" "*/ ?>"
 type "%~f1"
@@ -393,7 +436,12 @@ goto :EOF
 
 :: ========================================================================
 
-:: Convert Julia file.
+::D>## .jl
+::D>
+::D>* https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
+::D>* https://docs.julialang.org/en/v1/base/punctuation/
+::D>* https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
+::D>
 :cmdize.jl
 call :print-prolog julia "0<#= :" "=#0;"
 type "%~f1"
@@ -401,12 +449,55 @@ goto :EOF
 
 :: ========================================================================
 
+::G>## Hybridization in details
+::G>
+::G>This section discovers all guts of the hybridization.
+::G>
+
+::G>### `:print-usage`
+::G>
+::G>Prints different parts of the documentation.
+::G>
+::G>* `U` - to print usage
+::G>* `UH` - to print help (the `/H` option)
+::G>* `UHD` - to print help in details (the `/HELP` option)
+::G>* `UHDG` - to print full help (the `/HELP-FULL` option)
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - the marker
+::G>
+:print-usage
+for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
+goto :EOF
+
+:: ========================================================================
+
+::G>### `:warn`
+::G>
+::G>A common use subroutine for printing arguments to STDERR.
+::G>
+::G>Arguments
+::G>
+::G>* `%*` - a text for printing
+::G>
 :warn
 >&2 echo:%~n0: %*
 goto :EOF
 
 :: ========================================================================
 
+::G>### `:print-script-wsf-bat`
+::G>
+::G>The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridize it.
+::G>
+::G>To this moment it is used only once - for VBScript.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - filename
+::G>* `%2` - language
+::G>
 :print-script-wsf-bat
 for %%f in ( "%TEMP%\%~n1.wsf" ) do (
 	call :print-script-wsf "%~f1" %~2 >"%%~ff"
@@ -415,6 +506,15 @@ for %%f in ( "%TEMP%\%~n1.wsf" ) do (
 )
 goto :EOF
 
+::G>### `:print-script-wsf`
+::G>
+::G>The companion for the above subroutine. It prints the original file surrounded with WSF markup.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - filename
+::G>* `%2` - language
+::G>
 :print-script-wsf
 echo:^<?xml version="1.0" ?^>
 echo:^<package^>^<job id="cmdized"^>^<script language="%~2"^>^<^![CDATA[
@@ -424,20 +524,61 @@ goto :EOF
 
 :: ========================================================================
 
-:: common
-:: call :print-prolog engine
-:: call :print-prolog engine tag1 tag2
-:: call :print-prolog engine "" "" prefix
-::
-:: special
-:: call :print-prolog engine "" "" @ pattern
-:: call :print-prolog engine tag1 tag2 "" "?.wsf"
-::
-:: %1 - engine (the command to invoke the script)
-:: %2 - opening tag (used to hide batch commands wrapping them within tags)
-:: %3 - closing tag
-:: %4 - prefix (used to hide batch commands in place)
-:: %5 - pattern "f0" or "dpn0.extension" if %4 == "@"; "?.wsf" for wsf files only
+::G>### `:print-prolog`
+::G>
+::G>This internal subroutine is a workhorse. It creates prologs. Depending on the passed arguments it produces different prologs.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - engine (the executable invoking the script)
+::G>* `%2` - opening tag (used to hide batch commands wrapping them within tags)
+::G>* `%3` - closing tag (ditto)
+::G>* `%4` - prefix (used to hide batch commands in place)
+::G>* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; `?.wsf` for WSF-files only
+::G>
+::G>Common case (tagged)
+::G>
+::G>    call :print-prolog engine
+::G>    call :print-prolog engine tag1 tag2
+::G>
+::G>Both `tag1` and `tag2` are optional:
+::G>
+::G>    tag1
+::G>    @echo off
+::G>    engine %~f0 %*
+::G>    goto :EOF
+::G>    tag2
+::G>
+::G>Common case (prefixed)
+::G>
+::G>    call :print-prolog engine "" "" prefix
+::G>
+::G>The above invocation produces the prolog similar to the pseudo-code (the space after the prefix is here for readability reasons only):
+::G>
+::G>    prefix @echo off
+::G>    prefix engine %~f0 %*
+::G>    prefix goto :EOF
+::G>
+::G>Special case (`.wsf`)
+::G>
+::G>    call :print-prolog engine tag1 tag2 "" "?.wsf"
+::G>
+::G>It's almost the same as tagged common case:
+::G>
+::G>    tag1
+::G>    @echo off
+::G>    engine %~f0?.wsf %*
+::G>    goto :EOF
+::G>    tag2
+::G>
+::G>Special case (prefix = `@`)
+::G>
+::G>    call :print-prolog engine "" "" @ pattern
+::G>
+::G>It have higher priority and is processed prior others producing a code similar to:
+::G>
+::G>    @engine pattern %* & @goto :EOF
+::G>
 :print-prolog
 if "%~4" == "@" (
 	echo:@%~1 "%%~%~5" %%* ^& @goto :EOF
@@ -468,5 +609,18 @@ endlocal
 goto :EOF
 
 :: ========================================================================
+
+::G>### HOWTO
+::G>
+::G>This document is the part of the script and generated using the following command:
+::G>
+::G>    cmdize /help-full | git-md-toc -cut > doc/cmdize.md
+::G>
+::G>Any changes in the script are supposed to be replicated to this document file.
+::G>
+::G>`git-md-toc` is the Perl script hosted here:
+::G>
+::G>https://github.com/ildar-shaimordanov/git-markdown-toc
+::G>
 
 :: EOF
