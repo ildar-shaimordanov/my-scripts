@@ -2,16 +2,16 @@
 ::U>
 ::U># USAGE
 ::U>
-::U>    cmdize /H | /HELP | /HELP-FULL
+::U>    cmdize /HELP | /HELP-DETAIL | /HELP-DEVEL
 ::U>    cmdize /L
 ::U>    cmdize [/W] [/E engine] file ...
 ::U>
 
 ::H># OPTIONS
 ::H>
-::H>* `/H` - Show this help.
-::H>* `/HELP` - Show more details.
-::H>* `/HELP-FULL` - Show full help including internal details.
+::H>* `/HELP` - Show this help.
+::H>* `/HELP-DETAIL` - Show more details.
+::H>* `/HELP-DEVEL` - Show full help including internal details.
 ::H>* `/L` - Show the list of supported file extensions and applicable options.
 ::H>* `/E` - Set an engine for using as a the script runner.
 ::H>* `/W` - Set the alternative engine (for VBScript only).
@@ -64,17 +64,17 @@ if "%~1" == "" (
 	goto :EOF
 )
 
-if /i "%~1" == "/H" (
+if /i "%~1" == "/HELP" (
 	call :print-usage UH
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP" (
+if /i "%~1" == "/HELP-DETAIL" (
 	call :print-usage UHD
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP-FULL" (
+if /i "%~1" == "/HELP-DEVEL" (
 	call :print-usage UHDG
 	goto :EOF
 )
@@ -461,12 +461,12 @@ goto :EOF
 ::G>
 ::G>* `%1` - the marker
 ::G>
-::G>Available markers:
+::G>The markers used specifically by this tool:
 ::G>
-::G>* `U` - to print usage
-::G>* `UH` - to print help (the `/H` option)
-::G>* `UHD` - to print help in details (the `/HELP` option)
-::G>* `UHDG` - to print full help (the `/HELP-FULL` option)
+::G>* `U` - to print usage only
+::G>* `UH` - to print help (the `/HELP` option)
+::G>* `UHD` - to print help in details (the `/HELP-DETAIL` option)
+::G>* `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
 ::G>
 :print-usage
 for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
@@ -576,7 +576,7 @@ goto :EOF
 ::G>
 ::G>    call :print-prolog engine "" "" @ pattern
 ::G>
-::G>It have higher priority and is processed prior others producing a code similar to:
+::G>It has higher priority and is processed prior others producing a code similar to:
 ::G>
 ::G>    @engine pattern %* & @goto :EOF
 ::G>
@@ -615,7 +615,7 @@ goto :EOF
 ::G>
 ::G>This document is the part of the script and generated using the following command:
 ::G>
-::G>    cmdize /help-full | git-md-toc -cut > doc/cmdize.md
+::G>    cmdize /help-devel | git-md-toc -cut > doc/cmdize.md
 ::G>
 ::G>Any changes in the script are supposed to be replicated to this document file.
 ::G>

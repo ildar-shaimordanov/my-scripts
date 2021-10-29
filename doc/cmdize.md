@@ -33,15 +33,15 @@ Converts a script into a batch file.
 
 # USAGE
 
-    cmdize /H | /HELP | /HELP-FULL
+    cmdize /HELP | /HELP-DETAIL | /HELP-DEVEL
     cmdize /L
     cmdize [/W] [/E engine] file ...
 
 # OPTIONS
 
-* `/H` - Show this help.
-* `/HELP` - Show more details.
-* `/HELP-FULL` - Show full help including internal details.
+* `/HELP` - Show this help.
+* `/HELP-DETAIL` - Show more details.
+* `/HELP-DEVEL` - Show full help including internal details.
 * `/L` - Show the list of supported file extensions and applicable options.
 * `/E` - Set an engine for using as a the script runner.
 * `/W` - Set the alternative engine (for VBScript only).
@@ -202,12 +202,12 @@ Arguments
 
 * `%1` - the marker
 
-Available markers:
+The markers used specifically by this tool:
 
-* `U` - to print usage
-* `UH` - to print help (the `/H` option)
-* `UHD` - to print help in details (the `/HELP` option)
-* `UHDG` - to print full help (the `/HELP-FULL` option)
+* `U` - to print usage only
+* `UH` - to print help (the `/HELP` option)
+* `UHD` - to print help in details (the `/HELP-DETAIL` option)
+* `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
 
 ## `:warn`
 
@@ -288,7 +288,7 @@ Special case (prefix = `@`)
 
     call :print-prolog engine "" "" @ pattern
 
-It have higher priority and is processed prior others producing a code similar to:
+It has higher priority and is processed prior others producing a code similar to:
 
     @engine pattern %* & @goto :EOF
 
@@ -296,7 +296,7 @@ It have higher priority and is processed prior others producing a code similar t
 
 This document is the part of the script and generated using the following command:
 
-    cmdize /help-full | git-md-toc -cut > doc/cmdize.md
+    cmdize /help-devel | git-md-toc -cut > doc/cmdize.md
 
 Any changes in the script are supposed to be replicated to this document file.
 
