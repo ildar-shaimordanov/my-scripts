@@ -7,7 +7,7 @@ set "test_dir=%TEMP%"
 
 echo:==== COMMON TESTS ====
 
-::for /f %%x in ( '"%~dp0..\cmdize.bat" /L' ) do call :test_ext "%%~x"
+for /f %%x in ( '"%~dp0..\cmdize.bat" /L' ) do call :test_ext "%%~x"
 
 echo:==== SPECIAL TESTS ====
 
