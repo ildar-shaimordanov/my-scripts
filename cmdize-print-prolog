@@ -9,12 +9,9 @@ my $lines;
 
 open my $fh, '<', $file;
 while ( <$fh> ) {
-	next unless /call \s+ :print-prolog/x;
+	next unless /^ \s* call \s+ :print-prolog/x;
 
 	s/\s*$//;
-
-	# ":: call" -> "::call"
-	s/^:: /::/;
 
 	# call :print-prolog engine tag1 tag2 prefix pattern
 	my @w = ( m/"[^"]*"|\S+/g );
