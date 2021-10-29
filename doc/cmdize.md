@@ -33,15 +33,15 @@ Converts a script into a batch file.
 
 # USAGE
 
-    cmdize /HELP | /HELP-DETAIL | /HELP-DEVEL
+    cmdize /HELP | /HELP-MORE | /HELP-DEVEL
     cmdize /L
     cmdize [/W] [/E engine] [/P] file ...
 
 # OPTIONS
 
-* `/HELP` - Show this help.
-* `/HELP-DETAIL` - Show more details.
-* `/HELP-DEVEL` - Show full help including internal details.
+* `/HELP` - Show this help and description.
+* `/HELP-MORE` - Show more details.
+* `/HELP-DEVEL` - Show extremely detailed help including internal details.
 * `/L` - Show the list of supported file extensions and applicable options.
 * `/E` - Set an engine for using as a the script runner.
 * `/W` - Set the alternative engine (for VBScript only).
@@ -207,7 +207,7 @@ The markers used specifically by this tool:
 
 * `U` - to print usage only
 * `UH` - to print help (the `/HELP` option)
-* `UHD` - to print help in details (the `/HELP-DETAIL` option)
+* `UHD` - to print help in details (the `/HELP-MORE` option)
 * `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
 
 ## `:warn`

@@ -2,21 +2,21 @@
 ::U>
 ::U># USAGE
 ::U>
-::U>    cmdize /HELP | /HELP-DETAIL | /HELP-DEVEL
+::U>    cmdize /HELP | /HELP-MORE | /HELP-DEVEL
 ::U>    cmdize /L
 ::U>    cmdize [/W] [/E engine] [/P] file ...
 ::U>
+::U># OPTIONS
+::U>
+::U>* `/HELP` - Show this help and description.
+::U>* `/HELP-MORE` - Show more details.
+::U>* `/HELP-DEVEL` - Show extremely detailed help including internal details.
+::U>* `/L` - Show the list of supported file extensions and applicable options.
+::U>* `/E` - Set an engine for using as a the script runner.
+::U>* `/W` - Set the alternative engine (for VBScript only).
+::U>* `/P` - Display on standard output instead of creating a new file.
+::U>
 
-::H># OPTIONS
-::H>
-::H>* `/HELP` - Show this help.
-::H>* `/HELP-DETAIL` - Show more details.
-::H>* `/HELP-DEVEL` - Show full help including internal details.
-::H>* `/L` - Show the list of supported file extensions and applicable options.
-::H>* `/E` - Set an engine for using as a the script runner.
-::H>* `/W` - Set the alternative engine (for VBScript only).
-::H>* `/P` - Display on standard output instead of creating a new file.
-::H>
 ::H># DESCRIPTION
 ::H>
 ::H>This tool converts a script into a batch file allowing to use the script like regular programs and batch scripts without invoking an executable engine explicitly and just typing the script name without extension. The resulting batch file is placed next to the original script.
@@ -70,7 +70,7 @@ if /i "%~1" == "/HELP" (
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP-DETAIL" (
+if /i "%~1" == "/HELP-MORE" (
 	call :print-usage UHD
 	goto :EOF
 )
@@ -473,7 +473,7 @@ goto :EOF
 ::G>
 ::G>* `U` - to print usage only
 ::G>* `UH` - to print help (the `/HELP` option)
-::G>* `UHD` - to print help in details (the `/HELP-DETAIL` option)
+::G>* `UHD` - to print help in details (the `/HELP-MORE` option)
 ::G>* `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
 ::G>
 :print-usage
