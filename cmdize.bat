@@ -93,13 +93,13 @@ set "CMDIZE_ENGINE="
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
 
-if /i "%~1" == "/w" (
+if /i "%~1" == "/W" (
 	set "CMDIZE_WRAP=1"
 	shift /1
 	goto :cmdize_loop_begin
 )
 
-if /i "%~1" == "/e" (
+if /i "%~1" == "/E" (
 	if /i "%~2" == "default" (
 		set "CMDIZE_ENGINE="
 	) else (
@@ -111,16 +111,16 @@ if /i "%~1" == "/e" (
 )
 
 if not exist "%~f1" (
-	shift /1
 	set "CMDIZE_ERROR=1"
 	call :warn File not found: "%~1"
+	shift /1
 	goto :cmdize_loop_begin
 )
 
 findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
-	shift /1
 	set "CMDIZE_ERROR=1"
 	call :warn Unsupported extension: "%~1"
+	shift /1
 	goto :cmdize_loop_begin
 )
 
