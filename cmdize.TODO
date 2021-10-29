@@ -9,3 +9,31 @@ if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=lua"
 call :print-prolog "%CMDIZE_ENGINE%" "::____LUNAR_EXPLORER____::--[[" "--]]"
 type "%~f1"
 goto :EOF
+
+===========================================================================
+
+:: .sql
+:: https://forum.script-coding.com/viewtopic.php?pid=150294#p150294
+
+@echo off
+for /f "tokens=1 delims=:" %%n in ( 'findstr /n /r /c:"^-- SQL --" "%~f0"' ) do (
+	cmd /c "for /f "usebackq skip=%%n tokens=* eol=" %%s in ( "%~f0" ) do @echo:%%s" | sqlite3 %*
+	goto :EOF
+)
+goto :EOF
+-- SQL -- [this marker means that sql statements start below]
+select 1, date(), time();
+
+-- SQL -- [nothing important; it's simply comment]
+select 2, date(), time();
+
+echo:@echo off
+echo:for /f "tokens=1 delims=:" %%%%n in ( 'findstr /n /r /c:"^-- SQL --" "%%~f0"' ) do (
+echo:	cmd /c "for /f "usebackq skip=%%%%n tokens=* eol=" %%%%s in ( "%%~f0" ) do @echo:%%%%s" ^| sqlite3 %%*
+echo:	goto :EOF
+echo:)
+echo:goto :EOF
+echo:-- SQL --
+goto :EOF
+
+===========================================================================
