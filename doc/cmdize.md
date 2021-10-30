@@ -23,6 +23,7 @@
 * [Hybridization internals](#hybridization-internals)
   * [`:print-usage`](#print-usage)
   * [`:warn`](#warn)
+  * [`:print-extension-list`](#print-extension-list)
   * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-script-wsf`](#print-script-wsf)
   * [`:print-prolog`](#print-prolog)
@@ -217,6 +218,10 @@ A common use subroutine for displaying warnings to STDERR.
 Arguments
 
 * `%*` - a text for printing
+
+## `:print-extension-list`
+
+Prints the list of supported extensions. It is invoked by the `/L` option.
 
 ## `:print-script-wsf-bat`
 

@@ -81,7 +81,7 @@ if /i "%~1" == "/HELP-DEVEL" (
 )
 
 if /i "%~1" == "/L" (
-	for /f "tokens=1,* delims=." %%x in ( 'findstr /i /r "^:cmdize[.][0-9a-z_][0-9a-z_]*\>" "%~f0"' ) do echo:.%%~y
+	call :print-extension-list
 	goto :EOF
 )
 
@@ -492,6 +492,16 @@ goto :EOF
 ::G>
 :warn
 >&2 echo:%~n0: %*
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-extension-list`
+::G>
+::G>Prints the list of supported extensions. It is invoked by the `/L` option.
+::G>
+:print-extension-list
+for /f "tokens=1,* delims=." %%x in ( 'findstr /i /r "^:cmdize[.][0-9a-z_][0-9a-z_]*\>" "%~f0"' ) do echo:.%%~y
 goto :EOF
 
 :: ========================================================================
