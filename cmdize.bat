@@ -133,6 +133,7 @@ findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
 )
 
 call :cmdize%~x1 "%~1" %CMDIZE_MAYBE% "%~dpn1.bat"
+if errorlevel 1 set "CMDIZE_ERROR=1"
 shift /1
 goto :cmdize_loop_begin
 
@@ -375,12 +376,11 @@ goto :EOF
 :cmdize.wsf	[/e cscript|wscript]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-set "CMDIZE_ERROR="
-
 for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
-	if %%n neq 1 set "CMDIZE_ERROR=1"
-	if not "%%a" == "<" set "CMDIZE_ERROR=1"
-	if defined CMDIZE_ERROR (
+	set "CMDIZE_ERROR_WSF="
+	if %%n neq 1 set "CMDIZE_ERROR_WSF=1"
+	if not "%%a" == "<" set "CMDIZE_ERROR_WSF=1"
+	if defined CMDIZE_ERROR_WSF (
 		call :warn Incorrect XML declaration: it must be at the beginning of the script
 		exit /b 1
 	)
