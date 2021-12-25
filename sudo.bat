@@ -21,6 +21,7 @@
 ::Based on the solutions suggested in these threads:
 ::https://www.dostips.com/forum/viewtopic.php?f=3&t=9212
 ::https://stackoverflow.com/a/27717205/3627676
+::https://stackoverflow.com/a/30921854/3627676
 @echo off
 
 if /i "%~1" == "/?" goto :print_usage
