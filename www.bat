@@ -1,6 +1,6 @@
 @echo off
 
-if not defined WWW_HOME for %%f in ( "%~dp0..\vendors\WWW" ) do set "WWW_HOME=%%~ff"
+if not defined WWW_HOME for %%f in ( "%~dp0..\libexec\WWW" ) do set "WWW_HOME=%%~ff"
 if not exist "%WWW_HOME%" (
 	echo:"%WWW_HOME%" not exist>&2
 	exit /b 1
