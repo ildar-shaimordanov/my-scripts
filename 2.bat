@@ -174,7 +174,7 @@ if "%~1" == "" (
 
 	rem ... | 2
 
-	call :pipe-lookup txt
+	call :pipe-default
 
 ) else if exist "%~dpn0.%~n1.bat" (
 
@@ -246,6 +246,14 @@ if defined pipedebug call :pipe-debug "Before invocation"
 call :pipe-invoke %pipecmdopts%
 
 endlocal
+goto :EOF
+
+:: ========================================================================
+
+:pipe-default
+set "pipecmd=notepad.exe
+set "pipetitle=[.txt = default]"
+set "pipeext=.txt"
 goto :EOF
 
 :: ========================================================================
