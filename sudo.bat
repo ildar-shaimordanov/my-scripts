@@ -55,16 +55,26 @@ for %%p in ( "%~1" ) do if "%%~$PATH:p" == "" (
 exit /b 0
 
 
+rem 2.4.2.4 Well-Known SID Structures
+rem https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab
 :check_priv
-for /f "tokens=3 delims=\ " %%a in ( '
-	call "%SystemRoot%\system32\whoami.exe" /groups ^| findstr /b /c:"Mandatory Label"
-' ) do if /i "%%~a" == "system" (
-	echo:system
-) else if /i "%%~a" == "high" (
-	echo:admin
-) else if /i "%%~a" == "medium" (
-	echo:user
-) else (
-	echo:others
+setlocal
+
+set "S-1-16-0=untrusted"
+set "S-1-16-4096=low"
+set "S-1-16-8192=medium"
+set "S-1-16-8448=medium-plus"
+set "S-1-16-12288=high"
+set "S-1-16-16384=system"
+set "S-1-16-20480=protected"
+set "S-1-16-28672=secure"
+
+for /f "tokens=2" %%a in ( '
+	call "%SystemRoot%\system32\whoami.exe" /groups /fo list ^| findstr /e S-1-16-[0-9]*
+' ) do if defined %%~a (
+	call echo:%%%%~a%%
+	goto :EOF
 )
+
+echo:unknown
 goto :EOF
