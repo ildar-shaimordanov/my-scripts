@@ -142,7 +142,7 @@ internalip() {
 	[ -n "$t" ] || die "Cannot resolve $TARGETADDR"
 
 	ip route get "$t" \
-	| awk '{ print $NF; exit }'
+	| sed -n 's/.* src \([^ ]*\) .*/\1/p'
 }
 
 externalip() {
