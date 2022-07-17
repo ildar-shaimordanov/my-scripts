@@ -32,7 +32,7 @@ call :check_reqs reg.exe || goto :EOF
 
 type nul >"%TEMP%\%~n0.%USERNAME%.elevate"
 
-reg add "HKCU\Software\Classes\.elevate\shell\runas\command" /ve /d "cmd.exe /c cd /d \"%%w\" & start \"%~n0\" %%*" /f >nul
+reg add "HKCU\Software\Classes\.elevate\shell\runas\command" /ve /d "cmd.exe /c start /d \"%%w\" \"%~n0\" %%*" /f >nul
 
 "%TEMP%\%~n0.%USERNAME%.elevate" %*
 
