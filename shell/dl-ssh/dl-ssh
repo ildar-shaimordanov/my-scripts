@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+# =========================================================================
+#
+# ssh downloader
+#
+# Copyright (C) 2021 Ildar Shaimordanov
+#
+# =========================================================================
+#
+# This script was developed in the purpose to automate performing remotely
+# such actions as executing commands, collecting data, downloading them
+# and then handling with data locally.
+#
+# It logins to the remote host via SSH, executes commands remotely,
+# collects data, if needs, and delivers via SSH to the local host. Further
+# the script can perform additional actions like reordering, comparing
+# and committing in a local storage.
+#
+# To enable the script working properly, it requires the additional
+# file defining the parameters to connect to the remote host and the
+# functions to be executed on the remote host.
+#
+# =========================================================================
+
+print_usage() {
+	cat - <<USAGE
+NAME
+  ssh downloader
+
+SYNOPSIS
+  $( basename "$0" ) [OPTIONS]
+
+OPTIONS
+  -h, --help
+    Print this help and exit
+
+  -f RCFILE, --rcfile RCFILE
+    Use definitions from RCFILE (defaults to dl-ssh-rc).
+    It MUST be given as the first argument in the comamnd line.
+
+  -u RUSER, --username RUSER
+    Login as RUSER
+
+  -H RHOST, --host RHOST
+    Login to RHOST
+
+  -p RPORT, --port RPORT
+    The port to connect to on the remote host (defaults to 22)
+
+  -s RSHELL, --shell RSHELL
+    Remote login shell (defaults to bash)
+
+  -l, --login
+  +l, --no-login
+    Invoke shell as login shell executing shell profile scripts
+
+  -x, --xtrace
+  +x, --no-xtrace
+    Print user-defined commands executed remotely and locally
+
+  -X, --xtrace-remote
+  +X, --no-xtrace-remote
+    Print remotely executed commands, including those from profile scripts
+USAGE
+}
+
+# =========================================================================
+
+# the main function running on the remote host and collecting data
+dl() {
+	# on errors stop execution immediately
+	set -o pipefail
+	set -o errexit
+
+	WDIR="${TMP:-/tmp}/dl-$$"
+
+	# cleanup after ourselves
+	trap 'exec >&2; eval "$( command -v CLEANUP )"; rm -rf "$WDIR"' EXIT
+
+	mkdir -p "$WDIR"
+
+	# collect data
+	COLLECT >&2 || return $?
+
+	# archive with tar to STDOUT
+	cd  "$WDIR"
+	tar --dereference --hard-dereference -cf - *
+}
+
+# =========================================================================
+
+if printf '%s\n' "$@" | grep -qE '^(-h|--help)$'
+then
+	print_usage
+	exit
+fi
+
+# on errors stop execution immediately
+set -o pipefail
+set -o errexit
+
+case "$1" in
+-f | --rcfile ) RCFILE="$2" ; shift ; shift ;;
+esac
+
+: "${RCFILE:=./dl-ssh-rc}"
+
+. "$RCFILE"
+
+while [ $# -gt 0 ]
+do
+	case "$1" in
+	-u | --username		) RUSER="$2" ; shift ;;
+	-H | --host		) RHOST="$2" ; shift ;;
+	-p | --port		) RPORT="$2" ; shift ;;
+
+	-s | --shell		) RSHELL="2" ; shift ;;
+	-l | --login		) RLOGIN=1 ;;
+	+l | --no-login		) RLOGIN="" ;;
+
+	-x | --xtrace		) VERBOSE_EXEC=1 ;;
+	+x | --no-xtrace	) VERBOSE_EXEC="" ;;
+	-X | --xtrace-remote	) VERBOSE_REMOTE=1 ;;
+	+X | --no-xtrace-remote	) VERBOSE_REMOTE="" ;;
+
+	* ) echo "Unknown argument: $1" >&2 ; exit 255 ;;
+	esac
+	shift
+done
+
+# check the values are set
+: "${RUSER:?name required}"
+: "${RHOST:?name or address required}"
+: "${RSHELL:=bash}"
+
+# destination directory
+DLDIR="dl-$RHOST"
+
+# it's ok to fail here, if directory exists
+# a user should handle with it manually
+mkdir "$DLDIR"
+
+# deliver commands for execution
+# and download data
+{
+	cat "$RCFILE"
+	command -V dl | sed 1d
+	echo "${VERBOSE_EXEC:+set -x}"
+	echo "dl"
+} \
+| ssh "$RUSER@$RHOST" ${RPORT:+-p $RPORT} \
+	$RSHELL ${RLOGIN:+-l} ${VERBOSE_REMOTE:+-x} \
+| {
+	# there is no subshell, so verbosity set here is propagated further
+	${VERBOSE_EXEC:+set -x}
+
+	tar -C "$DLDIR" -xf -
+}
+
+# run commands locally, when downloading completed
+eval "$( command -v POSTPROCESS )"
+
+# =========================================================================
+
+# EOF
