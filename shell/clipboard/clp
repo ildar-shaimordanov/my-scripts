@@ -10,6 +10,9 @@ CLIP_EOL=''
 DOS2UNIX=''
 UNIX2DOS=''
 
+CLIP_ENC=''
+ICONV=''
+
 VERBOSELY=''
 
 # =========================================================================
@@ -25,6 +28,12 @@ Formatting options
 	-u	dos2unix
 	-d	unix2dos
 
+Encoding options
+	-f encoding
+	-t encoding
+		Encodings for input and output, respectively
+	-c	Discard silently unconvertible characters
+
 Information options
 	-h	Display this help message
 	-V	Display versions of tools
@@ -34,10 +43,11 @@ USAGE
 }
 
 print_version() {
-	printf '%s %s %s\n' \
+	printf '%s %s %s %s\n' \
 		"$( uname -s || cmd /c ver || echo "$OS" )" \
 		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}" \
-		"eol=$DOS2UNIX,$UNIX2DOS"
+		"eol=$DOS2UNIX,$UNIX2DOS" \
+		"enc=$ICONV"
 }
 
 # =========================================================================
@@ -90,8 +100,8 @@ then
 elif command -v pbpaste >/dev/null && command -v pbcopy >/dev/null
 then
 	# OSX? It has its own way
-	CLIP_GET=pbpaste
-	CLIP_PUT=pbcopy
+	CLIP_GET='pbpaste'
+	CLIP_PUT='pbcopy'
 elif [ -c /dev/clipboard ]
 then
 	# Cygwin?
@@ -138,7 +148,14 @@ fi
 
 # =========================================================================
 
-while getopts ":hVvud" arg
+if command -v iconv >/dev/null
+then
+	ICONV='iconv'
+fi
+
+# =========================================================================
+
+while getopts ":hVvudf:t:c" arg
 do
 	case "$arg" in
 	h ) print_usage ; exit ;;
@@ -148,12 +165,21 @@ do
 	u ) CLIP_EOL="$DOS2UNIX" ;;
 	d ) CLIP_EOL="$UNIX2DOS" ;;
 
+	f | t |c )
+		CLIP_ENC="$ICONV"
+		CLIP_ENC_OPTS="$CLIP_ENC_OPTS -$arg$OPTARG"
+		;;
+
+	: ) die "Argument expected for -$OPTARG" ;;
 	* ) die "Illegal option: -$OPTARG" ;;
 	esac
 
 	case "$arg" in
 	u )	[ -n "$CLIP_EOL" ] || not_supported dos2unix ;;
 	d )	[ -n "$CLIP_EOL" ] || not_supported unix2dos ;;
+	f | t | c )
+		[ -n "$CLIP_ENC" ] || not_supported iconv
+		;;
 	esac
 done
 
@@ -164,12 +190,14 @@ then
 	[ -n "$CLIP_GET" ] || die "No tool to paste from clipboard"
 	CLIP_RUN="$CLIP_GET"
 	CLIP_RUN="$CLIP_RUN${CLIP_EOL:+ | $CLIP_EOL}"
+	CLIP_RUN="$CLIP_RUN${CLIP_ENC:+ | $CLIP_ENC$CLIP_ENC_OPTS}"
 elif [ -t 1 ]
 then
 	# ... | clp
 	[ -n "$CLIP_PUT" ] || die "No tool to copy to clipboard"
 	CLIP_RUN="$CLIP_PUT"
 	CLIP_RUN="${CLIP_EOL:+$CLIP_EOL | }$CLIP_RUN"
+	CLIP_RUN="${CLIP_ENC:+$CLIP_ENC$CLIP_ENC_OPTS | }$CLIP_RUN"
 else
 	# ... | clp | ...
 	die "Useless use in the middle of the pipe"
