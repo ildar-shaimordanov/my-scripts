@@ -1,0 +1,56 @@
+#!/usr/bin/env sh
+
+# =========================================================================
+#
+# Simplify handling with the clipboard in BusyBox under Windows
+#
+# Do something with data taken from the clipboard
+# clp | ...
+#
+# Do something with data and keep in the clipboard
+# ... | clp
+#
+# Convert with help of dos2unix and unix2dos enabled
+#
+# =========================================================================
+
+clp() {
+	if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+	then
+		cat <<HELP
+Usage: [ clp [-u|-d] | ] ... [ | clp [-u|-d] ]
+
+Copy data from and/or to the clipboard
+
+	-u	dos2unix
+	-d	unix2dos
+HELP
+		return
+	fi
+
+	if [ ! -t 0 ]
+	then
+		# ... | clp
+		case "$1" in
+		-u ) dos2unix ;;
+		-d ) unix2dos ;;
+		*  ) cat - ;;
+		esac >/dev/clipboard
+	else
+		# clp | ...
+		# or simply output the clipboard
+		case "$1" in
+		-u ) dos2unix ;;
+		-d ) unix2dos ;;
+		*  ) cat - ;;
+		esac </dev/clipboard
+	fi
+}
+
+# =========================================================================
+
+clp "$@"
+
+# =========================================================================
+
+# EOF
