@@ -10,6 +10,29 @@ clp | ...
 ... | clp
 ```
 
+```
+Copy data from and/or to the clipboard
+
+Usage:
+        clp [OPTIONS]
+
+Formatting options
+        -u      dos2unix
+        -d      unix2dos
+
+Encoding options
+        -f encoding
+        -t encoding
+                Encodings for input and output, respectively
+        -c      Discard silently unconvertible characters
+
+Information options
+        -h      Display this help message
+        -V      Display versions of tools
+
+        -v      Display the executable command
+```
+
 ## History
 
 Initially I wrote the shell function for Cygwin because the last one is being used as my workhorse for long time.
