@@ -1,0 +1,130 @@
+#!/bin/sh
+
+# =========================================================================
+
+CLIP_GET=''
+CLIP_PUT=''
+CLIP_IMP=''
+
+VERBOSELY=''
+
+# =========================================================================
+
+print_usage() {
+	cat - <<USAGE
+Copy data from and/or to the clipboard
+
+Usage:
+	clp [OPTIONS]
+
+Information options
+	-h	Display this help message
+	-V	Display versions of tools
+
+	-v	Display the executable command
+USAGE
+}
+
+print_version() {
+	printf '%s %s\n' \
+		"$( uname -s || cmd /c ver || echo "$OS" )" \
+		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}"
+}
+
+# =========================================================================
+
+die() {
+	warn "$*"
+	exit 1
+}
+
+warn() {
+	echo "$*">&2
+}
+
+# =========================================================================
+
+# shellcheck disable=SC2016
+getclip() {
+	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
+	'Get-Clipboard -Raw | Write-Host -NoNewLine'
+}
+
+# shellcheck disable=SC2016
+putclip() {
+	CLIP_FILE="$( mktemp "${TMP:-/tmp}/.clp.$$.XXXXXX" )"
+	export CLIP_FILE
+
+	trap 'rm -f "$CLIP_FILE"' EXIT
+
+	cat - > "$CLIP_FILE"
+	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
+	'Get-Content -Raw $Env:CLIP_FILE | Set-Clipboard'
+}
+
+# =========================================================================
+
+if command -v xsel >/dev/null
+then
+	# Unixes: first attempt - preferable way
+	CLIP_GET='xsel --output --clipboard'
+	CLIP_PUT='xsel --input --clipboard'
+elif command -v xclip >/dev/null
+then
+	# Unixes: second attempt - another way
+	CLIP_GET='xclip -out -selection clipboard'
+	CLIP_PUT='xclip -in -selection clipboard'
+elif command -v pbpaste >/dev/null && command -v pbcopy >/dev/null
+then
+	# OSX? It has its own way
+	CLIP_GET=pbpaste
+	CLIP_PUT=pbcopy
+elif [ -c /dev/clipboard ]
+then
+	# Cygwin?
+	CLIP_IMP='/dev/clipboard'
+	CLIP_GET="cat - < $CLIP_IMP"
+	CLIP_PUT="cat - > $CLIP_IMP"
+elif [ "$OS" = "Windows_NT" ] && command -v powershell >/dev/null
+then
+	# UnxUtils, BusyBox or something similar?
+	CLIP_IMP='powershell'
+	CLIP_GET='getclip'
+	CLIP_PUT='putclip'
+fi
+
+# =========================================================================
+
+while getopts ":hVv" arg
+do
+	case "$arg" in
+	h ) print_usage ; exit ;;
+	V ) print_version ; exit ;;
+	v ) VERBOSELY=1 ;;
+
+	* ) die "Illegal option: -$OPTARG" ;;
+	esac
+done
+
+if [ -t 0 ]
+then
+	# clp
+	# clp | ...
+	[ -n "$CLIP_GET" ] || die "No tool to paste from clipboard"
+	CLIP_RUN="$CLIP_GET"
+elif [ -t 1 ]
+then
+	# ... | clp
+	[ -n "$CLIP_PUT" ] || die "No tool to copy to clipboard"
+	CLIP_RUN="$CLIP_PUT"
+else
+	# ... | clp | ...
+	die "Useless use in the middle of the pipe"
+fi
+
+[ -n "$VERBOSELY" ] && set -x
+eval "$CLIP_RUN"
+
+# =========================================================================
+
+# EOF
