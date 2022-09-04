@@ -6,6 +6,10 @@ CLIP_GET=''
 CLIP_PUT=''
 CLIP_IMP=''
 
+CLIP_EOL=''
+DOS2UNIX=''
+UNIX2DOS=''
+
 VERBOSELY=''
 
 # =========================================================================
@@ -17,6 +21,10 @@ Copy data from and/or to the clipboard
 Usage:
 	clp [OPTIONS]
 
+Formatting options
+	-u	dos2unix
+	-d	unix2dos
+
 Information options
 	-h	Display this help message
 	-V	Display versions of tools
@@ -26,9 +34,10 @@ USAGE
 }
 
 print_version() {
-	printf '%s %s\n' \
+	printf '%s %s %s\n' \
 		"$( uname -s || cmd /c ver || echo "$OS" )" \
-		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}"
+		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}" \
+		"eol=$DOS2UNIX,$UNIX2DOS"
 }
 
 # =========================================================================
@@ -40,6 +49,10 @@ die() {
 
 warn() {
 	echo "$*">&2
+}
+
+not_supported() {
+	warn "$1 not supported"
 }
 
 # =========================================================================
@@ -95,14 +108,52 @@ fi
 
 # =========================================================================
 
-while getopts ":hVv" arg
+if command -v dos2unix >/dev/null
+then
+	DOS2UNIX=dos2unix
+elif command -v sed >/dev/null
+then
+	DOS2UNIX='sed "s/\r$//"'
+elif command -v awk >/dev/null
+then
+	DOS2UNIX='awk -v RS="\r?\n" -v ORS="\n" 1'
+elif command -v gawk >/dev/null
+then
+	DOS2UNIX='gawk -v RS="\r?\n" -v ORS="\n" 1'
+fi
+
+if command -v unix2dos >/dev/null
+then
+	UNIX2DOS=unix2dos
+elif command -v sed >/dev/null
+then
+	UNIX2DOS='sed "s/[^\r]$/&\r/"'
+elif command -v awk >/dev/null
+then
+	UNIX2DOS='awk -v RS="\r?\n" -v ORS="\r\n" 1'
+elif command -v gawk >/dev/null
+then
+	UNIX2DOS='gawk -v RS="\r?\n" -v ORS="\r\n" 1'
+fi
+
+# =========================================================================
+
+while getopts ":hVvud" arg
 do
 	case "$arg" in
 	h ) print_usage ; exit ;;
 	V ) print_version ; exit ;;
 	v ) VERBOSELY=1 ;;
 
+	u ) CLIP_EOL="$DOS2UNIX" ;;
+	d ) CLIP_EOL="$UNIX2DOS" ;;
+
 	* ) die "Illegal option: -$OPTARG" ;;
+	esac
+
+	case "$arg" in
+	u )	[ -n "$CLIP_EOL" ] || not_supported dos2unix ;;
+	d )	[ -n "$CLIP_EOL" ] || not_supported unix2dos ;;
 	esac
 done
 
@@ -112,11 +163,13 @@ then
 	# clp | ...
 	[ -n "$CLIP_GET" ] || die "No tool to paste from clipboard"
 	CLIP_RUN="$CLIP_GET"
+	CLIP_RUN="$CLIP_RUN${CLIP_EOL:+ | $CLIP_EOL}"
 elif [ -t 1 ]
 then
 	# ... | clp
 	[ -n "$CLIP_PUT" ] || die "No tool to copy to clipboard"
 	CLIP_RUN="$CLIP_PUT"
+	CLIP_RUN="${CLIP_EOL:+$CLIP_EOL | }$CLIP_RUN"
 else
 	# ... | clp | ...
 	die "Useless use in the middle of the pipe"
