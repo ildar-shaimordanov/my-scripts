@@ -90,13 +90,13 @@ putclip() {
 if command -v xsel >/dev/null
 then
 	# Unixes: first attempt - preferable way
-	CLIP_GET='xsel --output --clipboard'
-	CLIP_PUT='xsel --input --clipboard'
+	CLIP_GET='xsel --clipboard --output'
+	CLIP_PUT='xsel --clipboard --input'
 elif command -v xclip >/dev/null
 then
 	# Unixes: second attempt - another way
-	CLIP_GET='xclip -out -selection clipboard'
-	CLIP_PUT='xclip -in -selection clipboard'
+	CLIP_GET='xclip -selection clipboard -out'
+	CLIP_PUT='xclip -selection clipboard -in'
 elif command -v pbpaste >/dev/null && command -v pbcopy >/dev/null
 then
 	# OSX? It has its own way
