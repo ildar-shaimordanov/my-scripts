@@ -18,7 +18,7 @@ VERBOSELY=''
 # =========================================================================
 
 print_usage() {
-	cat - <<USAGE
+	echo "\
 Copy data from and/or to the clipboard
 
 Usage:
@@ -39,7 +39,7 @@ Information options
 	-V	Display versions of tools
 
 	-v	Display the executable command
-USAGE
+"
 }
 
 print_version() {
