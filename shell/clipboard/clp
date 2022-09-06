@@ -42,9 +42,11 @@ Information options
 "
 }
 
+# shellcheck disable=SC3028
 print_version() {
-	printf '%s %s %s %s\n' \
-		"$( uname -s || cmd /c ver || echo "$OS" )" \
+	exec 2>/dev/null
+	uname -s || cmd /c ver || echo "${OSTYPE:-${OS:-unknown}}"
+	printf '%s %s %s\n' \
 		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}" \
 		"eol=$DOS2UNIX,$UNIX2DOS" \
 		"enc=$ICONV"
