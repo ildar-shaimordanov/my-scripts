@@ -89,6 +89,12 @@ putclip() {
 
 # =========================================================================
 
+# shellcheck disable=SC3028
+case "$OSTYPE" in
+darwin*	) CLIP_OS=darwin ;;
+*	) CLIP_OS='' ;;
+esac
+
 if command -v xsel >/dev/null
 then
 	# Unixes: first attempt - preferable way
@@ -99,11 +105,11 @@ then
 	# Unixes: second attempt - another way
 	CLIP_GET='xclip -selection clipboard -out'
 	CLIP_PUT='xclip -selection clipboard -in'
-elif command -v pbpaste >/dev/null && command -v pbcopy >/dev/null
+elif [ "$CLIP_OS" = "darwin" ]
 then
 	# OSX? It has its own way
-	CLIP_GET='pbpaste'
-	CLIP_PUT='pbcopy'
+	CLIP_GET="$( command -v pbpaste )" ; CLIP_GET="${CLIP_GET##*/}"
+	CLIP_PUT="$( command -v pbcopy  )" ; CLIP_PUT="${CLIP_PUT##*/}"
 elif [ -c /dev/clipboard ]
 then
 	# Cygwin?
