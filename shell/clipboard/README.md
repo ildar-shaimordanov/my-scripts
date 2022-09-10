@@ -5,32 +5,29 @@ This script is intended to copy from and paste to clipboard. I tried to develop 
 ## Usage
 
 ```
-clp
-clp | ...
-... | clp
-```
-
-```
 Copy data from and/or to the clipboard
 
 Usage:
-        clp [OPTIONS]
+	clp [OPTIONS]
+	clp [OPTIONS] | ...
+	... | clp [OPTIONS]
 
 Formatting options
-        -u      dos2unix
-        -d      unix2dos
+	-u	dos2unix
+	-d	unix2dos
 
 Encoding options
-        -f encoding
-        -t encoding
-                Encodings for input and output, respectively
-        -c      Discard silently unconvertible characters
+	-f encoding
+	-t encoding
+		Encodings for input and output, respectively
+	-c	Discard silently unconvertible characters
 
 Information options
-        -h      Display this help message
-        -V      Display versions of tools
+	-h	Display this help message
+	-V	Display versions of tools
 
-        -v      Display the executable command
+	-v	Display the executable command
+
 ```
 
 ## History

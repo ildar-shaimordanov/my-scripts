@@ -23,6 +23,8 @@ Copy data from and/or to the clipboard
 
 Usage:
 	clp [OPTIONS]
+	clp [OPTIONS] | ...
+	... | clp [OPTIONS]
 
 Formatting options
 	-u	dos2unix
