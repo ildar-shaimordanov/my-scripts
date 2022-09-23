@@ -4,6 +4,7 @@
 
 CLIP_GET=''
 CLIP_PUT=''
+CLIP_DEV=''
 CLIP_IMP=''
 
 CLIP_EOL=''
@@ -49,7 +50,7 @@ print_version() {
 	exec 2>/dev/null
 	uname -s || cmd /c ver || echo "${OSTYPE:-${OS:-unknown}}"
 	printf '%s %s %s\n' \
-		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}" \
+		"imp=${CLIP_DEV:-${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}}" \
 		"eol=${DOS2UNIX%% *},${UNIX2DOS%% *}" \
 		"enc=${ICONV%% *}"
 }
@@ -110,17 +111,17 @@ then
 elif [ "$CLIP_OS" = "darwin" ]
 then
 	# OSX? It has its own way
-	CLIP_GET="$( command -v pbpaste )" ; CLIP_GET="${CLIP_GET##*/}"
-	CLIP_PUT="$( command -v pbcopy  )" ; CLIP_PUT="${CLIP_PUT##*/}"
+	command -v pbpaste >/dev/null && CLIP_GET='pbpaste'
+	command -v pbcopy  >/dev/null && CLIP_PUT='pbcopy'
 elif [ -c /dev/clipboard ]
 then
 	# Cygwin?
-	CLIP_IMP='/dev/clipboard'
-	CLIP_GET="cat - < $CLIP_IMP"
-	CLIP_PUT="cat - > $CLIP_IMP"
+	CLIP_DEV='/dev/clipboard'
+	CLIP_GET="cat - < $CLIP_DEV"
+	CLIP_PUT="cat - > $CLIP_DEV"
 elif [ "$OS" = "Windows_NT" ] && command -v powershell >/dev/null
 then
-	# UnxUtils, BusyBox or something similar?
+	# BusyBox, UnxUtils or something else similar?
 	CLIP_IMP='powershell'
 	CLIP_GET='getclip_posh'
 	CLIP_PUT='putclip_posh'
