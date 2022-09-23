@@ -50,8 +50,8 @@ print_version() {
 	uname -s || cmd /c ver || echo "${OSTYPE:-${OS:-unknown}}"
 	printf '%s %s %s\n' \
 		"imp=${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}" \
-		"eol=$DOS2UNIX,$UNIX2DOS" \
-		"enc=$ICONV"
+		"eol=${DOS2UNIX%% *},${UNIX2DOS%% *}" \
+		"enc=${ICONV%% *}"
 }
 
 # =========================================================================
@@ -72,13 +72,13 @@ not_supported() {
 # =========================================================================
 
 # shellcheck disable=SC2016
-getclip() {
+getclip_posh() {
 	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
 	'Get-Clipboard -Raw | Write-Host -NoNewLine'
 }
 
 # shellcheck disable=SC2016
-putclip() {
+putclip_posh() {
 	CLIP_FILE="$( mktemp "${TMP:-/tmp}/.clp.$$.XXXXXX" )"
 	export CLIP_FILE
 
@@ -122,8 +122,8 @@ elif [ "$OS" = "Windows_NT" ] && command -v powershell >/dev/null
 then
 	# UnxUtils, BusyBox or something similar?
 	CLIP_IMP='powershell'
-	CLIP_GET='getclip'
-	CLIP_PUT='putclip'
+	CLIP_GET='getclip_posh'
+	CLIP_PUT='putclip_posh'
 fi
 
 # =========================================================================
@@ -172,24 +172,17 @@ do
 	V ) print_version ; exit ;;
 	v ) VERBOSELY=1 ;;
 
-	u ) CLIP_EOL="$DOS2UNIX" ;;
-	d ) CLIP_EOL="$UNIX2DOS" ;;
+	u ) CLIP_EOL="$DOS2UNIX" ; [ -n "$CLIP_EOL" ] || not_supported dos2unix ;;
+	d ) CLIP_EOL="$UNIX2DOS" ; [ -n "$CLIP_EOL" ] || not_supported unix2dos ;;
 
-	f | t |c )
+	f | t | c )
 		CLIP_ENC="$ICONV"
 		CLIP_ENC_OPTS="$CLIP_ENC_OPTS -$arg$OPTARG"
+		[ -n "$CLIP_ENC" ] || not_supported iconv
 		;;
 
 	: ) die "Argument expected for -$OPTARG" ;;
 	* ) die "Illegal option: -$OPTARG" ;;
-	esac
-
-	case "$arg" in
-	u )	[ -n "$CLIP_EOL" ] || not_supported dos2unix ;;
-	d )	[ -n "$CLIP_EOL" ] || not_supported unix2dos ;;
-	f | t | c )
-		[ -n "$CLIP_ENC" ] || not_supported iconv
-		;;
 	esac
 done
 
@@ -208,10 +201,10 @@ then
 	CLIP_RUN="$CLIP_PUT"
 	CLIP_RUN="${CLIP_EOL:+$CLIP_EOL | }$CLIP_RUN"
 	CLIP_RUN="${CLIP_ENC:+$CLIP_ENC$CLIP_ENC_OPTS | }$CLIP_RUN"
-else
-	# ... | clp | ...
-	die "Useless use in the middle of the pipe"
 fi
+
+# ... | clp | ...
+[ -n "$CLIP_RUN" ] || die "Useless use in the middle of the pipe"
 
 [ -n "$VERBOSELY" ] && set -x
 eval "$CLIP_RUN"
