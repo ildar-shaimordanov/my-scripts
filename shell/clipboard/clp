@@ -73,13 +73,13 @@ not_supported() {
 # =========================================================================
 
 # shellcheck disable=SC2016
-getclip_posh() {
+getclip() {
 	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
 	'Get-Clipboard -Raw | Write-Host -NoNewLine'
 }
 
 # shellcheck disable=SC2016
-putclip_posh() {
+putclip() {
 	CLIP_FILE="$( mktemp "${TMP:-/tmp}/.clp.$$.XXXXXX" )"
 	export CLIP_FILE
 
@@ -123,8 +123,8 @@ elif [ "$OS" = "Windows_NT" ] && command -v powershell >/dev/null
 then
 	# BusyBox, UnxUtils or something else similar?
 	CLIP_IMP='powershell'
-	CLIP_GET='getclip_posh'
-	CLIP_PUT='putclip_posh'
+	CLIP_GET='getclip'
+	CLIP_PUT='putclip'
 fi
 
 # =========================================================================
