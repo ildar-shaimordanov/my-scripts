@@ -28,9 +28,8 @@ Encoding options
 
 Information options
 	-h	Display this help message
-	-V	Display versions of tools
-
 	-v	Display the executable command
+	-V	Display versions of tools
 
 ```
 
