@@ -80,14 +80,10 @@ getclip() {
 
 # shellcheck disable=SC2016
 putclip() {
-	CLIP_FILE="$( mktemp "${TMP:-/tmp}/.clp.$$.XXXXXX" )"
-	export CLIP_FILE
-
-	trap 'rm -f "$CLIP_FILE"' EXIT
-
-	cat - > "$CLIP_FILE"
 	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
-	'Get-Content -Raw $Env:CLIP_FILE | Set-Clipboard'
+	'$a = @(); $i = [Console]::OpenStandardInput();' \
+	'while ( ( $b = $i.ReadByte() ) -ge 0 ) { $a += $b }' \
+	'[System.Text.Encoding]::UTF8.GetString($a) | Set-Clipboard'
 }
 
 # =========================================================================
