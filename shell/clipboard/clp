@@ -73,16 +73,20 @@ not_supported() {
 
 # shellcheck disable=SC2016
 getclip() {
-	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
+	posh \
 	'Get-Clipboard -Raw | Write-Host -NoNewLine'
 }
 
 # shellcheck disable=SC2016
 putclip() {
-	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command \
+	posh \
 	'$a = @(); $i = [Console]::OpenStandardInput();' \
 	'while ( ( $b = $i.ReadByte() ) -ge 0 ) { $a += $b }' \
 	'[System.Text.Encoding]::UTF8.GetString($a) | Set-Clipboard'
+}
+
+posh() {
+	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$*"
 }
 
 # =========================================================================
