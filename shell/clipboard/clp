@@ -80,8 +80,10 @@ getclip() {
 # shellcheck disable=SC2016
 putclip() {
 	posh \
-	'$a = @(); $i = [Console]::OpenStandardInput();' \
-	'while ( ( $b = $i.ReadByte() ) -ge 0 ) { $a += $b }' \
+	'$b = @(); $i = [Console]::OpenStandardInput();' \
+	'do { $b += @{ c = 0; d = [byte[]]::new(1048576) } }' \
+	'while ( $b[-1].c = $i.Read($b[-1].d, 0, $b[-1].d.count) )' \
+	'$a = $b | ForEach-Object { $_.d[0..($_.c - 1)] };' \
 	'[System.Text.Encoding]::UTF8.GetString($a) | Set-Clipboard'
 }
 
