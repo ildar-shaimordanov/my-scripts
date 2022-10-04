@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ../../bootstrap/bootstrap.sh
+. ../bootstrap.sh
 
 # Capture too long execution
 (
