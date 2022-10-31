@@ -48,10 +48,10 @@ Information options
 print_version() {
 	exec 2>/dev/null
 	uname -s || cmd /c ver || echo "${OSTYPE:-${OS:-unknown}}"
-	printf '%s %s %s\n' \
-		"imp=${CLIP_DEV:-${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}}" \
-		"eol=${DOS2UNIX%% *},${UNIX2DOS%% *}" \
-		"enc=${ICONV%% *}"
+	printf 'imp=%s eol=%s enc=%s\n' \
+		"${CLIP_DEV:-${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}}" \
+		"${DOS2UNIX%% *},${UNIX2DOS%% *}" \
+		"${ICONV%% *}"
 }
 
 # =========================================================================
