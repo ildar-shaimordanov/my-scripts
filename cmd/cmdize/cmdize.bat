@@ -8,8 +8,8 @@
 ::U>
 ::U># OPTIONS
 ::U>
-::U>* `/HELP` - Show this help and description.
-::U>* `/HELP-MORE` - Show more details.
+::U>* `/HELP`       - Show this help and description.
+::U>* `/HELP-MORE`  - Show more details.
 ::U>* `/HELP-DEVEL` - Show extremely detailed help including internal details.
 ::U>* `/L` - Show the list of supported file extensions and applicable options.
 ::U>* `/E` - Set an engine for using as a the script runner.
@@ -51,11 +51,11 @@
 ::H>
 ::H>Find this text and more details following by this link below.
 ::H>
-::H>https://github.com/ildar-shaimordanov/cmd.scripts/blob/master/doc/cmdize.md
+::H>https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
 ::H>
 ::H>Tests are here:
 ::H>
-::H>https://github.com/ildar-shaimordanov/cmd.scripts/tree/master/t
+::H>https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
 ::H>
 
 @echo off
@@ -471,9 +471,9 @@ goto :EOF
 ::G>
 ::G>The markers used specifically by this tool:
 ::G>
-::G>* `U` - to print usage only
-::G>* `UH` - to print help (the `/HELP` option)
-::G>* `UHD` - to print help in details (the `/HELP-MORE` option)
+::G>* `U`    - to print usage only
+::G>* `UH`   - to print help (the `/HELP` option)
+::G>* `UHD`  - to print help in details (the `/HELP-MORE` option)
 ::G>* `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
 ::G>
 :print-usage
