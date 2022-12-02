@@ -47,7 +47,7 @@ for %%f in (
 
 :: Fail, if BusyBox not found and download not required
 if not defined BB_EXE if /i not "%~1" == "--download" (
-	2>nul echo:ERROR: BusyBox executable not found
+	2>nul echo:ERROR: BusyBox binary not found. Run "%~n0 --download" first.
 	exit /b 1
 )
 
@@ -78,7 +78,11 @@ if /i "%~1" == "--download" (
 	set BB_URL
 	set BB_DST
 
-	powershell -NoLogo -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;$w=New-Object System.Net.WebClient;$w.DownloadFile($Env:BB_URL,$Env:BB_DST)"
+	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ^
+	"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;" ^
+	"$w = New-Object System.Net.WebClient;" ^
+	"$w.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials;" ^
+	"$w.DownloadFile($Env:BB_URL, $Env:BB_DST);"
 
 	echo:Downloading completed
 
