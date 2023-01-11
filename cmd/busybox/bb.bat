@@ -47,7 +47,7 @@ for %%f in (
 
 :: Fail, if BusyBox not found and download not required
 if not defined BB_EXE if /i not "%~1" == "--download" (
-	2>nul echo:ERROR: BusyBox binary not found. Run "%~n0 --download" first.
+	>&2 echo:ERROR: BusyBox binary not found. Run "%~n0 --download" first.
 	exit /b 1
 )
 
