@@ -2,7 +2,7 @@
 ::U>
 ::U># USAGE
 ::U>
-::U>    cmdize /HELP | /HELP-MORE | /HELP-DEVEL
+::U>    cmdize /HELP | /HELP-MORE | /HELP-DEVEL | /HELP-README
 ::U>    cmdize /L
 ::U>    cmdize [/W] [/E engine] [/P] file ...
 ::U>
@@ -640,7 +640,7 @@ goto :EOF
 ::R>
 ::R>This document is the part of the script and generated using the following command:
 ::R>
-::R>    cmdize /help-devel | git-md-toc -cut > README.md
+::R>    cmdize /help-readme | git-md-toc -cut > README.md
 ::R>
 ::R>Any changes in the script are supposed to be replicated to this document file.
 ::R>

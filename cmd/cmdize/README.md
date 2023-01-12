@@ -27,13 +27,14 @@
   * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-script-wsf`](#print-script-wsf)
   * [`:print-prolog`](#print-prolog)
+  * [HOWTO](#howto)
 <!-- toc-end -->
 
 Converts a script into a batch file.
 
 # USAGE
 
-    cmdize /HELP | /HELP-MORE | /HELP-DEVEL
+    cmdize /HELP | /HELP-MORE | /HELP-DEVEL | /HELP-README
     cmdize /L
     cmdize [/W] [/E engine] [/P] file ...
 
@@ -210,6 +211,7 @@ The markers used specifically by this tool:
 * `UH`    - to print help (the `/HELP` option)
 * `UHD`   - to print help in details (the `/HELP-MORE` option)
 * `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
+* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
 
 ## `:warn`
 
@@ -297,4 +299,16 @@ Special case (prefix = `@`)
 It has higher priority and is processed prior others producing a code similar to:
 
     @engine pattern %* & @goto :EOF
+
+## HOWTO
+
+This document is the part of the script and generated using the following command:
+
+    cmdize /help-readme | git-md-toc -cut > README.md
+
+Any changes in the script are supposed to be replicated to this document file.
+
+`git-md-toc` is the Perl script hosted here:
+
+https://github.com/ildar-shaimordanov/git-markdown-toc
 
