@@ -8,9 +8,10 @@
 ::U>
 ::U># OPTIONS
 ::U>
-::U>* `/HELP`       - Show this help and description.
-::U>* `/HELP-MORE`  - Show more details.
-::U>* `/HELP-DEVEL` - Show extremely detailed help including internal details.
+::U>* `/HELP`        - Show this help and description.
+::U>* `/HELP-MORE`   - Show more details.
+::U>* `/HELP-DEVEL`  - Show extremely detailed help including internal details.
+::U>* `/HELP-README` - Generate a text for a README file
 ::U>* `/L` - Show the list of supported file extensions and applicable options.
 ::U>* `/E` - Set an engine for using as a the script runner.
 ::U>* `/W` - Set the alternative engine (for VBScript only).
@@ -77,6 +78,11 @@ if /i "%~1" == "/HELP-MORE" (
 
 if /i "%~1" == "/HELP-DEVEL" (
 	call :print-usage UHDG
+	goto :EOF
+)
+
+if /i "%~1" == "/HELP-README" (
+	call :print-usage UHDGR
 	goto :EOF
 )
 
@@ -471,10 +477,11 @@ goto :EOF
 ::G>
 ::G>The markers used specifically by this tool:
 ::G>
-::G>* `U`    - to print usage only
-::G>* `UH`   - to print help (the `/HELP` option)
-::G>* `UHD`  - to print help in details (the `/HELP-MORE` option)
-::G>* `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
+::G>* `U`     - to print usage only
+::G>* `UH`    - to print help (the `/HELP` option)
+::G>* `UHD`   - to print help in details (the `/HELP-MORE` option)
+::G>* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
+::R>* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
 ::G>
 :print-usage
 for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
@@ -629,18 +636,18 @@ goto :EOF
 
 :: ========================================================================
 
-::G>## HOWTO
-::G>
-::G>This document is the part of the script and generated using the following command:
-::G>
-::G>    cmdize /help-devel | git-md-toc -cut > doc/cmdize.md
-::G>
-::G>Any changes in the script are supposed to be replicated to this document file.
-::G>
-::G>`git-md-toc` is the Perl script hosted here:
-::G>
-::G>https://github.com/ildar-shaimordanov/git-markdown-toc
-::G>
+::R>## HOWTO
+::R>
+::R>This document is the part of the script and generated using the following command:
+::R>
+::R>    cmdize /help-devel | git-md-toc -cut > README.md
+::R>
+::R>Any changes in the script are supposed to be replicated to this document file.
+::R>
+::R>`git-md-toc` is the Perl script hosted here:
+::R>
+::R>https://github.com/ildar-shaimordanov/git-markdown-toc
+::R>
 
 :: ========================================================================
 

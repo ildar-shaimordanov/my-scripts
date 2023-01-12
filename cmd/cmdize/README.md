@@ -1,4 +1,4 @@
-<!-- md-toc-begin -->
+<!-- toc-begin -->
 # Table of Content
 * [USAGE](#usage)
 * [OPTIONS](#options)
@@ -27,8 +27,7 @@
   * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-script-wsf`](#print-script-wsf)
   * [`:print-prolog`](#print-prolog)
-  * [HOWTO](#howto)
-<!-- md-toc-end -->
+<!-- toc-end -->
 
 Converts a script into a batch file.
 
@@ -40,9 +39,10 @@ Converts a script into a batch file.
 
 # OPTIONS
 
-* `/HELP` - Show this help and description.
-* `/HELP-MORE` - Show more details.
-* `/HELP-DEVEL` - Show extremely detailed help including internal details.
+* `/HELP`        - Show this help and description.
+* `/HELP-MORE`   - Show more details.
+* `/HELP-DEVEL`  - Show extremely detailed help including internal details.
+* `/HELP-README` - Generate a text for a README file
 * `/L` - Show the list of supported file extensions and applicable options.
 * `/E` - Set an engine for using as a the script runner.
 * `/W` - Set the alternative engine (for VBScript only).
@@ -82,11 +82,11 @@ Residents of the forum https://www.dostips.com/forum/ with whom the author has o
 
 Find this text and more details following by this link below.
 
-https://github.com/ildar-shaimordanov/cmd.scripts/blob/master/doc/cmdize.md
+https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
 
 Tests are here:
 
-https://github.com/ildar-shaimordanov/cmd.scripts/tree/master/t
+https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
 
 # DETAILS
 
@@ -206,10 +206,10 @@ Arguments
 
 The markers used specifically by this tool:
 
-* `U` - to print usage only
-* `UH` - to print help (the `/HELP` option)
-* `UHD` - to print help in details (the `/HELP-MORE` option)
-* `UHDG` - to print full help including internals (the `/HELP-DEVEL` option)
+* `U`     - to print usage only
+* `UH`    - to print help (the `/HELP` option)
+* `UHD`   - to print help in details (the `/HELP-MORE` option)
+* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
 
 ## `:warn`
 
@@ -297,16 +297,4 @@ Special case (prefix = `@`)
 It has higher priority and is processed prior others producing a code similar to:
 
     @engine pattern %* & @goto :EOF
-
-## HOWTO
-
-This document is the part of the script and generated using the following command:
-
-    cmdize /help-devel | git-md-toc -cut > doc/cmdize.md
-
-Any changes in the script are supposed to be replicated to this document file.
-
-`git-md-toc` is the Perl script hosted here:
-
-https://github.com/ildar-shaimordanov/git-markdown-toc
 
