@@ -1,20 +1,20 @@
 <#
 
-Generate the command for putting in to "cmdize.bat"
-powershell -f cmdize-powershell.ps1
+Generate the command for putting to "cmdize.bat"
+powershell -ep bypass -f cmdize-powershell.ps1
 
-Generate the command for putting in to a standalone script
-powershell -f cmdize-powershell.ps1 -standalone
+Generate the command for putting to a standalone script
+powershell -ep bypass -f cmdize-powershell.ps1 -standalone
 
 Generate the command and emulate with a FILE
-powershell -f cmdize-powershell.ps1 -emulateFile FILE [-isb] [FILE_ARGS]
+powershell -ep bypass -f cmdize-powershell.ps1 -emulateFile FILE [-isb] [FILE_ARGS]
 
 #>
 
 <#
 
 "Param()" does't work in the powershell-in-batch hybrid mode. It means
-that this script can't be hybridized (be embeded in to a batch file). To
+that this script can't be hybridized (be embeded to a batch file). To
 resolve this issue it should be reworked to eliminate usage of "Param()",
 or the script body should be placed into the function, or command line
 arguments should be parsed and recognized manually without using the
@@ -94,7 +94,7 @@ $minified = $minified -Replace "\s*`r?`n\s*", ''
 # =========================================================================
 
 if ( -not $emulateFile ) {
-	"powershell -NoLogo -NoProfile -Command `"$minified`""
+	"powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command `"$minified`""
 	exit
 }
 
@@ -105,7 +105,7 @@ $Env:PS1_ARGS = ( $args | % { "`"$_`"" } ) -Join ' '
 # Just to be sure in the transformation by this way only: %%%% -> %% -> %
 $emulated = $minified -Replace '%%%%', '%%' -Replace '%%', '%'
 
-powershell -NoLogo -NoProfile -Command $emulated
+powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command $emulated
 
 # =========================================================================
 
