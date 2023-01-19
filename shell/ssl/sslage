@@ -29,7 +29,7 @@ fi
 openssl s_client -connect "$1" </dev/null 2>/dev/null \
 | openssl x509 -dates -noout \
 | awk -v s0="$( date +%s )" -F= '
-function epoch(v) { c = "date -d\"" v "\" +%s" | getline v; return v }
+function epoch(v) { "date -d\"" v "\" +%s" | getline v; return v }
 function days(v1, v2) { return (v2 - v1) / 86400 }
 
 /notBefore/ { t1 = $2; s1 = epoch($2) }
@@ -45,8 +45,8 @@ END {
 	} else {
 		printf "Expired: %.0f\n", -n
 	}
-}
-'
+}'
+
 # =========================================================================
 
 # EOF
