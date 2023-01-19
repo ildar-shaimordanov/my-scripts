@@ -1,5 +1,17 @@
 #!/bin/sh
 
+# =========================================================================
+#
+# Validate the domain certificate
+#
+# Displays the time period when the certificate is valid
+# Estimates the total number of days when the certificate is valid
+# Estimates the number of days left until the certificate expires
+#
+# Copyright (C) 2023 Ildar Shaimordanov
+#
+# =========================================================================
+
 [ $# -gt 0 ] || {
 	echo "\
 Usage: $( basename "$0" ) HOST[:PORT]
@@ -35,3 +47,6 @@ END {
 	}
 }
 '
+# =========================================================================
+
+# EOF
