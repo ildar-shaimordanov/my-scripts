@@ -1,0 +1,37 @@
+#!/bin/sh
+
+[ $# -gt 0 ] || {
+	echo "\
+Usage: $( basename "$0" ) HOST[:PORT]
+Display age of the SSL certificate.
+If no port specified, :443 is assumed.
+"
+	exit 1
+}
+
+if [ "$1" = "${1%:*}" ]
+then
+	set -- "$1:443"
+fi
+
+openssl s_client -connect "$1" </dev/null 2>/dev/null \
+| openssl x509 -dates -noout \
+| awk -v s0="$( date +%s )" -F= '
+function epoch(v) { c = "date -d\"" v "\" +%s" | getline v; return v }
+function days(v1, v2) { return (v2 - v1) / 86400 }
+
+/notBefore/ { t1 = $2; s1 = epoch($2) }
+/notAfter/  { t2 = $2; s2 = epoch($2) }
+
+END {
+	print "Since:", t1
+	print "Until:", t2
+	printf "Days: %.0f\n", days(s1, s2)
+	n = days(s0, s2)
+	if ( n > 0 ) {
+		printf "Left: %.0f\n", n
+	} else {
+		printf "Expired: %.0f\n", -n
+	}
+}
+'
