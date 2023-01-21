@@ -75,21 +75,30 @@ $percent = if ( $standalone ) { '%%' } else { '%%%%' }
 
 $minified = $executor.ToString()
 
-$minified = $minified -Replace "```r?`n\s*", ''
-$minified = $minified -Split "`r?`n"
-$minified = $minified | Where-Object { $_ -notmatch '^\s*#' }
-$minified = $minified -Join "`n"
+# Split by EOL and remove indentation; remove all one-line comments
+$minified = $minified -Split "\s*`r?`n\s*"
+$minified = $minified | Where-Object { $_ -NotMatch '^#' }
 
-#$minified = $minified -Replace "^#.*`r?`n", ''
-$minified = $minified -Replace 'ForEach-Object', $percent
-$minified = $minified -Replace 'Get-Content', 'gc'
-$minified = $minified -Replace 'Invoke-Command', 'icm'
-$minified = $minified -Replace 'Invoke-Expression', 'iex'
-$minified = $minified -Replace 'Remove-Variable', 'rv'
-$minified = $minified -Replace 'Select-String', 'sls'
+# Combine into one line
+$minified = $minified -Join ""
+
+# Prepare for valid one-line program
 $minified = $minified -Replace '"', '\"'
 $minified = $minified -Replace '\s*([,=\|\+\{\}\(\)])\s*', '$1'
-$minified = $minified -Replace "\s*`r?`n\s*", ''
+
+# Shorten the result by replacing some commandlets with their aliases
+$aliases = @{
+	'ForEach-Object'	= if ( $standalone ) { '%%' } else { '%%%%' };
+	'Get-Content'		= 'gc';
+	'Invoke-Command'	= 'icm';
+	'Invoke-Expression'	= 'iex';
+	'Remove-Variable'	= 'rv';
+	'Select-String'		= 'sls';
+}
+
+$aliases.GetEnumerator() | ForEach-Object {
+	$minified = $minified -Replace $_.Name, $_.Value;
+}
 
 # =========================================================================
 
