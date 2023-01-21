@@ -18,6 +18,8 @@
 ::U>* `/P` - Display on standard output instead of creating a new file.
 ::U>
 
+:: ========================================================================
+
 ::H># DESCRIPTION
 ::H>
 ::H>This tool converts a script into a batch file allowing to use the script like regular programs and batch scripts without invoking an executable engine explicitly and just typing the script name without extension. The resulting batch file is placed next to the original script.
@@ -150,6 +152,53 @@ goto :cmdize_loop_begin
 ::D>More description, more links, more details about implementation in this section.
 ::D>
 
+:: ========================================================================
+
+::D>## .au3, .a3x
+::D>
+:cmdize.au3
+:cmdize.a3x
+call :print-prolog AutoIt3 "" "" ";"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .ahk
+::D>
+:cmdize.ahk
+call :print-prolog AutoHotKey "" "" ";"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .hta, .htm, .html
+::D>
+::D>* http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
+::D>
+:cmdize.hta
+:cmdize.htm
+:cmdize.html
+call :print-prolog "start mshta" "<!-- :" ": -->"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .jl
+::D>
+::D>* https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
+::D>* https://docs.julialang.org/en/v1/base/punctuation/
+::D>* https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
+::D>
+:cmdize.jl
+call :print-prolog julia "0<#= :" "=#0;"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
 ::D>## .js
 ::D>
 ::D>* `/E CSCRIPT` for `cscript //nologo //e:javascript` (default)
@@ -181,6 +230,112 @@ for %%e in ( "%CMDIZE_ENGINE%" ) do for %%s in (
 	type "%~f1"
 )
 
+goto :EOF
+
+:: ========================================================================
+
+::D>## .kix
+::D>
+:cmdize.kix
+call :print-prolog kix32 "" "" ";"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .php
+::D>
+::D>PHP is supposed to be used as a scripting language in Web. So to avoid possible conflicts with paths to dynamic libraries and to suppress HTTP headers, we use two options `-n` and `-q`, respectively.
+::D>
+:cmdize.php
+call :print-prolog "php -n -q" "<?php/* :" "*/ ?>"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .pl
+::D>
+::D>The document below gives more details about `pl2bat.bat` and `runperl.bat`. In fact, those scripts are full-featured prototypes for this script. By default it acts as the first one but without supporting old DOSs. With the `/E CMDONLY` option it creates the tiny batch acting similar to `runperl.bat`.
+::D>
+::D>* https://perldoc.perl.org/perlwin32
+::D>
+:cmdize.pl	[/e cmdonly]
+if /i "%CMDIZE_ENGINE%" == "cmdonly" (
+	call :print-prolog "perl -x -S" "" "" "@" "dpn0.pl"
+	goto :EOF
+)
+
+call :print-prolog "perl -x -S" "@rem = '--*-Perl-*--" "@rem ';"
+echo:#!perl
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .ps1
+::D>
+::D>Very-very-very complicated case. It's impossible to implement a pure hybrid. And too hard to implement a chimera. The resulting batch stores its filename and passed arguments in two environment variables `PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes powershell which tries to restore arguments, reads the file and invokes it. Also it is powered to continue working with STDIN properly. Powershell has two (at least known for me) ways to invoke another code: Invoke-Expression and invoke ScriptBlock. Both have their advandages and disadvantages. By default, Invoke-Expression is used. To give the users a choice between both, non-empty value in `PS1_ISB` enables ScriptBlock invocation.
+::D>
+::D>* http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
+::D>* http://stackoverflow.com/a/2611487/3627676
+::D>
+:cmdize.ps1
+echo:^<# :
+echo:@echo off
+echo:setlocal
+echo:rem Any non-empty value changes the script invocation: the script is
+echo:rem executed using ScriptBlock instead of Invoke-Expression as default.
+echo:set "PS1_ISB="
+echo:set "PS1_FILE=%%~f0"
+echo:set "PS1_ARGS=%%*"
+echo:powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;$a=@(@(if($a.count){$a})|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''});$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
+echo:goto :EOF
+echo:#^>
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .py
+::D>
+::D>* http://stackoverflow.com/a/29881143/3627676
+::D>* http://stackoverflow.com/a/17468811/3627676
+::D>
+:cmdize.py	[/e short]
+if /i "%CMDIZE_ENGINE%" == "short" (
+	call :print-prolog "python -x" "" "" "@" "f0"
+	type "%~f1"
+	goto :EOF
+)
+echo:0^<0# : ^^
+call :print-prolog python "'''" "'''"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .rb
+::D>
+::D>* https://stackoverflow.com/questions/35094778
+::D>
+:cmdize.rb
+echo:@break #^^
+call :print-prolog ruby "=begin" "=end"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::D>## .sh, .bash
+::D>
+::D>* http://forum.script-coding.com/viewtopic.php?id=11535
+::D>* http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
+::D>
+:cmdize.sh
+:cmdize.bash
+call :print-prolog bash ": << '____CMD____'" "____CMD____"
+type "%~f1"
 goto :EOF
 
 :: ========================================================================
@@ -260,105 +415,6 @@ goto :EOF
 
 :: ========================================================================
 
-::D>## .pl
-::D>
-::D>The document below gives more details about `pl2bat.bat` and `runperl.bat`. In fact, those scripts are full-featured prototypes for this script. By default it acts as the first one but without supporting old DOSs. With the `/E CMDONLY` option it creates the tiny batch acting similar to `runperl.bat`.
-::D>
-::D>* https://perldoc.perl.org/perlwin32
-::D>
-:cmdize.pl	[/e cmdonly]
-if /i "%CMDIZE_ENGINE%" == "cmdonly" (
-	call :print-prolog "perl -x -S" "" "" "@" "dpn0.pl"
-	goto :EOF
-)
-
-call :print-prolog "perl -x -S" "@rem = '--*-Perl-*--" "@rem ';"
-echo:#!perl
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .sh, .bash
-::D>
-::D>* http://forum.script-coding.com/viewtopic.php?id=11535
-::D>* http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
-::D>
-:cmdize.sh
-:cmdize.bash
-call :print-prolog bash ": << '____CMD____'" "____CMD____"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .ps1
-::D>
-::D>Very-very-very complicated case. It's impossible to implement a pure hybrid. And too hard to implement a chimera. The resulting batch stores its filename and passed arguments in two environment variables `PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes powershell which tries to restore arguments, reads the file and invokes it. Also it is powered to continue working with STDIN properly. Powershell has two (at least known for me) ways to invoke another code: Invoke-Expression and invoke ScriptBlock. Both have their advandages and disadvantages. By default, Invoke-Expression is used. To give the users a choice between both, non-empty value in `PS1_ISB` enables ScriptBlock invocation.
-::D>
-::D>* http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
-::D>* http://stackoverflow.com/a/2611487/3627676
-::D>
-:cmdize.ps1
-echo:^<# :
-echo:@echo off
-echo:setlocal
-echo:rem Any non-empty value changes the script invocation: the script is
-echo:rem executed using ScriptBlock instead of Invoke-Expression as default.
-echo:set "PS1_ISB="
-echo:set "PS1_FILE=%%~f0"
-echo:set "PS1_ARGS=%%*"
-echo:powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;$a=@(@(if($a.count){$a})|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''});$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
-echo:goto :EOF
-echo:#^>
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .py
-::D>
-::D>* http://stackoverflow.com/a/29881143/3627676
-::D>* http://stackoverflow.com/a/17468811/3627676
-::D>
-:cmdize.py	[/e short]
-if /i "%CMDIZE_ENGINE%" == "short" (
-	call :print-prolog "python -x" "" "" "@" "f0"
-	type "%~f1"
-	goto :EOF
-)
-echo:0^<0# : ^^
-call :print-prolog python "'''" "'''"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .rb
-::D>
-::D>* https://stackoverflow.com/questions/35094778
-::D>
-:cmdize.rb
-echo:@break #^^
-call :print-prolog ruby "=begin" "=end"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .hta, .htm, .html
-::D>
-::D>* http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
-::D>
-:cmdize.hta
-:cmdize.htm
-:cmdize.html
-call :print-prolog "start mshta" "<!-- :" ": -->"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
 ::D>## .wsf
 ::D>
 ::D>Hybridizing WSF the script looks for the XML declaration and makes it valid for running as batch. Also weird and undocumented trick with file extensions (`%~f0?.wsf`) is used to insist WSH to recognize the batch file as the WSF scenario. Honestly, the resulting file stops being well-formed XML file. However WSH chews it silently.
@@ -410,62 +466,12 @@ goto :EOF
 
 :: ========================================================================
 
-::D>## .kix
-::D>
-:cmdize.kix
-call :print-prolog kix32 "" "" ";"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .au3, .a3x
-::D>
-:cmdize.au3
-:cmdize.a3x
-call :print-prolog AutoIt3 "" "" ";"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .ahk
-::D>
-:cmdize.ahk
-call :print-prolog AutoHotKey "" "" ";"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .php
-::D>
-::D>PHP is supposed to be used as a scripting language in Web. So to avoid possible conflicts with paths to dynamic libraries and to suppress HTTP headers, we use two options `-n` and `-q`, respectively.
-::D>
-:cmdize.php
-call :print-prolog "php -n -q" "<?php/* :" "*/ ?>"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
-::D>## .jl
-::D>
-::D>* https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
-::D>* https://docs.julialang.org/en/v1/base/punctuation/
-::D>* https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
-::D>
-:cmdize.jl
-call :print-prolog julia "0<#= :" "=#0;"
-type "%~f1"
-goto :EOF
-
-:: ========================================================================
-
 ::G># Hybridization internals
 ::G>
 ::G>This section discovers all guts of the hybridization.
 ::G>
+
+:: ========================================================================
 
 ::G>## `:print-usage`
 ::G>
@@ -636,7 +642,7 @@ goto :EOF
 
 :: ========================================================================
 
-::R>## HOWTO
+::R># ABOUT THIS PAGE
 ::R>
 ::R>This document is the part of the script and generated using the following command:
 ::R>

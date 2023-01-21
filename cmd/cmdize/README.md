@@ -6,20 +6,20 @@
 * [AUTHORS and CONTRIBUTORS](#authors-and-contributors)
 * [SEE ALSO](#see-also)
 * [DETAILS](#details)
+  * [.au3, .a3x](#au3-a3x)
+  * [.ahk](#ahk)
+  * [.hta, .htm, .html](#hta-htm-html)
+  * [.jl](#jl)
   * [.js](#js)
-  * [.vbs](#vbs)
+  * [.kix](#kix)
+  * [.php](#php)
   * [.pl](#pl)
-  * [.sh, .bash](#sh-bash)
   * [.ps1](#ps1)
   * [.py](#py)
   * [.rb](#rb)
-  * [.hta, .htm, .html](#hta-htm-html)
+  * [.sh, .bash](#sh-bash)
+  * [.vbs](#vbs)
   * [.wsf](#wsf)
-  * [.kix](#kix)
-  * [.au3, .a3x](#au3-a3x)
-  * [.ahk](#ahk)
-  * [.php](#php)
-  * [.jl](#jl)
 * [Hybridization internals](#hybridization-internals)
   * [`:print-usage`](#print-usage)
   * [`:warn`](#warn)
@@ -27,7 +27,7 @@
   * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-script-wsf`](#print-script-wsf)
   * [`:print-prolog`](#print-prolog)
-  * [HOWTO](#howto)
+* [ABOUT THIS PAGE](#about-this-page)
 <!-- toc-end -->
 
 Converts a script into a batch file.
@@ -93,6 +93,20 @@ https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
 
 More description, more links, more details about implementation in this section.
 
+## .au3, .a3x
+
+## .ahk
+
+## .hta, .htm, .html
+
+* http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
+
+## .jl
+
+* https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
+* https://docs.julialang.org/en/v1/base/punctuation/
+* https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
+
 ## .js
 
 * `/E CSCRIPT` for `cscript //nologo //e:javascript` (default)
@@ -111,31 +125,17 @@ The following two links show my first steps in direction to create this script.
 * https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter.html
 * https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter-2.html
 
-## .vbs
+## .kix
 
-Pure VBScript within a batch file:
+## .php
 
-* `/E CSCRIPT` for `cscript //nologo //e:vbscript` (default)
-* `/E WSCRIPT` for `wscript //nologo //e:vbscript`
-
-With `/W` it's WSF within a batch file (with some specialties for WSF):
-
-* `/E CSCRIPT` for `cscript //nologo` (default)
-* `/E WSCRIPT` for `wscript //nologo`
-
-* http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
-* http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
+PHP is supposed to be used as a scripting language in Web. So to avoid possible conflicts with paths to dynamic libraries and to suppress HTTP headers, we use two options `-n` and `-q`, respectively.
 
 ## .pl
 
 The document below gives more details about `pl2bat.bat` and `runperl.bat`. In fact, those scripts are full-featured prototypes for this script. By default it acts as the first one but without supporting old DOSs. With the `/E CMDONLY` option it creates the tiny batch acting similar to `runperl.bat`.
 
 * https://perldoc.perl.org/perlwin32
-
-## .sh, .bash
-
-* http://forum.script-coding.com/viewtopic.php?id=11535
-* http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
 
 ## .ps1
 
@@ -153,9 +153,25 @@ Very-very-very complicated case. It's impossible to implement a pure hybrid. And
 
 * https://stackoverflow.com/questions/35094778
 
-## .hta, .htm, .html
+## .sh, .bash
 
-* http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
+* http://forum.script-coding.com/viewtopic.php?id=11535
+* http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
+
+## .vbs
+
+Pure VBScript within a batch file:
+
+* `/E CSCRIPT` for `cscript //nologo //e:vbscript` (default)
+* `/E WSCRIPT` for `wscript //nologo //e:vbscript`
+
+With `/W` it's WSF within a batch file (with some specialties for WSF):
+
+* `/E CSCRIPT` for `cscript //nologo` (default)
+* `/E WSCRIPT` for `wscript //nologo`
+
+* http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
+* http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
 
 ## .wsf
 
@@ -176,22 +192,6 @@ further it becomes:
     the rest of WSF
 
 * http://www.dostips.com/forum/viewtopic.php?p=33963#p33963
-
-## .kix
-
-## .au3, .a3x
-
-## .ahk
-
-## .php
-
-PHP is supposed to be used as a scripting language in Web. So to avoid possible conflicts with paths to dynamic libraries and to suppress HTTP headers, we use two options `-n` and `-q`, respectively.
-
-## .jl
-
-* https://github.com/JuliaLang/julia/blob/master/doc/src/base/punctuation.md
-* https://docs.julialang.org/en/v1/base/punctuation/
-* https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
 
 # Hybridization internals
 
@@ -300,7 +300,7 @@ It has higher priority and is processed prior others producing a code similar to
 
     @engine pattern %* & @goto :EOF
 
-## HOWTO
+# ABOUT THIS PAGE
 
 This document is the part of the script and generated using the following command:
 
