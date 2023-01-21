@@ -481,7 +481,7 @@ goto :EOF
 ::G>* `UH`    - to print help (the `/HELP` option)
 ::G>* `UHD`   - to print help in details (the `/HELP-MORE` option)
 ::G>* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
-::R>* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
+::G>* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
 ::G>
 :print-usage
 for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
