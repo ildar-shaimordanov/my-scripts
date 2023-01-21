@@ -71,7 +71,6 @@ the "-standalone" option. When the "-emulateFile" option is specified,
 all multiple percent characters are squeezed up to the single one.
 
 #>
-$percent = if ( $standalone ) { '%%' } else { '%%%%' }
 
 $minified = $executor.ToString()
 
