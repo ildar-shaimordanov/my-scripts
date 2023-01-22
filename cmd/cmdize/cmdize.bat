@@ -186,7 +186,12 @@ goto :EOF
 ::D>* `/E CCHAKRA` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>* `/E WCHAKRA` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>
-::D>Unfortunately, no easy way to wrap JScript9 into WSF.
+::D>With `/W` it's WSF within a batch file (with some specialties for WSF):
+::D>
+::D>* `/E CSCRIPT` for `cscript //nologo` (default)
+::D>* `/E WSCRIPT` for `wscript //nologo`
+::D>
+::D>Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So JScript9 is not supported in WSF.
 ::D>
 ::D>* http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
@@ -197,8 +202,13 @@ goto :EOF
 ::D>* https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter.html
 ::D>* https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter-2.html
 ::D>
-:cmdize.js	[/e cscript|wscript|cchakra|wchakra|ch|node|...]
+:cmdize.js	[/w] [/e cscript|wscript|cchakra|wchakra|ch|node|...]
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+
+if defined CMDIZE_WRAP (
+	call :print-script-wsf-bat "%~f1" javascript
+	goto :EOF
+)
 
 for %%e in ( "%CMDIZE_ENGINE%" ) do for %%s in (
 	"cscript cscript javascript"

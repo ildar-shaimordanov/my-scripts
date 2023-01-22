@@ -94,7 +94,12 @@ More description, more links, more details about implementation in this section.
 * `/E CCHAKRA` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 * `/E WCHAKRA` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 
-Unfortunately, no easy way to wrap JScript9 into WSF.
+With `/W` it's WSF within a batch file (with some specialties for WSF):
+
+* `/E CSCRIPT` for `cscript //nologo` (default)
+* `/E WSCRIPT` for `wscript //nologo`
+
+Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So JScript9 is not supported in WSF.
 
 * http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 * http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
