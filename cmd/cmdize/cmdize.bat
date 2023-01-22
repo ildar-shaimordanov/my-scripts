@@ -453,85 +453,12 @@ goto :EOF
 
 :: ========================================================================
 
-::G>## `:print-usage`
-::G>
-::G>Prints different parts of the documentation.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - the marker
-::G>
-::G>The markers used specifically by this tool:
-::G>
-::G>* `U`     - to print usage only
-::G>* `UH`    - to print help (the `/HELP` option)
-::G>* `UHD`   - to print help in details (the `/HELP-MORE` option)
-::G>* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
-::G>* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
-::G>
-:print-usage
-for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:warn`
-::G>
-::G>A common use subroutine for displaying warnings to STDERR.
-::G>
-::G>Arguments
-::G>
-::G>* `%*` - a text for printing
-::G>
-:warn
->&2 echo:%~n0: %*
-goto :EOF
-
-:: ========================================================================
-
 ::G>## `:print-extension-list`
 ::G>
 ::G>Prints the list of supported extensions. It is invoked by the `/L` option.
 ::G>
 :print-extension-list
 for /f "tokens=1,* delims=." %%x in ( 'findstr /i /r "^:cmdize[.][0-9a-z_][0-9a-z_]*\>" "%~f0"' ) do echo:.%%~y
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:print-script-wsf-bat`
-::G>
-::G>The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridizes it.
-::G>
-::G>To this moment it is used only once - for VBScript.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - filename
-::G>* `%2` - language
-::G>
-:print-script-wsf-bat
-for %%f in ( "%TEMP%\%~n1.wsf" ) do (
-	call :print-script-wsf "%~f1" %~2 >"%%~ff"
-	call :cmdize.wsf "%%~ff"
-	del /f /q "%%~ff"
-)
-goto :EOF
-
-::G>## `:print-script-wsf`
-::G>
-::G>The companion for the above subroutine. It prints the original file surrounded with WSF markup.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - filename
-::G>* `%2` - language
-::G>
-:print-script-wsf
-echo:^<?xml version="1.0" ?^>
-echo:^<package^>^<job id="cmdized"^>^<script language="%~2"^>^<^![CDATA[
-type "%~f1"
-echo:]]^>^</script^>^</job^>^</package^>
 goto :EOF
 
 :: ========================================================================
@@ -618,6 +545,81 @@ if defined tag (
 )
 
 endlocal
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-script-wsf`
+::G>
+::G>The companion for `:print-script-wsf-bat`. It prints the original file surrounded with WSF markup.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - filename
+::G>* `%2` - language
+::G>
+:print-script-wsf
+echo:^<?xml version="1.0" ?^>
+echo:^<package^>^<job id="cmdized"^>^<script language="%~2"^>^<^![CDATA[
+type "%~f1"
+echo:]]^>^</script^>^</job^>^</package^>
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-script-wsf-bat`
+::G>
+::G>The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridizes it.
+::G>
+::G>To this moment it is used only once - for VBScript.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - filename
+::G>* `%2` - language
+::G>
+:print-script-wsf-bat
+for %%f in ( "%TEMP%\%~n1.wsf" ) do (
+	call :print-script-wsf "%~f1" %~2 >"%%~ff"
+	call :cmdize.wsf "%%~ff"
+	del /f /q "%%~ff"
+)
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-usage`
+::G>
+::G>Prints different parts of the documentation.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - the marker
+::G>
+::G>The markers used specifically by this tool:
+::G>
+::G>* `U`     - to print usage only
+::G>* `UH`    - to print help (the `/HELP` option)
+::G>* `UHD`   - to print help in details (the `/HELP-MORE` option)
+::G>* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
+::G>* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
+::G>
+:print-usage
+for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:warn`
+::G>
+::G>A common use subroutine for displaying warnings to STDERR.
+::G>
+::G>Arguments
+::G>
+::G>* `%*` - a text for printing
+::G>
+:warn
+>&2 echo:%~n0: %*
 goto :EOF
 
 :: ========================================================================

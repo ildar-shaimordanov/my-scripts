@@ -19,12 +19,12 @@
   * [.vbs](#vbs)
   * [.wsf](#wsf)
 * [Hybridization internals](#hybridization-internals)
+  * [`:print-extension-list`](#print-extension-list)
+  * [`:print-prolog`](#print-prolog)
+  * [`:print-script-wsf`](#print-script-wsf)
+  * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-usage`](#print-usage)
   * [`:warn`](#warn)
-  * [`:print-extension-list`](#print-extension-list)
-  * [`:print-script-wsf-bat`](#print-script-wsf-bat)
-  * [`:print-script-wsf`](#print-script-wsf)
-  * [`:print-prolog`](#print-prolog)
 * [AUTHORS and CONTRIBUTORS](#authors-and-contributors)
 * [SEE ALSO](#see-also)
 * [ABOUT THIS PAGE](#about-this-page)
@@ -177,53 +177,9 @@ further it becomes:
 
 This section discovers all guts of the hybridization.
 
-## `:print-usage`
-
-Prints different parts of the documentation.
-
-Arguments
-
-* `%1` - the marker
-
-The markers used specifically by this tool:
-
-* `U`     - to print usage only
-* `UH`    - to print help (the `/HELP` option)
-* `UHD`   - to print help in details (the `/HELP-MORE` option)
-* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
-* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
-
-## `:warn`
-
-A common use subroutine for displaying warnings to STDERR.
-
-Arguments
-
-* `%*` - a text for printing
-
 ## `:print-extension-list`
 
 Prints the list of supported extensions. It is invoked by the `/L` option.
-
-## `:print-script-wsf-bat`
-
-The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridizes it.
-
-To this moment it is used only once - for VBScript.
-
-Arguments
-
-* `%1` - filename
-* `%2` - language
-
-## `:print-script-wsf`
-
-The companion for the above subroutine. It prints the original file surrounded with WSF markup.
-
-Arguments
-
-* `%1` - filename
-* `%2` - language
 
 ## `:print-prolog`
 
@@ -279,6 +235,50 @@ Special case (prefix = `@`)
 It has higher priority and is processed prior others producing a code similar to:
 
     @engine pattern %* & @goto :EOF
+
+## `:print-script-wsf`
+
+The companion for `:print-script-wsf-bat`. It prints the original file surrounded with WSF markup.
+
+Arguments
+
+* `%1` - filename
+* `%2` - language
+
+## `:print-script-wsf-bat`
+
+The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridizes it.
+
+To this moment it is used only once - for VBScript.
+
+Arguments
+
+* `%1` - filename
+* `%2` - language
+
+## `:print-usage`
+
+Prints different parts of the documentation.
+
+Arguments
+
+* `%1` - the marker
+
+The markers used specifically by this tool:
+
+* `U`     - to print usage only
+* `UH`    - to print help (the `/HELP` option)
+* `UHD`   - to print help in details (the `/HELP-MORE` option)
+* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
+* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
+
+## `:warn`
+
+A common use subroutine for displaying warnings to STDERR.
+
+Arguments
+
+* `%*` - a text for printing
 
 # AUTHORS and CONTRIBUTORS
 
