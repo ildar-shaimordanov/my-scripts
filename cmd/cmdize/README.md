@@ -3,8 +3,6 @@
 * [USAGE](#usage)
 * [OPTIONS](#options)
 * [DESCRIPTION](#description)
-* [AUTHORS and CONTRIBUTORS](#authors-and-contributors)
-* [SEE ALSO](#see-also)
 * [DETAILS](#details)
   * [.au3, .a3x](#au3-a3x)
   * [.ahk](#ahk)
@@ -27,6 +25,8 @@
   * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-script-wsf`](#print-script-wsf)
   * [`:print-prolog`](#print-prolog)
+* [AUTHORS and CONTRIBUTORS](#authors-and-contributors)
+* [SEE ALSO](#see-also)
 * [ABOUT THIS PAGE](#about-this-page)
 <!-- toc-end -->
 
@@ -68,26 +68,6 @@ For VBScript there is choice from either `CSCRIPT` or `WSCRIPT`. If the script i
 For Perl `/E CMDONLY` is the only applicable value. It's fake engine that is used for creating the pure batch file for putting it with the original script in PATH.
 
 For Python `/E SHORT` specifies creation of a quite minimalistic runner file. Other values don't make sense.
-
-# AUTHORS and CONTRIBUTORS
-
-Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
-
-leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
-
-greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
-
-Residents of the forum https://www.dostips.com/forum/ with whom the author has opportunity to discuss many aspects of batch scripting.
-
-# SEE ALSO
-
-Find this text and more details following by this link below.
-
-https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
-
-Tests are here:
-
-https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
 
 # DETAILS
 
@@ -299,6 +279,26 @@ Special case (prefix = `@`)
 It has higher priority and is processed prior others producing a code similar to:
 
     @engine pattern %* & @goto :EOF
+
+# AUTHORS and CONTRIBUTORS
+
+Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
+
+leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
+
+greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
+
+Residents of the forum https://www.dostips.com/forum/ with whom the author has opportunity to discuss many aspects of batch scripting.
+
+# SEE ALSO
+
+Find this text and more details following by this link below.
+
+https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
+
+Tests are here:
+
+https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
 
 # ABOUT THIS PAGE
 

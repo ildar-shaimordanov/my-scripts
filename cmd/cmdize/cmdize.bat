@@ -40,26 +40,6 @@
 ::H>
 ::H>For Python `/E SHORT` specifies creation of a quite minimalistic runner file. Other values don't make sense.
 ::H>
-::H># AUTHORS and CONTRIBUTORS
-::H>
-::H>Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
-::H>
-::H>leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
-::H>
-::H>greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
-::H>
-::H>Residents of the forum https://www.dostips.com/forum/ with whom the author has opportunity to discuss many aspects of batch scripting.
-::H>
-::H># SEE ALSO
-::H>
-::H>Find this text and more details following by this link below.
-::H>
-::H>https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
-::H>
-::H>Tests are here:
-::H>
-::H>https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
-::H>
 
 @echo off
 
@@ -639,6 +619,29 @@ if defined tag (
 
 endlocal
 goto :EOF
+
+:: ========================================================================
+
+::H># AUTHORS and CONTRIBUTORS
+::H>
+::H>Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
+::H>
+::H>leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
+::H>
+::H>greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
+::H>
+::H>Residents of the forum https://www.dostips.com/forum/ with whom the author has opportunity to discuss many aspects of batch scripting.
+::H>
+::H># SEE ALSO
+::H>
+::H>Find this text and more details following by this link below.
+::H>
+::H>https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
+::H>
+::H>Tests are here:
+::H>
+::H>https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
+::H>
 
 :: ========================================================================
 
