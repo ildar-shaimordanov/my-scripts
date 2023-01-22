@@ -485,7 +485,7 @@ goto :EOF
 ::G>* `%4` - prefix (used to hide batch commands in place)
 ::G>* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; `?.wsf` for WSF-files only
 ::G>
-::G>Common case (tagged)
+::G>### Common case (tagged)
 ::G>
 ::G>    call :print-prolog engine
 ::G>    call :print-prolog engine tag1 tag2
@@ -498,7 +498,7 @@ goto :EOF
 ::G>    goto :EOF
 ::G>    tag2
 ::G>
-::G>Common case (prefixed)
+::G>### Common case (prefixed)
 ::G>
 ::G>    call :print-prolog engine "" "" prefix
 ::G>
@@ -508,7 +508,7 @@ goto :EOF
 ::G>    prefix engine %~f0 %*
 ::G>    prefix goto :EOF
 ::G>
-::G>Special case (`.wsf`)
+::G>### Special case (`.wsf`)
 ::G>
 ::G>    call :print-prolog engine tag1 tag2 "" "?.wsf"
 ::G>
@@ -520,7 +520,7 @@ goto :EOF
 ::G>    goto :EOF
 ::G>    tag2
 ::G>
-::G>Special case (prefix = `@`)
+::G>### Special case (prefix = `@`)
 ::G>
 ::G>    call :print-prolog engine "" "" @ pattern
 ::G>
@@ -638,7 +638,7 @@ goto :EOF
 ::H>
 ::H>Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
 ::H>
-::H>leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
+::H>leo-liar (https://github.com/leo-liar) is the person who pointed on the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script. Also he provided the fix.
 ::H>
 ::H>greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
 ::H>

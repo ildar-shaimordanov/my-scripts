@@ -21,6 +21,10 @@
 * [Hybridization internals](#hybridization-internals)
   * [`:print-extension-list`](#print-extension-list)
   * [`:print-prolog`](#print-prolog)
+    * [Common case (tagged)](#common-case-tagged)
+    * [Common case (prefixed)](#common-case-prefixed)
+    * [Special case (`.wsf`)](#special-case-wsf)
+    * [Special case (prefix = `@`)](#special-case-prefix--)
   * [`:print-script-wsf`](#print-script-wsf)
   * [`:print-script-wsf-bat`](#print-script-wsf-bat)
   * [`:print-usage`](#print-usage)
@@ -198,7 +202,7 @@ Arguments
 * `%4` - prefix (used to hide batch commands in place)
 * `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; `?.wsf` for WSF-files only
 
-Common case (tagged)
+### Common case (tagged)
 
     call :print-prolog engine
     call :print-prolog engine tag1 tag2
@@ -211,7 +215,7 @@ Both `tag1` and `tag2` are optional:
     goto :EOF
     tag2
 
-Common case (prefixed)
+### Common case (prefixed)
 
     call :print-prolog engine "" "" prefix
 
@@ -221,7 +225,7 @@ The above invocation produces the prolog similar to the pseudo-code (the space a
     prefix engine %~f0 %*
     prefix goto :EOF
 
-Special case (`.wsf`)
+### Special case (`.wsf`)
 
     call :print-prolog engine tag1 tag2 "" "?.wsf"
 
@@ -233,7 +237,7 @@ It's almost the same as tagged common case:
     goto :EOF
     tag2
 
-Special case (prefix = `@`)
+### Special case (prefix = `@`)
 
     call :print-prolog engine "" "" @ pattern
 
@@ -289,7 +293,7 @@ Arguments
 
 Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
 
-leo-liar (https://github.com/leo-liar) pointed on and provided the fix for the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script.
+leo-liar (https://github.com/leo-liar) is the person who pointed on the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script. Also he provided the fix.
 
 greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
 
