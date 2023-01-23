@@ -39,11 +39,11 @@ If no port specified, :443 is assumed.
 
 openssl s_client -connect "$1" </dev/null \
 | openssl x509 -dates -noout \
-| awk -v s0="$( date +%s )" -F= '
+| awk -v s0="$( date -u +%s )" -F= '
 /notBefore/ { t1 = $2 }
 /notAfter/  { t2 = $2 }
 
-function epoch(v) { "date -d\"" v "\" +%s" | getline v; return v }
+function epoch(v) { "date -d\"" v "\" -u +%s" | getline v; return v }
 function days(v1, v2) { return (v2 - v1) / 86400 }
 
 END {
