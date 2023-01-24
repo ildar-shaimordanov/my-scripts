@@ -33,13 +33,15 @@ If no port specified, :443 is assumed.
 	exit 1
 }
 
-[ -n "$VERBOSE" ] || exec 2>/dev/null
+age_openssl() {
+	[ -n "$VERBOSE" ] || exec 2>/dev/null
 
-[ "$1" = "${1%:*}" ] && set -- "$1:443"
+	openssl s_client -connect "$1" </dev/null \
+	| openssl x509 -dates -noout
+}
 
-openssl s_client -connect "$1" </dev/null \
-| openssl x509 -dates -noout \
-| awk -v s0="$( date -u +%s )" -F= '
+validate_age() {
+	awk -v s0="$( date -u +%s )" -F= '
 /notBefore/ { t1 = $2 }
 /notAfter/  { t2 = $2 }
 
@@ -67,6 +69,13 @@ END {
 		printf "Expired: %.0f\n", -n
 	}
 }'
+}
+
+# =========================================================================
+
+[ "$1" = "${1%:*}" ] && set -- "$1:443"
+
+age_openssl "$1" | validate_age
 
 # =========================================================================
 
