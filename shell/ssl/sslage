@@ -33,12 +33,66 @@ If no port specified, :443 is assumed.
 	exit 1
 }
 
+# =========================================================================
+
+# uncomment it for testing with the standard curl
+#PATH="C:/Windows/System32;$PATH"
+
+AGE=""
+
+for n in openssl curl
+do
+	command -v $n >/dev/null && {
+		AGE="$n"
+		break
+	}
+done
+
+[ -n "$AGE" ] || {
+	echo "No proper tool" >&2
+	exit 127
+}
+
+# =========================================================================
+
+age() {
+	age_$AGE "$@"
+}
+
 age_openssl() {
 	[ -n "$VERBOSE" ] || exec 2>/dev/null
 
 	openssl s_client -connect "$1" </dev/null \
 	| openssl x509 -dates -noout
 }
+
+age_curl() {
+	info="$( age_curl_info "$1" )"
+	cert="$( echo "$info" | age_curl_cert )"
+
+	[ -n "$cert" ] || {
+		echo "$info" >&2
+		return 1
+	}
+
+	[ -n "$VERBOSE" ] && echo "$cert" >&2
+
+	echo "$cert" \
+	| sed -n \
+	's/.*start date: /notBefore=/p; s/.*expire date: /notAfter=/p'
+}
+
+age_curl_info() {
+	curl -s -v -I "https://$1" 2>&1 \
+	| grep '^\*'
+}
+
+age_curl_cert() {
+	sed -n \
+	'/^\* Server certificate:$/ { p; :a; n; /^\* [ \t]/ s/^//p; ta }'
+}
+
+# =========================================================================
 
 validate_age() {
 	awk -v s0="$( date -u +%s )" -F= '
@@ -88,7 +142,7 @@ END {
 
 [ "$1" = "${1%:*}" ] && set -- "$1:443"
 
-age_openssl "$1" | validate_age
+age "$1" | validate_age
 
 # =========================================================================
 
