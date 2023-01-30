@@ -101,18 +101,10 @@ validate_age() {
 
 # Workaround to enable the script working properly in busybox also,
 # because of the limited set of the supported TIME formats there.
-function bb_compat(v, m, a) {
-	m["Jan"] = "01"; m["Feb"] = "02"; m["Mar"] = "03";
-	m["Apr"] = "04"; m["May"] = "05"; m["Jun"] = "06";
-	m["Jul"] = "07"; m["Aug"] = "08"; m["Sep"] = "09";
-	m["Oct"] = "10"; m["Nov"] = "11"; m["Dec"] = "12";
-
-	split(v, a, " ")
-	v = a[4] "-" m[a[1]] "-" a[2] " " a[3]
-	return v
-}
+function bb_compat(v) { sub(/ \S+$/, "", v); return v }
 
 function epoch(v) { "date -d\"" v "\" -u +%s" | getline v; return v }
+
 function days(v1, v2) { return (v2 - v1) / 86400 }
 
 END {
