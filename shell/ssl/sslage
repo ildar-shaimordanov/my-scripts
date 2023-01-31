@@ -106,7 +106,7 @@ function bb_compat(v) { sub(/ \S+$/, "", v); return v }
 
 function epoch(v) { "date -d\"" v "\" -u +%s" | getline v; return v }
 
-function days(v1, v2) { return (v2 - v1) / 86400 }
+function days(v1, v2) { return int((v2 - v1) / 86400) }
 
 END {
 	if ( ! t1 || ! t2 ) {
@@ -120,13 +120,13 @@ END {
 	s1 = epoch(bb_compat(t1))
 	s2 = epoch(bb_compat(t2))
 
-	printf "Days: %.0f\n", days(s1, s2)
+	print "Days:", days(s1, s2)
 
 	n = days(s0, s2)
 	if ( n > 0 ) {
-		printf "Left: %.0f\n", n
+		print "Left:", n
 	} else {
-		printf "Expired: %.0f\n", -n
+		print "Expired:", -n
 	}
 }'
 }
