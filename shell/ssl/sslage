@@ -96,6 +96,53 @@ age_curl_cert() {
 # =========================================================================
 
 validate_age() {
+	validate_age_sh
+}
+
+validate_age_sh() {
+	s1=""
+	s2=""
+
+	while IFS='=' read -r m t
+	do
+		[ "$m" = "notBefore" ] || [ "$m" = "notAfter" ] || continue
+
+		s="$( date -d "${t% *}" -u +%s )"
+
+		case "$m" in
+		notBefore ) t1="$t" ; s1="$s" ;;
+		notAfter  ) t2="$t" ; s2="$s" ;;
+		esac
+	done
+
+	if [ -z "$s1" ] || [ -z "$s2" ]
+	then
+		echo "Error: No data to validate" >&2
+		return 1
+	fi
+
+	s0="$( date -u +%s )"
+	n="$( days "$s0" "$s2" )"
+
+	if [ "$n" -gt "0" ]
+	then
+		m="Left"
+	else
+		m="Expired"
+		n="$(( -n ))"
+	fi
+
+	echo "Since: $t1"
+	echo "Until: $t2"
+	echo "Days: $( days "$s1" "$s2" )"
+	echo "$m: $n"
+}
+
+days() {
+	echo "$(( ($2 - $1) / 86400 ))"
+}
+
+validate_age_awk() {
 	awk -v s0="$( date -u +%s )" -F= '
 /notBefore/ { t1 = $2 }
 /notAfter/  { t2 = $2 }
