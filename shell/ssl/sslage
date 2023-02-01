@@ -4,13 +4,28 @@
 #
 # Validate the domain certificate
 #
-# Displays the time period when the certificate is valid
-# Estimates the total number of days when the certificate is valid
-# Estimates the number of days left until the certificate expires
-#
 # Copyright (C) 2023 Ildar Shaimordanov
+# MIT License
 #
 # =========================================================================
+
+# +++
+#
+# # NAME
+#
+# `sslage` - validate the domain certificate
+#
+# # SYNOPSIS
+#
+#     sslage [-v] HOST[:PORT]
+#
+# # DESCRIPTION
+#
+# * Displays the time period when the certificate is valid
+# * Estimates the total number of days when the certificate is valid
+# * Estimates the number of days left until the certificate expires
+#
+# ---
 
 VERBOSE=""
 
@@ -27,15 +42,16 @@ shift $(( OPTIND-1 ))
 [ $# -gt 0 ] || {
 	echo "\
 Usage: $( basename "$0" ) [-v] HOST[:PORT]
-Display age of the SSL certificate.
+Display age of the host SSL certificate.
 If no port specified, :443 is assumed.
+Use the -v option to see the certificate details.
 "
 	exit 1
 }
 
 # =========================================================================
 
-# uncomment it for testing with the standard curl
+# uncomment it for testing with the curl embedded to Windows
 #PATH="C:/Windows/System32;$PATH"
 
 AGE=""
@@ -55,6 +71,21 @@ done
 
 # =========================================================================
 
+# +++
+#
+# ## Capturing the certificate dates
+#
+# `openssl` is the standard tool for testing certificates. That's the
+# simplest way to find out the certificate time period.
+#
+# There is the alternative way to recognize the SSL certificate
+# details. Calling `curl` verbosely allows us to capture the full
+# information about handshake and extract some details about the
+# certificate. If something goes wrong we show it immediately. Also
+# using the "-v" option we will be able to show the certificate details.
+#
+# ---
+
 age() {
 	[ "$1" = "${1%:*}" ] && set -- "$1:443"
 	age_$AGE "$1"
@@ -68,32 +99,48 @@ age_openssl() {
 }
 
 age_curl() {
-	info="$( age_curl_info "$1" )"
-	cert="$( echo "$info" | age_curl_cert )"
+	full_info="$( age_curl_full_info "$1" )"
+	cert_info="$( echo "$full_info" | age_curl_cert_info )"
 
-	[ -n "$cert" ] || {
-		echo "$info" >&2
+	[ -n "$cert_info" ] || {
+		echo "$full_info" >&2
 		return 1
 	}
 
-	[ -n "$VERBOSE" ] && echo "$cert" >&2
+	[ -n "$VERBOSE" ] && echo "$cert_info" >&2
 
-	echo "$cert" \
+	echo "$cert_info" \
 	| sed -n \
 	's/.*start date: /notBefore=/p; s/.*expire date: /notAfter=/p'
 }
 
-age_curl_info() {
+age_curl_full_info() {
 	curl -s -v -I "https://$1" 2>&1 \
 	| grep '^\*'
 }
 
-age_curl_cert() {
+age_curl_cert_info() {
 	sed -n \
 	'/^\* Server certificate:$/ { p; :a; n; /^\* [ \t]/ s/^//p; ta }'
 }
 
 # =========================================================================
+
+# +++
+#
+# ## Calculate the certificate age using `awk` or pure shell
+#
+# The certificate age is estimated as the number of the whole days. So,
+# if today is the last day of the certificate validity, it's assumed
+# that the certificate is expired already. I tried to implement the
+# script POSIX-compliant as much as possible.
+#
+# Initially it's been the shell script with `awk` inline script having
+# almost 50% of the script size. Later I improved it and added the
+# function validating the certificate age implemented in pure shell. I
+# decided to leave the previous `awk`-based implementation. Just for fan.
+#
+# ---
 
 validate_age() {
 	validate_age_sh
@@ -181,6 +228,24 @@ END {
 # =========================================================================
 
 age "$1" | validate_age
+
+# =========================================================================
+
+# +++
+#
+# # SEE ALSO
+#
+# * https://github.com/shakibamoshiri/curly
+# Their "check SSL date" does almost the same thing the current project
+# implements.
+#
+# # LICENSE
+#
+# Copyright 2023 Ildar Shaimordanov
+#
+#     MIT License
+#
+# ---
 
 # =========================================================================
 

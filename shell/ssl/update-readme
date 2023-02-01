@@ -1,0 +1,13 @@
+#!/bin/sh
+
+exec <sslage
+exec >README.md
+
+extract_doc() {
+	sed -n '
+	/^# [+]\{3\}$/,/^# [-]\{3\}$/!d
+	/^# [+-]\{3\}$/! s/^# \?//p
+	'
+}
+
+extract_doc | git-md-toc -cut
