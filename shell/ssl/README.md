@@ -34,7 +34,7 @@ There is the alternative way to recognize the SSL certificate
 details. Calling `curl` verbosely allows us to capture the full
 information about handshake and extract some details about the
 certificate. If something goes wrong we show it immediately. Also
-using the "-v" option we will be able to show the certificate details.
+using the `-v` option we will be able to show the certificate details.
 
 
 ## Calculate the certificate age using `awk` or pure shell

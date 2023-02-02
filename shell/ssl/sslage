@@ -51,8 +51,10 @@ Use the -v option to see the certificate details.
 
 # =========================================================================
 
-# uncomment it for testing with the curl embedded to Windows
+# Uncomment one of the following line for testing under BusyBox or Cygwin
+# with the curl embedded to Windows
 #PATH="C:/Windows/System32;$PATH"
+#PATH="/cygdrive/c/Windows/System32:$PATH"
 
 AGE=""
 
@@ -82,7 +84,7 @@ done
 # details. Calling `curl` verbosely allows us to capture the full
 # information about handshake and extract some details about the
 # certificate. If something goes wrong we show it immediately. Also
-# using the "-v" option we will be able to show the certificate details.
+# using the `-v` option we will be able to show the certificate details.
 #
 # ---
 
@@ -102,10 +104,11 @@ age_curl() {
 	full_info="$( age_curl_full_info "$1" )"
 	cert_info="$( echo "$full_info" | age_curl_cert_info )"
 
-	[ -n "$cert_info" ] || {
+	if [ -z "$cert_info" ] && [ -n "$VERBOSE" ]
+	then
 		echo "$full_info" >&2
 		return 1
-	}
+	fi
 
 	[ -n "$VERBOSE" ] && echo "$cert_info" >&2
 
