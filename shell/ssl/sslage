@@ -104,11 +104,12 @@ age_curl() {
 	full_info="$( age_curl_full_info "$1" )"
 	cert_info="$( echo "$full_info" | age_curl_cert_info )"
 
-	if [ -z "$cert_info" ] && [ -n "$VERBOSE" ]
-	then
-		echo "$full_info" >&2
+	# Exit immediately if no certificate information is captured. When
+	# verbosity is enabled, handshake information is printed.
+	[ -n "$cert_info" ] || {
+		[ -n "$VERBOSE" ] && echo "$full_info" >&2
 		return 1
-	fi
+	}
 
 	[ -n "$VERBOSE" ] && echo "$cert_info" >&2
 
