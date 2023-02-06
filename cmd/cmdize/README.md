@@ -55,27 +55,55 @@ Converts a script into a batch file.
 
 # DESCRIPTION
 
-This tool converts a script into a batch file allowing to use the script like regular programs and batch scripts without invoking an executable engine explicitly and just typing the script name without extension. The resulting batch file is placed next to the original script.
+This tool converts a script into a batch file allowing to use the
+script like regular programs and batch scripts without invoking
+an executable engine explicitly and just typing the script name
+without extension. The resulting batch file is placed next to the
+original script.
 
-The new file consist of the body of the script prepended with the special header (or prolog) being the *polyglot* and having some tricks to be a valid code both for the batch and original script.
+The new file consist of the body of the script prepended with the
+special header (or prolog) being the *polyglot* and having some
+tricks to be a valid code both for the batch and original script.
 
-This tool is pure batch file. So there is limitation in processing files having Byte Order Mark (BOM). For example, it fail with high probability while processing a unicode encoded WSF-file with XML declaration.
+This tool is pure batch file. So there is limitation in processing
+files having Byte Order Mark (BOM). For example, it fail with high
+probability while processing a unicode encoded WSF-file with XML
+declaration.
 
-The *engine* term stands for the executable running the script. Not for all languages it's applicable. Depending the language, the engine can be set to any, none or one of predefined values. `/E DEFAULT` is the special engine that resets any previously set engines to the default value. The same result can be received with `/E ""`.
+The *engine* term stands for the executable running the script. Not
+for all languages it's applicable. Depending the language, the engine
+can be set to any, none or one of predefined values. `/E DEFAULT`
+is the special engine that resets any previously set engines to the
+default value. The same result can be received with `/E ""`.
 
-For WSF-scripts the engine is one of `CSCRIPT` and `WSCRIPT`. If XML declaration is presented (in the form like `<?xml...?>`), it must be in the most beginning of the file. Otherwise error is reported and the script is not cmdized.
+For WSF-scripts the engine is one of `CSCRIPT` and `WSCRIPT`. If XML
+declaration is presented (in the form like `<?xml...?>`), it must
+be in the most beginning of the file. Otherwise error is reported
+and the script is not cmdized.
 
-For JavaScript/JScript it can be one of `CSCRIPT`, `WSCRIPT` (for JScript5+), `CCHAKRA`, `WCHAKRA` (for JScript9 or Chakra) or any valid command with options to enable running NodeJS, ChakraCore, Rhino and so on (for example, `node`, `ch`, `java -jar rhino.jar`, respectively).
+For JavaScript/JScript it can be one of `CSCRIPT`, `WSCRIPT` (for
+JScript5+), `CCHAKRA`, `WCHAKRA` (for JScript9 or Chakra) or any
+valid command with options to enable running NodeJS, ChakraCore,
+Rhino and so on (for example, `node`, `ch`, `java -jar rhino.jar`,
+respectively).
 
-For VBScript there is choice from either `CSCRIPT` or `WSCRIPT`. If the script implements the statement `Option Explicit`, then it is commented to avoid the compilation error. The `/W` option creates the alternative runner embedding the script into a WSF-file. In this case that statement is not commented and left as is.
+For VBScript there is choice from either `CSCRIPT` or `WSCRIPT`. If
+the script implements the statement `Option Explicit`, then it is
+commented to avoid the compilation error. The `/W` option creates
+the alternative runner embedding the script into a WSF-file. In this
+case that statement is not commented and left as is.
 
-For Perl `/E CMDONLY` is the only applicable value. It's fake engine that is used for creating the pure batch file for putting it with the original script in PATH.
+For Perl `/E CMDONLY` is the only applicable value. It's fake engine
+that is used for creating the pure batch file for putting it with
+the original script in PATH.
 
-For Python `/E SHORT` specifies creation of a quite minimalistic runner file. Other values don't make sense.
+For Python `/E SHORT` specifies creation of a quite minimalistic
+runner file. Other values don't make sense.
 
 # DETAILS
 
-More description, more links, more details about implementation in this section.
+More description, more links, more details about implementation in
+this section.
 
 ## .au3, .a3x
 
@@ -98,18 +126,21 @@ More description, more links, more details about implementation in this section.
 * `/E CCHAKRA` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 * `/E WCHAKRA` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 
-With `/W` it's WSF within a batch file (with some specialties for WSF):
+With `/W` it's WSF within a batch file (with some specialties
+for WSF):
 
 * `/E CSCRIPT` for `cscript //nologo` (default)
 * `/E WSCRIPT` for `wscript //nologo`
 
-Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So JScript9 is not supported in WSF.
+Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So
+JScript9 is not supported in WSF.
 
 * http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 * http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
 * https://gist.github.com/ildar-shaimordanov/88d7a5544c0eeacaa3bc
 
-The following two links show my first steps in direction to create this script.
+The following two links show my first steps in direction to create
+this script.
 
 * https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter.html
 * https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter-2.html
@@ -118,17 +149,33 @@ The following two links show my first steps in direction to create this script.
 
 ## .php
 
-PHP is supposed to be used as a scripting language in Web. So to avoid possible conflicts with paths to dynamic libraries and to suppress HTTP headers, we use two options `-n` and `-q`, respectively.
+PHP is supposed to be used as a scripting language in Web. So to
+avoid possible conflicts with paths to dynamic libraries and to
+suppress HTTP headers, we use two options `-n` and `-q`, respectively.
 
 ## .pl
 
-The document below gives more details about `pl2bat.bat` and `runperl.bat`. In fact, those scripts are full-featured prototypes for this script. By default it acts as the first one but without supporting old DOSs. With the `/E CMDONLY` option it creates the tiny batch acting similar to `runperl.bat`.
+The document below gives more details about `pl2bat.bat` and
+`runperl.bat`. In fact, those scripts are full-featured prototypes
+for this script. By default it acts as the first one but without
+supporting old DOSs. With the `/E CMDONLY` option it creates the
+tiny batch acting similar to `runperl.bat`.
 
 * https://perldoc.perl.org/perlwin32
 
 ## .ps1
 
-Very-very-very complicated case. It's impossible to implement a pure hybrid. And too hard to implement a chimera. The resulting batch stores its filename and passed arguments in two environment variables `PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes powershell which tries to restore arguments, reads the file and invokes it. Also it is powered to continue working with STDIN properly. Powershell has two (at least known for me) ways to invoke another code: Invoke-Expression and invoke ScriptBlock. Both have their advandages and disadvantages. By default, Invoke-Expression is used. To give the users a choice between both, non-empty value in `PS1_ISB` enables ScriptBlock invocation.
+Very-very-very complicated case. It's too hard to implement a
+pure hybrid. And too hard to implement a chimera. The resulting
+batch stores its filename and passed arguments in two environment
+variables `PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes
+powershell which tries to restore arguments, reads the file and
+invokes it. Also it is powered to continue working with STDIN
+properly. Powershell has two (at least known for me) ways to invoke
+another code: Invoke-Expression and invoke ScriptBlock. Both have
+their advandages and disadvantages. By default, Invoke-Expression
+is used. To give the users a choice between both, non-empty value in
+`PS1_ISB` enables ScriptBlock invocation.
 
 * http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
 * http://stackoverflow.com/a/2611487/3627676
@@ -154,7 +201,8 @@ Pure VBScript within a batch file:
 * `/E CSCRIPT` for `cscript //nologo //e:vbscript` (default)
 * `/E WSCRIPT` for `wscript //nologo //e:vbscript`
 
-With `/W` it's WSF within a batch file (with some specialties for WSF):
+With `/W` it's WSF within a batch file (with some specialties
+for WSF):
 
 * `/E CSCRIPT` for `cscript //nologo` (default)
 * `/E WSCRIPT` for `wscript //nologo`
@@ -164,7 +212,11 @@ With `/W` it's WSF within a batch file (with some specialties for WSF):
 
 ## .wsf
 
-Hybridizing WSF the script looks for the XML declaration and makes it valid for running as batch. Also weird and undocumented trick with file extensions (`%~f0?.wsf`) is used to insist WSH to recognize the batch file as the WSF scenario. Honestly, the resulting file stops being well-formed XML file. However WSH chews it silently.
+Hybridizing WSF the script looks for the XML declaration and makes
+it valid for running as batch. Also weird and undocumented trick with
+file extensions (`%~f0?.wsf`) is used to insist WSH to recognize the
+batch file as the WSF scenario. Honestly, the resulting file stops
+being well-formed XML file. However WSH chews it silently.
 
 BOM fails cmdizing.
 
@@ -188,19 +240,24 @@ This section discovers all guts of the hybridization.
 
 ## `:print-extension-list`
 
-Prints the list of supported extensions. It is invoked by the `/L` option.
+Prints the list of supported extensions. It is invoked by the
+`/L` option.
 
 ## `:print-prolog`
 
-This internal subroutine is a real workhorse. It creates prologs. Depending on the passed arguments it produces different prologs.
+This internal subroutine is a real workhorse. It creates
+prologs. Depending on the passed arguments it produces different
+prologs.
 
 Arguments
 
 * `%1` - engine (the executable invoking the script)
-* `%2` - opening tag (used to hide batch commands wrapping them within tags)
+* `%2` - opening tag (used to hide batch commands wrapping them
+within tags)
 * `%3` - closing tag (ditto)
 * `%4` - prefix (used to hide batch commands in place)
-* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; `?.wsf` for WSF-files only
+* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; and `?.wsf`
+for WSF-files only
 
 ### Common case (tagged)
 
@@ -219,7 +276,8 @@ Both `tag1` and `tag2` are optional:
 
     call :print-prolog engine "" "" prefix
 
-The above invocation produces the prolog similar to the pseudo-code (the space after the prefix is here for readability reasons only):
+The above invocation produces the prolog similar to the pseudo-code
+(the space after the prefix here is for readability reasons only):
 
     prefix @echo off
     prefix engine %~f0 %*
@@ -241,13 +299,15 @@ It's almost the same as tagged common case:
 
     call :print-prolog engine "" "" @ pattern
 
-It has higher priority and is processed prior others producing a code similar to:
+It has higher priority and is processed prior others producing a
+code similar to:
 
     @engine pattern %* & @goto :EOF
 
 ## `:print-script-wsf`
 
-The companion for `:print-script-wsf-bat`. It prints the original file surrounded with WSF markup.
+The companion for `:print-script-wsf-bat`. It prints the original
+file surrounded with WSF markup.
 
 Arguments
 
@@ -256,7 +316,9 @@ Arguments
 
 ## `:print-script-wsf-bat`
 
-The purpose of this subroutine is to unify hybridizing a particular file as a WSF-file. It creates a temporary WSF-file with the content of the original file within and then hybridizes it.
+The purpose of this subroutine is to unify hybridizing a particular
+file as a WSF-file. It creates a temporary WSF-file with the content
+of the original file within and then hybridizes it.
 
 To this moment it is used only once - for VBScript.
 
@@ -276,10 +338,10 @@ Arguments
 The markers used specifically by this tool:
 
 * `U`     - to print usage only
-* `UH`    - to print help (the `/HELP` option)
-* `UHD`   - to print help in details (the `/HELP-MORE` option)
-* `UHDG`  - to print full help including internals (the `/HELP-DEVEL` option)
-* `UHDGR` - to print a text for a README file (the `/HELP-README` option)
+* `UH`    - to print help, `/HELP`
+* `UHD`   - to print help in details, `/HELP-MORE`
+* `UHDG`  - to print full help including internals, `/HELP-DEVEL`
+* `UHDGR` - to print a text for a README file, `/HELP-README`
 
 ## `:warn`
 
@@ -291,13 +353,21 @@ Arguments
 
 # AUTHORS and CONTRIBUTORS
 
-Ildar Shaimordanov is the main author maintaining the tool since 2014. First steps in this direction were made in 2009, when he created the `js2bat` script. Some stuff is invented by him, other is collected from different sources in the Internet.
+Ildar Shaimordanov is the main author maintaining the tool since
+2014. First steps in this direction were made in 2009, when he
+created the `js2bat` script. Some stuff is invented by him, other
+is collected from different sources in the Internet.
 
-leo-liar (https://github.com/leo-liar) is the person who pointed on the potential problem when some users who have UNIX tools in their PATH might call a different FIND.EXE which will break this script. Also he provided the fix.
+leo-liar (https://github.com/leo-liar) is the person who pointed
+on the potential problem when some users who have UNIX tools in
+their PATH might call a different FIND.EXE which will break this
+script. Also he provided the fix.
 
-greg zakharov (https://forum.script-coding.com/profile.php?id=27367) disputes and throws interesting ideas time to time.
+greg zakharov (https://forum.script-coding.com/profile.php?id=27367)
+disputes and throws interesting ideas time to time.
 
-Residents of the forum https://www.dostips.com/forum/ with whom the author has opportunity to discuss many aspects of batch scripting.
+Residents of the forum https://www.dostips.com/forum/ with whom the
+author has opportunity to discuss many aspects of batch scripting.
 
 # SEE ALSO
 
@@ -311,11 +381,13 @@ https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
 
 # ABOUT THIS PAGE
 
-This document is the part of the script and generated using the following command:
+This document is the part of the script and generated using the
+following command:
 
-    cmdize /help-readme | git-md-toc -cut > README.md
+    ./cmdize.bat /help-readme | git-md-toc -cut > README.md
 
-Any changes in the script are supposed to be replicated to this document file.
+Any changes in the script are supposed to be replicated to this
+document file.
 
 `git-md-toc` is the Perl script hosted here:
 
