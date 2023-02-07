@@ -30,11 +30,12 @@
 `openssl` is the standard tool for testing certificates. That's the
 simplest way to find out the certificate time period.
 
-There is the alternative way to recognize the SSL certificate
-details. Calling `curl` verbosely allows us to capture the full
-information about handshake and extract some details about the
-certificate. If something goes wrong we show it immediately. Also
-using the `-v` option we will be able to show the certificate details.
+There is alternative way to recognize the SSL certificate
+details. Calling `curl -v` allows us to capture the full information
+about SSL negotiation and extract some details about the certificate.
+
+The `-v` option is used for verbosity in both cases: to show the
+certificate details and to display error if something goes wrong.
 
 
 ## Calculate the certificate age using `awk` or pure shell
