@@ -12,14 +12,14 @@ DOS2UNIX=''
 UNIX2DOS=''
 
 CLIP_ENC=''
-ICONV=''
+ENCODING=''
 
 VERBOSELY=''
 
 # =========================================================================
 
 print_usage() {
-	echo "\
+	warn "\
 Copy data from and/or to the clipboard
 
 Usage:
@@ -46,12 +46,13 @@ Information options
 
 # shellcheck disable=SC3028
 print_version() {
+	exec 1>&2
 	exec 2>/dev/null
 	uname -s || cmd /c ver || echo "${OSTYPE:-${OS:-unknown}}"
-	printf 'imp=%s eol=%s enc=%s\n' \
-		"${CLIP_DEV:-${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}}" \
-		"${DOS2UNIX%% *},${UNIX2DOS%% *}" \
-		"${ICONV%% *}"
+	printf '%s=%s\n' \
+	imp "${CLIP_DEV:-${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}}" \
+	eol "$DOS2UNIX,$UNIX2DOS" \
+	enc "$ENCODING"
 }
 
 # =========================================================================
@@ -63,10 +64,6 @@ die() {
 
 warn() {
 	echo "$*">&2
-}
-
-not_supported() {
-	warn "$1 not supported"
 }
 
 # =========================================================================
@@ -88,7 +85,16 @@ putclip() {
 }
 
 posh() {
-	powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$*"
+	$CLIP_IMP -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$*"
+}
+
+# =========================================================================
+
+lookup_command() {
+	for n in "$@"
+	do
+		command -v "$n" && break
+	done
 }
 
 # =========================================================================
@@ -99,12 +105,12 @@ darwin*	) CLIP_OS=darwin ;;
 *	) CLIP_OS='' ;;
 esac
 
-if command -v xsel >/dev/null
+if CLIP_IMP="$( command -v xsel )"
 then
 	# Unixes: first attempt - preferable way
 	CLIP_GET='xsel --clipboard --output'
 	CLIP_PUT='xsel --clipboard --input'
-elif command -v xclip >/dev/null
+elif CLIP_IMP="$( command -v xclip )"
 then
 	# Unixes: second attempt - another way
 	CLIP_GET='xclip -selection clipboard -out'
@@ -112,60 +118,59 @@ then
 elif [ "$CLIP_OS" = "darwin" ]
 then
 	# OSX? It has its own way
-	command -v pbpaste >/dev/null && CLIP_GET='pbpaste'
-	command -v pbcopy  >/dev/null && CLIP_PUT='pbcopy'
+	CLIP_GET="$( command -v pbpaste )"
+	CLIP_PUT="$( command -v pbcopy  )"
 elif [ -c /dev/clipboard ]
 then
-	# Cygwin?
+	# Cygwin-like? They have special device
 	CLIP_DEV='/dev/clipboard'
 	CLIP_GET="cat - < $CLIP_DEV"
 	CLIP_PUT="cat - > $CLIP_DEV"
-elif [ "$OS" = "Windows_NT" ] && command -v powershell >/dev/null
+elif CLIP_IMP="$( lookup_command powershell pwsh )"
 then
-	# BusyBox, UnxUtils or something else similar?
-	CLIP_IMP='powershell'
+	# BusyBox, UnxUtils or something else?
 	CLIP_GET='getclip'
 	CLIP_PUT='putclip'
 fi
 
 # =========================================================================
 
-if command -v dos2unix >/dev/null
+DOS2UNIX="$( command -v dos2unix )"
+DOS2UNIX_OPTS=''
+
+UNIX2DOS="$( command -v unix2dos )"
+UNIX2DOS_OPTS=''
+
+if [ -z "$DOS2UNIX" ] || [ -z "$UNIX2DOS" ]
 then
-	DOS2UNIX=dos2unix
-elif command -v sed >/dev/null
-then
-	DOS2UNIX='sed "s/\r$//"'
-elif command -v awk >/dev/null
-then
-	DOS2UNIX='awk -v RS="\r?\n" -v ORS="\n" 1'
-elif command -v gawk >/dev/null
-then
-	DOS2UNIX='gawk -v RS="\r?\n" -v ORS="\n" 1'
+	cmd="$( lookup_command sed gsed awk gawk nawk mawk )"
 fi
 
-if command -v unix2dos >/dev/null
+if [ -z "$DOS2UNIX" ]
 then
-	UNIX2DOS=unix2dos
-elif command -v sed >/dev/null
-then
-	UNIX2DOS='sed "s/[^\r]$/&\r/"'
-elif command -v awk >/dev/null
-then
-	UNIX2DOS='awk -v RS="\r?\n" -v ORS="\r\n" 1'
-elif command -v gawk >/dev/null
-then
-	UNIX2DOS='gawk -v RS="\r?\n" -v ORS="\r\n" 1'
+	case "$cmd" in
+	*sed ) DOS2UNIX="$cmd" ; DOS2UNIX_OPTS='"s/\r$//"' ;;
+	*awk ) DOS2UNIX="$cmd" ; DOS2UNIX_OPTS='-v RS="\r?\n" -v ORS="\n" 1' ;;
+	esac
 fi
 
-# =========================================================================
-
-if command -v iconv >/dev/null
+if [ -z "$UNIX2DOS" ]
 then
-	ICONV='iconv'
+	case "$cmd" in
+	*sed ) UNIX2DOS="$cmd" ; UNIX2DOS_OPTS='"s/[^\r]$/&\r/"' ;;
+	*awk ) UNIX2DOS="$cmd" ; UNIX2DOS_OPTS='-v RS="\r?\n" -v ORS="\r\n" 1' ;;
+	esac
 fi
 
 # =========================================================================
+
+ENCODING="$( lookup_command iconv uconv )"
+
+# =========================================================================
+
+warn_not_supported() {
+	warn "$1 not supported"
+}
 
 while getopts ":hVvudf:t:c" arg
 do
@@ -174,13 +179,19 @@ do
 	V ) print_version ; exit ;;
 	v ) VERBOSELY=1 ;;
 
-	u ) CLIP_EOL="$DOS2UNIX" ; [ -n "$CLIP_EOL" ] || not_supported dos2unix ;;
-	d ) CLIP_EOL="$UNIX2DOS" ; [ -n "$CLIP_EOL" ] || not_supported unix2dos ;;
+	u )
+		CLIP_EOL="$DOS2UNIX"
+		CLIP_EOL_OPTS="$DOS2UNIX_OPTS"
+		[ -n "$CLIP_EOL" ] || warn_not_supported dos2unix ;;
+	d )
+		CLIP_EOL="$UNIX2DOS"
+		CLIP_EOL_OPTS="$UNIX2DOS_OPTS"
+		[ -n "$CLIP_EOL" ] || warn_not_supported unix2dos ;;
 
 	f | t | c )
-		CLIP_ENC="$ICONV"
+		CLIP_ENC="$ENCODING"
 		CLIP_ENC_OPTS="$CLIP_ENC_OPTS -$arg$OPTARG"
-		[ -n "$CLIP_ENC" ] || not_supported iconv
+		[ -n "$CLIP_ENC" ] || warn_not_supported iconv
 		;;
 
 	: ) die "Argument expected for -$OPTARG" ;;
@@ -194,15 +205,15 @@ then
 	# clp | ...
 	[ -n "$CLIP_GET" ] || die "No tool to paste from clipboard"
 	CLIP_RUN="$CLIP_GET"
-	CLIP_RUN="$CLIP_RUN${CLIP_EOL:+ | $CLIP_EOL}"
-	CLIP_RUN="$CLIP_RUN${CLIP_ENC:+ | $CLIP_ENC$CLIP_ENC_OPTS}"
+	CLIP_RUN="$CLIP_RUN${CLIP_EOL:+ | $CLIP_EOL $CLIP_EOL_OPTS}"
+	CLIP_RUN="$CLIP_RUN${CLIP_ENC:+ | $CLIP_ENC $CLIP_ENC_OPTS}"
 elif [ -t 1 ]
 then
 	# ... | clp
 	[ -n "$CLIP_PUT" ] || die "No tool to copy to clipboard"
 	CLIP_RUN="$CLIP_PUT"
-	CLIP_RUN="${CLIP_EOL:+$CLIP_EOL | }$CLIP_RUN"
-	CLIP_RUN="${CLIP_ENC:+$CLIP_ENC$CLIP_ENC_OPTS | }$CLIP_RUN"
+	CLIP_RUN="${CLIP_EOL:+$CLIP_EOL $CLIP_EOL_OPTS | }$CLIP_RUN"
+	CLIP_RUN="${CLIP_ENC:+$CLIP_ENC $CLIP_ENC_OPTS | }$CLIP_RUN"
 fi
 
 # ... | clp | ...
