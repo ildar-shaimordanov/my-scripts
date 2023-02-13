@@ -182,11 +182,13 @@ do
 	u )
 		CLIP_EOL="$DOS2UNIX"
 		CLIP_EOL_OPTS="$DOS2UNIX_OPTS"
-		[ -n "$CLIP_EOL" ] || warn_not_supported dos2unix ;;
+		[ -n "$CLIP_EOL" ] || warn_not_supported dos2unix
+		;;
 	d )
 		CLIP_EOL="$UNIX2DOS"
 		CLIP_EOL_OPTS="$UNIX2DOS_OPTS"
-		[ -n "$CLIP_EOL" ] || warn_not_supported unix2dos ;;
+		[ -n "$CLIP_EOL" ] || warn_not_supported unix2dos
+		;;
 
 	f | t | c )
 		CLIP_ENC="$ENCODING"
