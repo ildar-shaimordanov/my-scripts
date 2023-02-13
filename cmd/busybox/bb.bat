@@ -103,8 +103,7 @@ set "HISTFILE=%TEMP%\.ash_history"
 :: ========================================================================
 
 if defined BB_DEBUG (
-	@prompt +$S
-	@echo on
+	>&2 echo:+ "%BB_EXE%" sh "%~f0" %*
 )
 
 "%BB_EXE%" sh "%~f0" %*
@@ -140,7 +139,7 @@ case "$1" in
 	sh "$@"
 	;;
 * )
-	eval 'exec "$@"'
+	eval '"$@"'
 	;;
 esac
 
