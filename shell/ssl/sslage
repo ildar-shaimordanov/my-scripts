@@ -128,7 +128,7 @@ age_curl_full_info() {
 
 age_curl_cert_info() {
 	sed -n \
-	'/^\* Server certificate:$/ { p; :a; n; /^\* [ \t]/ s/^//p; ta }'
+	'/^\* Server certificate:$/ { p; :a; n; /^\* [ \t]/p; ba }'
 }
 
 # =========================================================================
