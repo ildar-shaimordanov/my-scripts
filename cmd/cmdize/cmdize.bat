@@ -720,10 +720,6 @@ goto :EOF
 ::H>
 ::H>https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
 ::H>
-::H>Tests are here:
-::H>
-::H>https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
-::H>
 
 :: ========================================================================
 

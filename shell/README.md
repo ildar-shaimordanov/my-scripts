@@ -1,5 +1,5 @@
-# bash scripts
+# shell scripts
 
-Collection of bash scripts
+Collection of shell scripts (both bash and POSIX-compatible)
 
 Demo scripts are under the `*/t` directories.

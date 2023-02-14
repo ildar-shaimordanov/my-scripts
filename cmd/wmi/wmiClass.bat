@@ -31,7 +31,6 @@
 ::History
 ::  2022/02/25: Version 1.2
 ::  https://www.dostips.com/forum/viewtopic.php?p=66294#p66294
-::  https://github.com/ildar-shaimordanov/cmd.scripts/blob/master/wmiClass.bat
 ::  - Rethink usage and rewrite the code significantly
 ::  - Add examples into the help message
 ::  - Add /where, the new option for limiting the number of records

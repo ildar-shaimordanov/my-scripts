@@ -375,10 +375,6 @@ Find this text and more details following by this link below.
 
 https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
 
-Tests are here:
-
-https://github.com/ildar-shaimordanov/my-scripts/tree/master/cmd/cmdize/t
-
 # ABOUT THIS PAGE
 
 This document is the part of the script and generated using the
