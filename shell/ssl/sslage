@@ -27,25 +27,52 @@
 #
 # ---
 
+# =========================================================================
+
+ME="$( basename "$0" )"
+
 VERBOSE=""
+
+# =========================================================================
+
+print_usage() {
+	warn "\
+Usage: $ME [-v] HOST[:PORT]
+Display age of the host SSL certificate.
+If no port specified, :443 is assumed.
+Use the -v option to see the certificate details.
+"
+}
+
+# =========================================================================
+
+die() {
+	warn "${*-Died!}"
+	exit 1
+}
+
+warn() {
+	info "${*-Warning!}" >&2
+}
+
+info() {
+	printf '%s\n' "$@"
+}
+
+# =========================================================================
 
 while getopts ":v" opt
 do
 	case "$opt" in
 	v ) VERBOSE=1 ;;
-	* ) echo "Illegal option: $OPTARG" >&2 ; exit 1 ;;
+	* ) die "Illegal option: $OPTARG" ;;
 	esac
 done
 
 shift $(( OPTIND-1 ))
 
 [ $# -gt 0 ] || {
-	echo "\
-Usage: $( basename "$0" ) [-v] HOST[:PORT]
-Display age of the host SSL certificate.
-If no port specified, :443 is assumed.
-Use the -v option to see the certificate details.
-"
+	print_usage
 	exit 1
 }
 
@@ -66,10 +93,7 @@ do
 	}
 done
 
-[ -n "$AGE" ] || {
-	echo "No proper tool" >&2
-	exit 127
-}
+[ -n "$AGE" ] || die "No proper tool"
 
 # =========================================================================
 
@@ -108,12 +132,12 @@ age_curl() {
 	# Exit immediately if no certificate information is captured. When
 	# verbosity is enabled, SSL negotiation is printed.
 	[ -n "$cert_info" ] || {
-		[ -n "$VERBOSE" ] && echo "$full_info" >&2
+		[ -n "$VERBOSE" ] && warn "$full_info"
 		return 1
 	}
 
 	# Print the certificate details, when verbosity is on.
-	[ -n "$VERBOSE" ] && echo "$cert_info" >&2
+	[ -n "$VERBOSE" ] && warn "$cert_info"
 
 	# Extract dates and convert output to the openssl-like view.
 	echo "$cert_info" \
@@ -145,7 +169,7 @@ age_curl_cert_info() {
 # Initially it's been the shell script with `awk` inline script having
 # almost 50% of the script size. Later I improved it and added the
 # function validating the certificate age implemented in pure shell. I
-# decided to leave the previous `awk`-based implementation. Just for fan.
+# decided to keep the previous `awk`-based implementation. Just for fan.
 #
 # ---
 
@@ -171,8 +195,7 @@ validate_age_sh() {
 
 	if [ -z "$s1" ] || [ -z "$s2" ]
 	then
-		echo "Error: No data to validate" >&2
-		return 1
+		die "Error: No data to validate"
 	fi
 
 	s0="$( date -u +%s )"

@@ -48,7 +48,7 @@ script POSIX-compliant as much as possible.
 Initially it's been the shell script with `awk` inline script having
 almost 50% of the script size. Later I improved it and added the
 function validating the certificate age implemented in pure shell. I
-decided to leave the previous `awk`-based implementation. Just for fan.
+decided to keep the previous `awk`-based implementation. Just for fan.
 
 
 # SEE ALSO
