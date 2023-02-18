@@ -39,7 +39,7 @@ Converts a script into a batch file.
 
     cmdize /help | /help-more | /help-devel | /help-readme
     cmdize /list
-    cmdize [/e ENGINE] [/p] FILE ...
+    cmdize [/e ENGINE] [/x EXTENSION] [/p] FILE ...
 
 # OPTIONS
 
@@ -49,6 +49,7 @@ Converts a script into a batch file.
 * `/help-readme` - Generate a text for a README file
 * `/list` - Show the list of supported file extensions and specific options.
 * `/e` - Set the engine for using as the script runner.
+* `/x` - Set another extension to consider another file type.
 * `/p` - Display on standard output instead of creating a new file.
 
 # DESCRIPTION
@@ -123,9 +124,6 @@ These engines create js-bat hybrid:
 * `/e wscript` for `wscript //nologo //e:javascript`
 * `/e cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 * `/e wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
-
-Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So
-JScript9 is not supported in WSF.
 
 * http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 * http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
@@ -242,7 +240,7 @@ The markers used specifically by this tool:
 
 ## `:print-info-extension-list`
 
-Prints the list of supported extensions, `/list`.
+Prints the list of supported extensions with `/list`.
 
 ## `:print-info-help`
 
@@ -255,10 +253,10 @@ Arguments
 The markers used specifically by this tool:
 
 * `U`     - to print usage only
-* `UH`    - to print help, `/help`
-* `UHD`   - to print help in details, `/help-more`
-* `UHDG`  - to print full help including internals, `/help-devel`
-* `UHDGR` - to print a text for a README file, `/help-readme`
+* `UH`    - to print help with `/help`
+* `UHD`   - to print help in details with `/help-more`
+* `UHDG`  - to print all internals with `/help-devel`
+* `UHDGR` - to print a text for a README file with `/help-readme`
 
 ## `:print-hybrid-prolog`
 

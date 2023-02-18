@@ -4,7 +4,7 @@
 ::U>
 ::U>    cmdize /help | /help-more | /help-devel | /help-readme
 ::U>    cmdize /list
-::U>    cmdize [/e ENGINE] [/p] FILE ...
+::U>    cmdize [/e ENGINE] [/x EXTENSION] [/p] FILE ...
 ::U>
 ::U># OPTIONS
 ::U>
@@ -14,6 +14,7 @@
 ::U>* `/help-readme` - Generate a text for a README file
 ::U>* `/list` - Show the list of supported file extensions and specific options.
 ::U>* `/e` - Set the engine for using as the script runner.
+::U>* `/x` - Set another extension to consider another file type.
 ::U>* `/p` - Display on standard output instead of creating a new file.
 ::U>
 
@@ -103,6 +104,7 @@ set "CMDIZE_ERROR=0"
 set "CMDIZE_WRAP="
 set "CMDIZE_ENGINE="
 set "CMDIZE_MAYBE=>"
+set "CMDIZE_USE="
 set "CMDIZE_EXT="
 
 :cmdize_loop_begin
@@ -121,6 +123,13 @@ if /i "%~1" == "/p" (
 	goto :cmdize_loop_begin
 )
 
+if /i "%~1" == "/x" (
+	set "CMDIZE_USE=%~2"
+	shift /1
+	shift /1
+	goto :cmdize_loop_begin
+)
+
 if not exist "%~f1" (
 	set "CMDIZE_ERROR=1"
 	call :warn File not found: "%~1"
@@ -128,7 +137,16 @@ if not exist "%~f1" (
 	goto :cmdize_loop_begin
 )
 
-set "CMDIZE_EXT=%~x1"
+if defined CMDIZE_USE if not "%CMDIZE_USE:~0,1%" == "." (
+	call :warn Replace "%CMDIZE_USE%" with ".%CMDIZE_USE%"
+	set "CMDIZE_USE=.%CMDIZE_USE%"
+)
+
+if defined CMDIZE_USE (
+	set "CMDIZE_EXT=%CMDIZE_USE%"
+) else (
+	set "CMDIZE_EXT=%~x1"
+)
 
 if not defined CMDIZE_EXT (
 	set "CMDIZE_ERROR=1"
@@ -240,9 +258,6 @@ goto :EOF
 ::D>* `/e wscript` for `wscript //nologo //e:javascript`
 ::D>* `/e cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>* `/e wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
-::D>
-::D>Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So
-::D>JScript9 is not supported in WSF.
 ::D>
 ::D>* http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
@@ -366,7 +381,7 @@ goto :EOF
 
 :: ========================================================================
 
-::L>.py	[/e short]
+::L>.py
 
 ::D>## .py
 ::D>
@@ -376,12 +391,6 @@ goto :EOF
 
 :cmdize.py
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=python"
-
-if /i "%CMDIZE_ENGINE%" == "short" (
-	call :print-hybrid-prolog "%CMDIZE_ENGINE% -x" "" "" "@" "f0"
-	type "%~f1"
-	goto :EOF
-)
 
 echo:0^<0# : ^^
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "'''" "'''"
@@ -597,7 +606,7 @@ goto :EOF
 
 ::G>## `:print-info-extension-list`
 ::G>
-::G>Prints the list of supported extensions, `/list`.
+::G>Prints the list of supported extensions with `/list`.
 ::G>
 
 :print-info-extension-list
@@ -617,10 +626,10 @@ goto :EOF
 ::G>The markers used specifically by this tool:
 ::G>
 ::G>* `U`     - to print usage only
-::G>* `UH`    - to print help, `/help`
-::G>* `UHD`   - to print help in details, `/help-more`
-::G>* `UHDG`  - to print full help including internals, `/help-devel`
-::G>* `UHDGR` - to print a text for a README file, `/help-readme`
+::G>* `UH`    - to print help with `/help`
+::G>* `UHD`   - to print help in details with `/help-more`
+::G>* `UHDG`  - to print all internals with `/help-devel`
+::G>* `UHDGR` - to print a text for a README file with `/help-readme`
 ::G>
 
 :print-info-help
