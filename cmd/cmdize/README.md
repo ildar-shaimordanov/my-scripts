@@ -15,19 +15,18 @@
   * [.ps1](#ps1)
   * [.py](#py)
   * [.rb](#rb)
-  * [.sh, .bash](#sh-bash)
+  * [.sh](#sh)
   * [.vbs](#vbs)
   * [.wsf](#wsf)
 * [Hybridization internals](#hybridization-internals)
-  * [`:print-extension-list`](#print-extension-list)
-  * [`:print-prolog`](#print-prolog)
+  * [`:print-info`](#print-info)
+  * [`:print-info-extension-list`](#print-info-extension-list)
+  * [`:print-info-help`](#print-info-help)
+  * [`:print-hybrid-prolog`](#print-hybrid-prolog)
     * [Common case (tagged)](#common-case-tagged)
     * [Common case (prefixed)](#common-case-prefixed)
     * [Special case (`.wsf`)](#special-case-wsf)
     * [Special case (prefix = `@`)](#special-case-prefix--)
-  * [`:print-script-wsf`](#print-script-wsf)
-  * [`:print-script-wsf-bat`](#print-script-wsf-bat)
-  * [`:print-usage`](#print-usage)
   * [`:warn`](#warn)
 * [AUTHORS and CONTRIBUTORS](#authors-and-contributors)
 * [SEE ALSO](#see-also)
@@ -38,20 +37,19 @@ Converts a script into a batch file.
 
 # USAGE
 
-    cmdize /HELP | /HELP-MORE | /HELP-DEVEL | /HELP-README
-    cmdize /L
-    cmdize [/W] [/E engine] [/P] file ...
+    cmdize /help | /help-more | /help-devel | /help-readme
+    cmdize /list
+    cmdize [/e ENGINE] [/p] FILE ...
 
 # OPTIONS
 
-* `/HELP`        - Show this help and description.
-* `/HELP-MORE`   - Show more details.
-* `/HELP-DEVEL`  - Show extremely detailed help including internal details.
-* `/HELP-README` - Generate a text for a README file
-* `/L` - Show the list of supported file extensions and applicable options.
-* `/E` - Set an engine for using as a the script runner.
-* `/W` - Set the alternative engine (for VBScript only).
-* `/P` - Display on standard output instead of creating a new file.
+* `/help`        - Show this help and description.
+* `/help-more`   - Show more details.
+* `/help-devel`  - Show extremely detailed help including internal details.
+* `/help-readme` - Generate a text for a README file
+* `/list` - Show the list of supported file extensions and specific options.
+* `/e` - Set the engine for using as the script runner.
+* `/p` - Display on standard output instead of creating a new file.
 
 # DESCRIPTION
 
@@ -89,9 +87,7 @@ respectively).
 
 For VBScript there is choice from either `CSCRIPT` or `WSCRIPT`. If
 the script implements the statement `Option Explicit`, then it is
-commented to avoid the compilation error. The `/W` option creates
-the alternative runner embedding the script into a WSF-file. In this
-case that statement is not commented and left as is.
+commented to avoid the compilation error.
 
 For Perl `/E CMDONLY` is the only applicable value. It's fake engine
 that is used for creating the pure batch file for putting it with
@@ -121,16 +117,12 @@ this section.
 
 ## .js
 
-* `/E CSCRIPT` for `cscript //nologo //e:javascript` (default)
-* `/E WSCRIPT` for `wscript //nologo //e:javascript`
-* `/E CCHAKRA` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
-* `/E WCHAKRA` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+These engines create js-bat hybrid:
 
-With `/W` it's WSF within a batch file (with some specialties
-for WSF):
-
-* `/E CSCRIPT` for `cscript //nologo` (default)
-* `/E WSCRIPT` for `wscript //nologo`
+* `/e cscript` for `cscript //nologo //e:javascript`
+* `/e wscript` for `wscript //nologo //e:javascript`
+* `/e cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+* `/e wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 
 Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So
 JScript9 is not supported in WSF.
@@ -158,8 +150,7 @@ suppress HTTP headers, we use two options `-n` and `-q`, respectively.
 The document below gives more details about `pl2bat.bat` and
 `runperl.bat`. In fact, those scripts are full-featured prototypes
 for this script. By default it acts as the first one but without
-supporting old DOSs. With the `/E CMDONLY` option it creates the
-tiny batch acting similar to `runperl.bat`.
+supporting old DOSs.
 
 * https://perldoc.perl.org/perlwin32
 
@@ -189,23 +180,17 @@ is used. To give the users a choice between both, non-empty value in
 
 * https://stackoverflow.com/questions/35094778
 
-## .sh, .bash
+## .sh
 
 * http://forum.script-coding.com/viewtopic.php?id=11535
 * http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
 
 ## .vbs
 
-Pure VBScript within a batch file:
+Pure VBScript within a batch file (vbs-bat hybrid):
 
-* `/E CSCRIPT` for `cscript //nologo //e:vbscript` (default)
-* `/E WSCRIPT` for `wscript //nologo //e:vbscript`
-
-With `/W` it's WSF within a batch file (with some specialties
-for WSF):
-
-* `/E CSCRIPT` for `cscript //nologo` (default)
-* `/E WSCRIPT` for `wscript //nologo`
+* `/e cscript` for `cscript //nologo //e:vbscript`
+* `/e wscript` for `wscript //nologo //e:vbscript`
 
 * http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
 * http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
@@ -238,12 +223,44 @@ further it becomes:
 
 This section discovers all guts of the hybridization.
 
-## `:print-extension-list`
+## `:print-info`
 
-Prints the list of supported extensions. It is invoked by the
-`/L` option.
+Extract the marked data and print.
 
-## `:print-prolog`
+Arguments
+
+* `%1` - the marker
+
+The markers used specifically by this tool:
+
+* `U`     - to print usage only
+* `UH`    - to print help, `/help`
+* `UHD`   - to print help in details, `/help-more`
+* `UHDG`  - to print full help including internals, `/help-devel`
+* `UHDGR` - to print a text for a README file, `/help-readme`
+* `L`     - to print a list of supported extensions, `/list`
+
+## `:print-info-extension-list`
+
+Prints the list of supported extensions, `/list`.
+
+## `:print-info-help`
+
+Prints different parts of the documentation.
+
+Arguments
+
+* `%1` - the marker
+
+The markers used specifically by this tool:
+
+* `U`     - to print usage only
+* `UH`    - to print help, `/help`
+* `UHD`   - to print help in details, `/help-more`
+* `UHDG`  - to print full help including internals, `/help-devel`
+* `UHDGR` - to print a text for a README file, `/help-readme`
+
+## `:print-hybrid-prolog`
 
 This internal subroutine is a real workhorse. It creates
 prologs. Depending on the passed arguments it produces different
@@ -261,8 +278,8 @@ for WSF-files only
 
 ### Common case (tagged)
 
-    call :print-prolog engine
-    call :print-prolog engine tag1 tag2
+    call :print-hybrid-prolog engine
+    call :print-hybrid-prolog engine tag1 tag2
 
 Both `tag1` and `tag2` are optional:
 
@@ -274,7 +291,7 @@ Both `tag1` and `tag2` are optional:
 
 ### Common case (prefixed)
 
-    call :print-prolog engine "" "" prefix
+    call :print-hybrid-prolog engine "" "" prefix
 
 The above invocation produces the prolog similar to the pseudo-code
 (the space after the prefix here is for readability reasons only):
@@ -285,7 +302,7 @@ The above invocation produces the prolog similar to the pseudo-code
 
 ### Special case (`.wsf`)
 
-    call :print-prolog engine tag1 tag2 "" "?.wsf"
+    call :print-hybrid-prolog engine tag1 tag2 "" "?.wsf"
 
 It's almost the same as tagged common case:
 
@@ -297,51 +314,12 @@ It's almost the same as tagged common case:
 
 ### Special case (prefix = `@`)
 
-    call :print-prolog engine "" "" @ pattern
+    call :print-hybrid-prolog engine "" "" @ pattern
 
 It has higher priority and is processed prior others producing a
 code similar to:
 
     @engine pattern %* & @goto :EOF
-
-## `:print-script-wsf`
-
-The companion for `:print-script-wsf-bat`. It prints the original
-file surrounded with WSF markup.
-
-Arguments
-
-* `%1` - filename
-* `%2` - language
-
-## `:print-script-wsf-bat`
-
-The purpose of this subroutine is to unify hybridizing a particular
-file as a WSF-file. It creates a temporary WSF-file with the content
-of the original file within and then hybridizes it.
-
-To this moment it is used only once - for VBScript.
-
-Arguments
-
-* `%1` - filename
-* `%2` - language
-
-## `:print-usage`
-
-Prints different parts of the documentation.
-
-Arguments
-
-* `%1` - the marker
-
-The markers used specifically by this tool:
-
-* `U`     - to print usage only
-* `UH`    - to print help, `/HELP`
-* `UHD`   - to print help in details, `/HELP-MORE`
-* `UHDG`  - to print full help including internals, `/HELP-DEVEL`
-* `UHDGR` - to print a text for a README file, `/HELP-README`
 
 ## `:warn`
 

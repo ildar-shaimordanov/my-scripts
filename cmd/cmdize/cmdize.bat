@@ -2,20 +2,19 @@
 ::U>
 ::U># USAGE
 ::U>
-::U>    cmdize /HELP | /HELP-MORE | /HELP-DEVEL | /HELP-README
-::U>    cmdize /L
-::U>    cmdize [/W] [/E engine] [/P] file ...
+::U>    cmdize /help | /help-more | /help-devel | /help-readme
+::U>    cmdize /list
+::U>    cmdize [/e ENGINE] [/p] FILE ...
 ::U>
 ::U># OPTIONS
 ::U>
-::U>* `/HELP`        - Show this help and description.
-::U>* `/HELP-MORE`   - Show more details.
-::U>* `/HELP-DEVEL`  - Show extremely detailed help including internal details.
-::U>* `/HELP-README` - Generate a text for a README file
-::U>* `/L` - Show the list of supported file extensions and applicable options.
-::U>* `/E` - Set an engine for using as a the script runner.
-::U>* `/W` - Set the alternative engine (for VBScript only).
-::U>* `/P` - Display on standard output instead of creating a new file.
+::U>* `/help`        - Show this help and description.
+::U>* `/help-more`   - Show more details.
+::U>* `/help-devel`  - Show extremely detailed help including internal details.
+::U>* `/help-readme` - Generate a text for a README file
+::U>* `/list` - Show the list of supported file extensions and specific options.
+::U>* `/e` - Set the engine for using as the script runner.
+::U>* `/p` - Display on standard output instead of creating a new file.
 ::U>
 
 :: ========================================================================
@@ -56,9 +55,7 @@
 ::H>
 ::H>For VBScript there is choice from either `CSCRIPT` or `WSCRIPT`. If
 ::H>the script implements the statement `Option Explicit`, then it is
-::H>commented to avoid the compilation error. The `/W` option creates
-::H>the alternative runner embedding the script into a WSF-file. In this
-::H>case that statement is not commented and left as is.
+::H>commented to avoid the compilation error.
 ::H>
 ::H>For Perl `/E CMDONLY` is the only applicable value. It's fake engine
 ::H>that is used for creating the pure batch file for putting it with
@@ -71,32 +68,32 @@
 @echo off
 
 if "%~1" == "" (
-	call :print-usage U
+	call :print-info-help U
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP" (
-	call :print-usage UH
+if /i "%~1" == "/help" (
+	call :print-info-help UH
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP-MORE" (
-	call :print-usage UHD
+if /i "%~1" == "/help-more" (
+	call :print-info-help UHD
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP-DEVEL" (
-	call :print-usage UHDG
+if /i "%~1" == "/help-devel" (
+	call :print-info-help UHDG
 	goto :EOF
 )
 
-if /i "%~1" == "/HELP-README" (
-	call :print-usage UHDGR
+if /i "%~1" == "/help-readme" (
+	call :print-info-help UHDGR
 	goto :EOF
 )
 
-if /i "%~1" == "/L" (
-	call :print-extension-list
+if /i "%~1" == "/list" (
+	call :print-info-extension-list
 	goto :EOF
 )
 
@@ -106,28 +103,19 @@ set "CMDIZE_ERROR=0"
 set "CMDIZE_WRAP="
 set "CMDIZE_ENGINE="
 set "CMDIZE_MAYBE=>"
+set "CMDIZE_EXT="
 
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
 
-if /i "%~1" == "/W" (
-	set "CMDIZE_WRAP=1"
-	shift /1
-	goto :cmdize_loop_begin
-)
-
-if /i "%~1" == "/E" (
-	if /i "%~2" == "default" (
-		set "CMDIZE_ENGINE="
-	) else (
-		set "CMDIZE_ENGINE=%~2"
-	)
+if /i "%~1" == "/e" (
+	set "CMDIZE_ENGINE=%~2"
 	shift /1
 	shift /1
 	goto :cmdize_loop_begin
 )
 
-if /i "%~1" == "/P" (
+if /i "%~1" == "/p" (
 	set "CMDIZE_MAYBE=& rem "
 	shift /1
 	goto :cmdize_loop_begin
@@ -140,15 +128,27 @@ if not exist "%~f1" (
 	goto :cmdize_loop_begin
 )
 
-findstr /i /b /l ":cmdize%~x1" "%~f0" >nul || (
+set "CMDIZE_EXT=%~x1"
+
+if not defined CMDIZE_EXT (
 	set "CMDIZE_ERROR=1"
-	call :warn Unsupported extension: "%~1"
+	call :warn Empty extension for "%~1"
 	shift /1
 	goto :cmdize_loop_begin
 )
 
-call :cmdize%~x1 "%~1" %CMDIZE_MAYBE% "%~dpn1.bat"
+findstr /i /x /l ":cmdize%CMDIZE_EXT%" "%~f0" >nul || (
+	set "CMDIZE_ERROR=1"
+	call :warn Unsupported extension: "%CMDIZE_EXT%"
+	shift /1
+	goto :cmdize_loop_begin
+)
+
+setlocal
+call :cmdize%CMDIZE_EXT% "%~1" %CMDIZE_MAYBE% "%~dpn1.bat"
+endlocal
 if errorlevel 1 set "CMDIZE_ERROR=1"
+
 shift /1
 goto :cmdize_loop_begin
 
@@ -162,37 +162,57 @@ goto :cmdize_loop_begin
 
 :: ========================================================================
 
+::L>.au3
+::L>.a3x
+
 ::D>## .au3, .a3x
 ::D>
+
 :cmdize.au3
 :cmdize.a3x
-call :print-prolog AutoIt3 "" "" ";"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=AutoIt3"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" ";"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.ahk
 
 ::D>## .ahk
 ::D>
+
 :cmdize.ahk
-call :print-prolog AutoHotKey "" "" ";"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=AutoHotKey"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" ";"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.hta
+::L>.htm
+::L>.html
 
 ::D>## .hta, .htm, .html
 ::D>
 ::D>* http://forum.script-coding.com/viewtopic.php?pid=79322#p79322
 ::D>
+
 :cmdize.hta
 :cmdize.htm
 :cmdize.html
-call :print-prolog "start mshta" "<!-- :" ": -->"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=start mshta"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "<!-- :" ": -->"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.jl
 
 ::D>## .jl
 ::D>
@@ -200,25 +220,26 @@ goto :EOF
 ::D>* https://docs.julialang.org/en/v1/base/punctuation/
 ::D>* https://forum.script-coding.com/viewtopic.php?pid=150262#p150262
 ::D>
+
 :cmdize.jl
-call :print-prolog julia "0<#= :" "=#0;"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=julia"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "0<#= :" "=#0;"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
 
+::L>.js	[/e cscript|wscript|cchakra|wchakra|ch|node|...]
+
 ::D>## .js
 ::D>
-::D>* `/E CSCRIPT` for `cscript //nologo //e:javascript` (default)
-::D>* `/E WSCRIPT` for `wscript //nologo //e:javascript`
-::D>* `/E CCHAKRA` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
-::D>* `/E WCHAKRA` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+::D>These engines create js-bat hybrid:
 ::D>
-::D>With `/W` it's WSF within a batch file (with some specialties
-::D>for WSF):
-::D>
-::D>* `/E CSCRIPT` for `cscript //nologo` (default)
-::D>* `/E WSCRIPT` for `wscript //nologo`
+::D>* `/e cscript` for `cscript //nologo //e:javascript`
+::D>* `/e wscript` for `wscript //nologo //e:javascript`
+::D>* `/e cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+::D>* `/e wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>
 ::D>Unfortunately, no easy way to wrap JScript9 (or Chakra) into WSF. So
 ::D>JScript9 is not supported in WSF.
@@ -233,36 +254,40 @@ goto :EOF
 ::D>* https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter.html
 ::D>* https://with-love-from-siberia.blogspot.com/2009/07/js2bat-converter-2.html
 ::D>
-:cmdize.js	[/w] [/e cscript|wscript|cchakra|wchakra|ch|node|...]
+
+:cmdize.js
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-if defined CMDIZE_WRAP (
-	call :print-script-wsf-bat "%~f1" javascript
-	goto :EOF
-)
-
-for %%e in ( "%CMDIZE_ENGINE%" ) do for %%s in (
+for %%s in (
 	"cscript cscript javascript"
 	"wscript wscript javascript"
 	"cchakra cscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
 	"wchakra wscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
-) do for /f "tokens=1,2,3" %%a in ( "%%~s" ) do if "%%~e" == "%%~a" (
-	call :print-prolog "%%~b //nologo //e:%%~c" "0</*! ::" "*/0;"
-	type "%~f1"
+) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
+	set "CMDIZE_ENGINE=%%~b //nologo //e:%%~c"
 )
 
-goto :EOF
-
-:: ========================================================================
-
-::D>## .kix
-::D>
-:cmdize.kix
-call :print-prolog kix32 "" "" ";"
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "0</*! ::" "*/0;"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.kix
+
+::D>## .kix
+::D>
+
+:cmdize.kix
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=kix32"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" ";"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
+::L>.php
 
 ::D>## .php
 ::D>
@@ -270,35 +295,39 @@ goto :EOF
 ::D>avoid possible conflicts with paths to dynamic libraries and to
 ::D>suppress HTTP headers, we use two options `-n` and `-q`, respectively.
 ::D>
+
 :cmdize.php
-call :print-prolog "php -n -q" "<?php/* :" "*/ ?>"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=php -n -q"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "<?php/* :" "*/ ?>"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.pl
 
 ::D>## .pl
 ::D>
 ::D>The document below gives more details about `pl2bat.bat` and
 ::D>`runperl.bat`. In fact, those scripts are full-featured prototypes
 ::D>for this script. By default it acts as the first one but without
-::D>supporting old DOSs. With the `/E CMDONLY` option it creates the
-::D>tiny batch acting similar to `runperl.bat`.
+::D>supporting old DOSs.
 ::D>
 ::D>* https://perldoc.perl.org/perlwin32
 ::D>
-:cmdize.pl	[/e cmdonly]
-if /i "%CMDIZE_ENGINE%" == "cmdonly" (
-	call :print-prolog "perl -x -S" "" "" "@" "dpn0.pl"
-	goto :EOF
-)
 
-call :print-prolog "perl -x -S" "@rem = '--*-Perl-*--" "@rem ';"
+:cmdize.pl
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=perl -x -S"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "@rem = '--*-Perl-*--" "@rem ';"
 echo:#!perl
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.ps1
 
 ::D>## .ps1
 ::D>
@@ -317,7 +346,10 @@ goto :EOF
 ::D>* http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
 ::D>* http://stackoverflow.com/a/2611487/3627676
 ::D>
+
 :cmdize.ps1
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command"
+
 echo:^<# :
 echo:@echo off
 echo:setlocal
@@ -326,7 +358,7 @@ echo:rem executed using ScriptBlock instead of Invoke-Expression as default.
 echo:set "PS1_ISB="
 echo:set "PS1_FILE=%%~f0"
 echo:set "PS1_ARGS=%%*"
-echo:powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;$a=@(@(if($a.count){$a})|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''});$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
+echo:%CMDIZE_ENGINE% "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;$a=@(@(if($a.count){$a})|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''});$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
@@ -334,76 +366,90 @@ goto :EOF
 
 :: ========================================================================
 
+::L>.py	[/e short]
+
 ::D>## .py
 ::D>
 ::D>* http://stackoverflow.com/a/29881143/3627676
 ::D>* http://stackoverflow.com/a/17468811/3627676
 ::D>
-:cmdize.py	[/e short]
+
+:cmdize.py
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=python"
+
 if /i "%CMDIZE_ENGINE%" == "short" (
-	call :print-prolog "python -x" "" "" "@" "f0"
+	call :print-hybrid-prolog "%CMDIZE_ENGINE% -x" "" "" "@" "f0"
 	type "%~f1"
 	goto :EOF
 )
+
 echo:0^<0# : ^^
-call :print-prolog python "'''" "'''"
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "'''" "'''"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
+
+::L>.rb
 
 ::D>## .rb
 ::D>
 ::D>* https://stackoverflow.com/questions/35094778
 ::D>
+
 :cmdize.rb
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=ruby"
+
 echo:@break #^^
-call :print-prolog ruby "=begin" "=end"
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "=begin" "=end"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
 
-::D>## .sh, .bash
+::L>.sh
+
+::D>## .sh
 ::D>
 ::D>* http://forum.script-coding.com/viewtopic.php?id=11535
 ::D>* http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
 ::D>
+
 :cmdize.sh
-:cmdize.bash
-call :print-prolog bash ": << '____CMD____'" "____CMD____"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=sh"
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" ": << '____CMD____'" "____CMD____"
 type "%~f1"
 goto :EOF
 
 :: ========================================================================
 
+::L>.vbs	[/e cscript|wscript|...]
+
 ::D>## .vbs
 ::D>
-::D>Pure VBScript within a batch file:
+::D>Pure VBScript within a batch file (vbs-bat hybrid):
 ::D>
-::D>* `/E CSCRIPT` for `cscript //nologo //e:vbscript` (default)
-::D>* `/E WSCRIPT` for `wscript //nologo //e:vbscript`
-::D>
-::D>With `/W` it's WSF within a batch file (with some specialties
-::D>for WSF):
-::D>
-::D>* `/E CSCRIPT` for `cscript //nologo` (default)
-::D>* `/E WSCRIPT` for `wscript //nologo`
+::D>* `/e cscript` for `cscript //nologo //e:vbscript`
+::D>* `/e wscript` for `wscript //nologo //e:vbscript`
 ::D>
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
 ::D>
-:cmdize.vbs	[/w] [/e cscript|wscript]
+
+:cmdize.vbs
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
 
-if defined CMDIZE_WRAP (
-	call :print-script-wsf-bat "%~f1" vbscript
-	goto :EOF
+for %%s in (
+	"cscript cscript vbscript"
+	"wscript wscript vbscript"
+) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
+	set "CMDIZE_ENGINE=%%~b //nologo //e:%%~c"
 )
 
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
 for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
-	call :print-prolog "%CMDIZE_ENGINE% //nologo //e:vbscript" "" "" "::'%%~s"
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" "::'%%~s"
 )
 del /q "%TEMP%\%~n0.$$"
 
@@ -453,6 +499,8 @@ goto :EOF
 
 :: ========================================================================
 
+::L>.wsf	[/e cscript|wscript]
+
 ::D>## .wsf
 ::D>
 ::D>Hybridizing WSF the script looks for the XML declaration and makes
@@ -477,8 +525,16 @@ goto :EOF
 ::D>
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33963#p33963
 ::D>
-:cmdize.wsf	[/e cscript|wscript]
+
+:cmdize.wsf
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+
+for %%s in (
+	"cscript cscript"
+	"wscript wscript"
+) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
+	set "CMDIZE_ENGINE=%%~b //nologo"
+)
 
 for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
 	set "CMDIZE_ERROR_WSF="
@@ -494,7 +550,7 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	rem form acceptable by the batch file also.
 
 	echo:%%a?%%d :
-	call :print-prolog "%CMDIZE_ENGINE% //nologo" ": %%e?><!-- :" ": --%%c" "" "?.wsf"
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" ": %%e?><!-- :" ": --%%c" "" "?.wsf"
 
 	for /f "tokens=1,* delims=:" %%a in ( 'findstr /n /r "^" "%~f1"' ) do (
 		if %%a gtr 1 echo:%%b
@@ -502,7 +558,7 @@ for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do
 	goto :EOF
 )
 
-call :print-prolog "%CMDIZE_ENGINE% //nologo" "<!-- :" ": -->" "" "?.wsf"
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "<!-- :" ": -->" "" "?.wsf"
 type "%~f1"
 goto :EOF
 
@@ -515,18 +571,65 @@ goto :EOF
 
 :: ========================================================================
 
-::G>## `:print-extension-list`
+::G>## `:print-info`
 ::G>
-::G>Prints the list of supported extensions. It is invoked by the
-::G>`/L` option.
+::G>Extract the marked data and print.
 ::G>
-:print-extension-list
-for /f "tokens=1,* delims=." %%x in ( 'findstr /i /r "^:cmdize[.][0-9a-z_][0-9a-z_]*\>" "%~f0"' ) do echo:.%%~y
+::G>Arguments
+::G>
+::G>* `%1` - the marker
+::G>
+::G>The markers used specifically by this tool:
+::G>
+::G>* `U`     - to print usage only
+::G>* `UH`    - to print help, `/help`
+::G>* `UHD`   - to print help in details, `/help-more`
+::G>* `UHDG`  - to print full help including internals, `/help-devel`
+::G>* `UHDGR` - to print a text for a README file, `/help-readme`
+::G>* `L`     - to print a list of supported extensions, `/list`
+::G>
+
+:print-info
+for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
 goto :EOF
 
 :: ========================================================================
 
-::G>## `:print-prolog`
+::G>## `:print-info-extension-list`
+::G>
+::G>Prints the list of supported extensions, `/list`.
+::G>
+
+:print-info-extension-list
+call :print-info "L"
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-info-help`
+::G>
+::G>Prints different parts of the documentation.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - the marker
+::G>
+::G>The markers used specifically by this tool:
+::G>
+::G>* `U`     - to print usage only
+::G>* `UH`    - to print help, `/help`
+::G>* `UHD`   - to print help in details, `/help-more`
+::G>* `UHDG`  - to print full help including internals, `/help-devel`
+::G>* `UHDGR` - to print a text for a README file, `/help-readme`
+::G>
+
+:print-info-help
+call :print-info "%~1"
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-hybrid-prolog`
 ::G>
 ::G>This internal subroutine is a real workhorse. It creates
 ::G>prologs. Depending on the passed arguments it produces different
@@ -544,8 +647,8 @@ goto :EOF
 ::G>
 ::G>### Common case (tagged)
 ::G>
-::G>    call :print-prolog engine
-::G>    call :print-prolog engine tag1 tag2
+::G>    call :print-hybrid-prolog engine
+::G>    call :print-hybrid-prolog engine tag1 tag2
 ::G>
 ::G>Both `tag1` and `tag2` are optional:
 ::G>
@@ -557,7 +660,7 @@ goto :EOF
 ::G>
 ::G>### Common case (prefixed)
 ::G>
-::G>    call :print-prolog engine "" "" prefix
+::G>    call :print-hybrid-prolog engine "" "" prefix
 ::G>
 ::G>The above invocation produces the prolog similar to the pseudo-code
 ::G>(the space after the prefix here is for readability reasons only):
@@ -568,7 +671,7 @@ goto :EOF
 ::G>
 ::G>### Special case (`.wsf`)
 ::G>
-::G>    call :print-prolog engine tag1 tag2 "" "?.wsf"
+::G>    call :print-hybrid-prolog engine tag1 tag2 "" "?.wsf"
 ::G>
 ::G>It's almost the same as tagged common case:
 ::G>
@@ -580,20 +683,19 @@ goto :EOF
 ::G>
 ::G>### Special case (prefix = `@`)
 ::G>
-::G>    call :print-prolog engine "" "" @ pattern
+::G>    call :print-hybrid-prolog engine "" "" @ pattern
 ::G>
 ::G>It has higher priority and is processed prior others producing a
 ::G>code similar to:
 ::G>
 ::G>    @engine pattern %* & @goto :EOF
 ::G>
-:print-prolog
+
+:print-hybrid-prolog
 if "%~4" == "@" (
 	echo:@%~1 "%%~%~5" %%* ^& @goto :EOF
 	goto :EOF
 )
-
-setlocal
 
 set "tag=%~2"
 if defined tag (
@@ -613,71 +715,6 @@ if defined tag (
 	setlocal
 )
 
-endlocal
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:print-script-wsf`
-::G>
-::G>The companion for `:print-script-wsf-bat`. It prints the original
-::G>file surrounded with WSF markup.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - filename
-::G>* `%2` - language
-::G>
-:print-script-wsf
-echo:^<?xml version="1.0" ?^>
-echo:^<package^>^<job id="cmdized"^>^<script language="%~2"^>^<^![CDATA[
-type "%~f1"
-echo:]]^>^</script^>^</job^>^</package^>
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:print-script-wsf-bat`
-::G>
-::G>The purpose of this subroutine is to unify hybridizing a particular
-::G>file as a WSF-file. It creates a temporary WSF-file with the content
-::G>of the original file within and then hybridizes it.
-::G>
-::G>To this moment it is used only once - for VBScript.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - filename
-::G>* `%2` - language
-::G>
-:print-script-wsf-bat
-for %%f in ( "%TEMP%\%~n1.wsf" ) do (
-	call :print-script-wsf "%~f1" %~2 >"%%~ff"
-	call :cmdize.wsf "%%~ff"
-	del /f /q "%%~ff"
-)
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:print-usage`
-::G>
-::G>Prints different parts of the documentation.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - the marker
-::G>
-::G>The markers used specifically by this tool:
-::G>
-::G>* `U`     - to print usage only
-::G>* `UH`    - to print help, `/HELP`
-::G>* `UHD`   - to print help in details, `/HELP-MORE`
-::G>* `UHDG`  - to print full help including internals, `/HELP-DEVEL`
-::G>* `UHDGR` - to print a text for a README file, `/HELP-README`
-::G>
-:print-usage
-for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
 goto :EOF
 
 :: ========================================================================
@@ -690,6 +727,7 @@ goto :EOF
 ::G>
 ::G>* `%*` - a text for printing
 ::G>
+
 :warn
 >&2 echo:%~n0: %*
 goto :EOF
