@@ -267,8 +267,7 @@ prologs.
 Arguments
 
 * `%1` - engine (the executable invoking the script)
-* `%2` - opening tag (used to hide batch commands wrapping them
-within tags)
+* `%2` - opening tag (to hide batch commands wrapping within tags)
 * `%3` - closing tag (ditto)
 * `%4` - prefix (used to hide batch commands in place)
 * `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; and `?.wsf`

@@ -647,8 +647,7 @@ goto :EOF
 ::G>Arguments
 ::G>
 ::G>* `%1` - engine (the executable invoking the script)
-::G>* `%2` - opening tag (used to hide batch commands wrapping them
-::G>within tags)
+::G>* `%2` - opening tag (to hide batch commands wrapping within tags)
 ::G>* `%3` - closing tag (ditto)
 ::G>* `%4` - prefix (used to hide batch commands in place)
 ::G>* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; and `?.wsf`
