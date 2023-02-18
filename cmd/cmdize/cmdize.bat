@@ -104,7 +104,7 @@ set "CMDIZE_ERROR=0"
 set "CMDIZE_WRAP="
 set "CMDIZE_ENGINE="
 set "CMDIZE_MAYBE=>"
-set "CMDIZE_USE="
+set "CMDIZE_EXT_ALT="
 set "CMDIZE_EXT="
 
 :cmdize_loop_begin
@@ -124,10 +124,15 @@ if /i "%~1" == "/p" (
 )
 
 if /i "%~1" == "/x" (
-	set "CMDIZE_USE=%~2"
+	set "CMDIZE_EXT_ALT=%~2"
 	shift /1
 	shift /1
 	goto :cmdize_loop_begin
+)
+
+if defined CMDIZE_EXT_ALT if not "%CMDIZE_EXT_ALT:~0,1%" == "." (
+	call :warn Replace "%CMDIZE_EXT_ALT%" with ".%CMDIZE_EXT_ALT%"
+	set "CMDIZE_EXT_ALT=.%CMDIZE_EXT_ALT%"
 )
 
 if not exist "%~f1" (
@@ -137,13 +142,8 @@ if not exist "%~f1" (
 	goto :cmdize_loop_begin
 )
 
-if defined CMDIZE_USE if not "%CMDIZE_USE:~0,1%" == "." (
-	call :warn Replace "%CMDIZE_USE%" with ".%CMDIZE_USE%"
-	set "CMDIZE_USE=.%CMDIZE_USE%"
-)
-
-if defined CMDIZE_USE (
-	set "CMDIZE_EXT=%CMDIZE_USE%"
+if defined CMDIZE_EXT_ALT (
+	set "CMDIZE_EXT=%CMDIZE_EXT_ALT%"
 ) else (
 	set "CMDIZE_EXT=%~x1"
 )
