@@ -464,6 +464,14 @@ goto :EOF
 ::D>
 ::D>* https://stackoverflow.com/questions/35094778
 ::D>
+::D>By this link yet another solution is provided as well:
+::D>
+::D>    @rem = %Q{
+::D>    @echo off
+::D>    ruby "%~f0" %*
+::D>    goto :EOF
+::D>    }
+::D>
 ::D>Ruby supports one more way of hybridization:
 ::D>
 ::D>    @echo off

@@ -181,6 +181,14 @@ This solution is based on the following link:
 
 * https://stackoverflow.com/questions/35094778
 
+By this link yet another solution is provided as well:
+
+    @rem = %Q{
+    @echo off
+    ruby "%~f0" %*
+    goto :EOF
+    }
+
 Ruby supports one more way of hybridization:
 
     @echo off
