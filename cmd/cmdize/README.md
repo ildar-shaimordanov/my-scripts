@@ -107,6 +107,8 @@ These engines are special to create js-bat hybrid:
 * `/e :cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 * `/e :wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 
+By these links you can find more discussions and examples:
+
 * http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 * http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
 * https://gist.github.com/ildar-shaimordanov/88d7a5544c0eeacaa3bc
@@ -179,6 +181,8 @@ These engines are special to create vbs-bat hybrid:
 
 * `/e :cscript` for `cscript //nologo //e:vbscript`
 * `/e :wscript` for `wscript //nologo //e:vbscript`
+
+By these links you can find more discussions:
 
 * http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
 * http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
@@ -356,6 +360,5 @@ Any changes in the script are supposed to be replicated to this
 document file.
 
 `git-md-toc` is the Perl script hosted here:
-
 https://github.com/ildar-shaimordanov/git-markdown-toc
 

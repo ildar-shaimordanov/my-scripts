@@ -267,6 +267,8 @@ goto :EOF
 ::D>* `/e :cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>* `/e :wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>
+::D>By these links you can find more discussions and examples:
+::D>
 ::D>* http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
 ::D>* https://gist.github.com/ildar-shaimordanov/88d7a5544c0eeacaa3bc
@@ -497,6 +499,8 @@ goto :EOF
 ::D>
 ::D>* `/e :cscript` for `cscript //nologo //e:vbscript`
 ::D>* `/e :wscript` for `wscript //nologo //e:vbscript`
+::D>
+::D>By these links you can find more discussions:
 ::D>
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
@@ -851,7 +855,6 @@ goto :EOF
 ::R>document file.
 ::R>
 ::R>`git-md-toc` is the Perl script hosted here:
-::R>
 ::R>https://github.com/ildar-shaimordanov/git-markdown-toc
 ::R>
 
