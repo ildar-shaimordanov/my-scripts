@@ -9,7 +9,7 @@ my $lines;
 
 open my $fh, '<', $file;
 while ( <$fh> ) {
-	next unless /^ \s* call \s+ :print-prolog/x;
+	next unless /^ \s* call \s+ :print-hybrid-prolog/x;
 
 	s/\s*$//;
 

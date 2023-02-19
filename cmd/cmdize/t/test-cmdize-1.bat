@@ -5,23 +5,7 @@ setlocal
 set "test_dir=%TEMP%"
 ::set "test_dir=."
 
-echo:==== COMMON TESTS ====
-
-for /f %%x in ( '"%~dp0..\cmdize.bat" /L' ) do call :test_ext "%%~x"
-
-echo:==== SPECIAL TESTS ====
-
-call :test_ext .js
-call :test_ext .js "/e cchakra"
-
-call :test_ext .vbs
-call :test_ext .vbs "/w"
-
-call :test_ext .pl
-call :test_ext .pl "/e cmdonly"
-
-call :test_ext .py
-call :test_ext .py "/e short"
+for /f %%x in ( '"%~dp0..\cmdize.bat" /list' ) do call :test_ext "%%~x"
 
 goto :EOF
 
@@ -52,7 +36,7 @@ goto :EOF
 ::test.vbs::	Option Explicit:Dim a:a = 1
 
 ::test.wsf::<?xml?>
-::test.wsf::<job><script>WScript.Echo^("Hello"^)</script></job>
+::test.wsf::<job><script>WScript.Echo("Hello")</script></job>
 
 :: ========================================================================
 

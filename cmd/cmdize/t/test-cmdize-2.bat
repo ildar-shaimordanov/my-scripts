@@ -12,8 +12,8 @@ set "test_dir=%TEMP%"
 ::test.js::		ScriptEngineMinorVersion(),
 ::test.js::		ScriptEngineBuildVersion()
 ::test.js::	].join('.'));
-call :test_ext .js "/e cscript"
-call :test_ext .js "/e cchakra"
+call :test_ext .js "/e :cscript"
+call :test_ext .js "/e :cchakra"
 
 ::test.vbs::	Option Explicit
 ::test.vbs::
@@ -24,8 +24,8 @@ call :test_ext .js "/e cchakra"
 ::test.vbs::		ScriptEngineMinorVersion, _
 ::test.vbs::		ScriptEngineBuildVersion _
 ::test.vbs::	), ".")
-call :test_ext .vbs "/e cscript"
-call :test_ext .vbs "/w /e cscript"
+call :test_ext .vbs "/e :cscript"
+call :test_ext .vbs "/e :wscript"
 
 ::test.wsf::<?xml version="1.0" ?>
 ::test.wsf::<package><job id="wsf+bat">
@@ -50,7 +50,7 @@ call :test_ext .vbs "/w /e cscript"
 ::test.wsf::	), ".")
 ::test.wsf::]]></script>
 ::test.wsf::</job></package>
-call :test_ext .wsf "/e cscript"
+call :test_ext .wsf "/e :cscript"
 
 ::test.ps1::	"FILE: $Env:PS1_FILE"
 ::test.ps1::
