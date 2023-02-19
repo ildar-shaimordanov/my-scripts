@@ -23,48 +23,29 @@
 
 ::H># DESCRIPTION
 ::H>
-::H>This tool converts a script into a batch file allowing to use the
-::H>script like regular programs and batch scripts without invoking
-::H>an executable engine explicitly and just typing the script name
-::H>without extension. The resulting batch file is placed next to the
+::H>This script takes the original script and converts it to the
+::H>batch file. The final script is polyglot file (or hybrid) that is
+::H>interpreted as the batch script invoking the interpreter of the
 ::H>original script.
 ::H>
-::H>The new file consist of the body of the script prepended with the
-::H>special header (or prolog) being the *polyglot* and having some
-::H>tricks to be a valid code both for the batch and original script.
+::H>Here and further polyglots are called as hybrids (pure polyglots
+::H>implemented purely on syntax of batch and the particular language)
+::H>and chimeras (polyglots using some tricks like temporary files or
+::H>environment variables).
 ::H>
-::H>This tool is pure batch file. So there is limitation in processing
-::H>files having Byte Order Mark (BOM). For example, it fail with high
-::H>probability while processing a unicode encoded WSF-file with XML
-::H>declaration.
+::H>The portion of the batch code added to the body of the original
+::H>script is called prolog. And the process of adding it is called
+::H>hybridization.
 ::H>
-::H>The *engine* term stands for the executable running the script. Not
-::H>for all languages it's applicable. Depending the language, the engine
-::H>can be set to any, none or one of predefined values. `/E DEFAULT`
-::H>is the special engine that resets any previously set engines to the
-::H>default value. The same result can be received with `/E ""`.
+::H>There is example of jscript in batch:
 ::H>
-::H>For WSF-scripts the engine is one of `CSCRIPT` and `WSCRIPT`. If XML
-::H>declaration is presented (in the form like `<?xml...?>`), it must
-::H>be in the most beginning of the file. Otherwise error is reported
-::H>and the script is not cmdized.
+::H>    @if (1 == 0) @end /*
+::H>    @cscript //nologo //e:javascript "%~f0" %* & @goto :EOF
+::H>    */
+::H>    WScript.Echo("Hello");
 ::H>
-::H>For JavaScript/JScript it can be one of `CSCRIPT`, `WSCRIPT` (for
-::H>JScript5+), `CCHAKRA`, `WCHAKRA` (for JScript9 or Chakra) or any
-::H>valid command with options to enable running NodeJS, ChakraCore,
-::H>Rhino and so on (for example, `node`, `ch`, `java -jar rhino.jar`,
-::H>respectively).
-::H>
-::H>For VBScript there is choice from either `CSCRIPT` or `WSCRIPT`. If
-::H>the script implements the statement `Option Explicit`, then it is
-::H>commented to avoid the compilation error.
-::H>
-::H>For Perl `/E CMDONLY` is the only applicable value. It's fake engine
-::H>that is used for creating the pure batch file for putting it with
-::H>the original script in PATH.
-::H>
-::H>For Python `/E SHORT` specifies creation of a quite minimalistic
-::H>runner file. Other values don't make sense.
+::H>Follow the link to learn more about polyglots:
+::H>https://en.wikipedia.org/wiki/Polyglot_(computing)
 ::H>
 
 @echo off
@@ -275,16 +256,16 @@ goto :EOF
 
 :: ========================================================================
 
-::L>.js	[/e cscript|wscript|cchakra|wchakra|ch|node|...]
+::L>.js	[/e :cscript|:wscript|:cchakra|:wchakra|...]
 
 ::D>## .js
 ::D>
-::D>These engines create js-bat hybrid:
+::D>These engines are special to create js-bat hybrid:
 ::D>
-::D>* `/e cscript` for `cscript //nologo //e:javascript`
-::D>* `/e wscript` for `wscript //nologo //e:javascript`
-::D>* `/e cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
-::D>* `/e wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+::D>* `/e :cscript` for `cscript //nologo //e:javascript`
+::D>* `/e :wscript` for `wscript //nologo //e:javascript`
+::D>* `/e :cchakra` for `cscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
+::D>* `/e :wchakra` for `wscript //nologo //e:{16d51579-a30b-4c8b-a276-0ff4dc41e755}`
 ::D>
 ::D>* http://forum.script-coding.com/viewtopic.php?pid=79210#p79210
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33879#p33879
@@ -298,13 +279,13 @@ goto :EOF
 ::D>
 
 :cmdize.js
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=:cscript"
 
 for %%s in (
-	"cscript cscript javascript"
-	"wscript wscript javascript"
-	"cchakra cscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
-	"wchakra wscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
+	":cscript cscript javascript"
+	":wscript wscript javascript"
+	":cchakra cscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
+	":wchakra wscript {16d51579-a30b-4c8b-a276-0ff4dc41e755}"
 ) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
 	set "CMDIZE_ENGINE=%%~b //nologo //e:%%~c"
 )
@@ -394,16 +375,18 @@ goto :EOF
 ::D>## .ps1
 ::D>
 ::D>Very-very-very complicated case. It's too hard to implement a
-::D>pure hybrid. And too hard to implement a chimera. The resulting
-::D>batch stores its filename and passed arguments in two environment
-::D>variables `PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes
-::D>powershell which tries to restore arguments, reads the file and
-::D>invokes it. Also it is powered to continue working with STDIN
-::D>properly. Powershell has two (at least known for me) ways to invoke
-::D>another code: Invoke-Expression and invoke ScriptBlock. Both have
-::D>their advandages and disadvantages. By default, Invoke-Expression
-::D>is used. To give the users a choice between both, non-empty value in
-::D>`PS1_ISB` enables ScriptBlock invocation.
+::D>universal and pure hybrid. In fact it's chimera because it uses
+::D>environment variables and can fail and can require additional
+::D>movements from end user perspective. The resulting batch stores
+::D>its filename and passed arguments in two environment variables
+::D>`PS1_FILE` and `PS1_ARGS`, respectively. Then it invokes powershell
+::D>which tries to restore arguments, reads the file and invokes it. Also
+::D>it is powered to continue working with STDIN properly. Powershell
+::D>has two (at least known for me) ways to invoke another code:
+::D>Invoke-Expression and invoke ScriptBlock. Both have their advandages
+::D>and disadvantages. By default, Invoke-Expression is used. To give
+::D>the users a choice between both, non-empty value in `PS1_ISB`
+::D>enables ScriptBlock invocation.
 ::D>
 ::D>* http://blogs.msdn.com/b/jaybaz_ms/archive/2007/04/26/powershell-polyglot.aspx
 ::D>* http://stackoverflow.com/a/2611487/3627676
@@ -436,6 +419,12 @@ goto :EOF
 ::L>.py
 
 ::D>## .py
+::D>
+::D>Below is example of the smaller version for the python's prolog. But
+::D>it has less possibilities to extend the prolog with additional
+::D>commands if need.
+::D>
+::D>    @python -x "%~f0" %* & @goto :EOF
 ::D>
 ::D>* http://stackoverflow.com/a/29881143/3627676
 ::D>* http://stackoverflow.com/a/17468811/3627676
@@ -500,25 +489,25 @@ goto :EOF
 
 :: ========================================================================
 
-::L>.vbs	[/e cscript|wscript|...]
+::L>.vbs	[/e :cscript|:wscript|...]
 
 ::D>## .vbs
 ::D>
-::D>Pure VBScript within a batch file (vbs-bat hybrid):
+::D>These engines are special to create vbs-bat hybrid:
 ::D>
-::D>* `/e cscript` for `cscript //nologo //e:vbscript`
-::D>* `/e wscript` for `wscript //nologo //e:vbscript`
+::D>* `/e :cscript` for `cscript //nologo //e:vbscript`
+::D>* `/e :wscript` for `wscript //nologo //e:vbscript`
 ::D>
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=33882#p33882
 ::D>* http://www.dostips.com/forum/viewtopic.php?p=32485#p32485
 ::D>
 
 :cmdize.vbs
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=:cscript"
 
 for %%s in (
-	"cscript cscript vbscript"
-	"wscript wscript vbscript"
+	":cscript cscript vbscript"
+	":wscript wscript vbscript"
 ) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
 	set "CMDIZE_ENGINE=%%~b //nologo //e:%%~c"
 )
@@ -580,9 +569,14 @@ goto :EOF
 
 :: ========================================================================
 
-::L>.wsf	[/e cscript|wscript]
+::L>.wsf	[/e :cscript|:wscript]
 
 ::D>## .wsf
+::D>
+::D>These engines are special to create wsf-bat hybrid:
+::D>
+::D>* `/e :cscript` for `cscript //nologo`
+::D>* `/e :wscript` for `wscript //nologo`
 ::D>
 ::D>Hybridizing WSF the script looks for the XML declaration and makes
 ::D>it valid for running as batch. Also weird and undocumented trick with
@@ -608,11 +602,11 @@ goto :EOF
 ::D>
 
 :cmdize.wsf
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=cscript"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=:cscript"
 
 for %%s in (
-	"cscript cscript"
-	"wscript wscript"
+	":cscript cscript"
+	":wscript wscript"
 ) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
 	set "CMDIZE_ENGINE=%%~b //nologo"
 )
