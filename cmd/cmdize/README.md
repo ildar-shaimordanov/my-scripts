@@ -69,7 +69,8 @@ The portion of the batch code added to the body of the original
 script is called prolog. And the process of adding it is called
 hybridization.
 
-There is example of jscript in batch:
+Below is the example of javascript in batch applicable for Windows
+JScript only and not supporting other engines like NodeJS, Rhino etc.
 
     @if (1 == 0) @end /*
     @cscript //nologo //e:javascript "%~f0" %* & @goto :EOF
@@ -86,7 +87,11 @@ this section.
 
 ## .au3, .a3x
 
+* https://www.robvanderwoude.com/clevertricks.php
+
 ## .ahk
+
+AutoHotKey is based on the AutoIt syntax. So its hybrid is the same.
 
 ## .hta, .htm, .html
 
@@ -121,18 +126,22 @@ this script.
 
 ## .kix
 
+* https://www.robvanderwoude.com/clevertricks.php
+
 ## .php
 
 PHP is supposed to be used as a scripting language in Web. So to
 avoid possible conflicts with paths to dynamic libraries and to
 suppress HTTP headers, we use two options `-n` and `-q`, respectively.
 
+* https://www.php.net/manual/en/features.commandline.options.php
+
 ## .pl
 
 The document below gives more details about `pl2bat.bat` and
 `runperl.bat`. In fact, those scripts are full-featured prototypes
 for this script. By default it acts as the first one but without
-supporting old DOSs.
+support to old DOSes.
 
 * https://perldoc.perl.org/perlwin32
 
@@ -168,7 +177,18 @@ commands if need.
 
 ## .rb
 
+This solution is based on the following link:
+
 * https://stackoverflow.com/questions/35094778
+
+Ruby supports one more way of hybridization:
+
+    @echo off
+    ruby -x "%~f0" %*
+    goto :EOF
+    #!ruby
+
+* https://ruby-doc.com/docs/ProgrammingRuby/html/rubyworld.html
 
 ## .sh
 
@@ -181,6 +201,9 @@ These engines are special to create vbs-bat hybrid:
 
 * `/e :cscript` for `cscript //nologo //e:vbscript`
 * `/e :wscript` for `wscript //nologo //e:vbscript`
+
+If the script contains the statement `Option Explicit`, the last
+one is commented to avoid the compilation error.
 
 By these links you can find more discussions:
 

@@ -37,7 +37,8 @@
 ::H>script is called prolog. And the process of adding it is called
 ::H>hybridization.
 ::H>
-::H>There is example of jscript in batch:
+::H>Below is the example of javascript in batch applicable for Windows
+::H>JScript only and not supporting other engines like NodeJS, Rhino etc.
 ::H>
 ::H>    @if (1 == 0) @end /*
 ::H>    @cscript //nologo //e:javascript "%~f0" %* & @goto :EOF
@@ -173,6 +174,8 @@ goto :cmdize_loop_begin
 
 ::D>## .au3, .a3x
 ::D>
+::D>* https://www.robvanderwoude.com/clevertricks.php
+::D>
 
 :cmdize.au3
 :cmdize.a3x
@@ -192,6 +195,8 @@ goto :EOF
 ::L>.ahk
 
 ::D>## .ahk
+::D>
+::D>AutoHotKey is based on the AutoIt syntax. So its hybrid is the same.
 ::D>
 
 :cmdize.ahk
@@ -307,6 +312,8 @@ goto :EOF
 
 ::D>## .kix
 ::D>
+::D>* https://www.robvanderwoude.com/clevertricks.php
+::D>
 
 :cmdize.kix
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=kix32"
@@ -330,6 +337,8 @@ goto :EOF
 ::D>avoid possible conflicts with paths to dynamic libraries and to
 ::D>suppress HTTP headers, we use two options `-n` and `-q`, respectively.
 ::D>
+::D>* https://www.php.net/manual/en/features.commandline.options.php
+::D>
 
 :cmdize.php
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=php -n -q"
@@ -352,7 +361,7 @@ goto :EOF
 ::D>The document below gives more details about `pl2bat.bat` and
 ::D>`runperl.bat`. In fact, those scripts are full-featured prototypes
 ::D>for this script. By default it acts as the first one but without
-::D>supporting old DOSs.
+::D>support to old DOSes.
 ::D>
 ::D>* https://perldoc.perl.org/perlwin32
 ::D>
@@ -451,7 +460,18 @@ goto :EOF
 
 ::D>## .rb
 ::D>
+::D>This solution is based on the following link:
+::D>
 ::D>* https://stackoverflow.com/questions/35094778
+::D>
+::D>Ruby supports one more way of hybridization:
+::D>
+::D>    @echo off
+::D>    ruby -x "%~f0" %*
+::D>    goto :EOF
+::D>    #!ruby
+::D>
+::D>* https://ruby-doc.com/docs/ProgrammingRuby/html/rubyworld.html
 ::D>
 
 :cmdize.rb
@@ -499,6 +519,9 @@ goto :EOF
 ::D>
 ::D>* `/e :cscript` for `cscript //nologo //e:vbscript`
 ::D>* `/e :wscript` for `wscript //nologo //e:vbscript`
+::D>
+::D>If the script contains the statement `Option Explicit`, the last
+::D>one is commented to avoid the compilation error.
 ::D>
 ::D>By these links you can find more discussions:
 ::D>
