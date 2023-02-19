@@ -52,32 +52,32 @@
 @echo off
 
 if "%~1" == "" (
-	call :print-info-help U
+	call :print-info U
 	goto :EOF
 )
 
 if /i "%~1" == "/help" (
-	call :print-info-help UH
+	call :print-info UH
 	goto :EOF
 )
 
 if /i "%~1" == "/help-more" (
-	call :print-info-help UHD
+	call :print-info UHD
 	goto :EOF
 )
 
 if /i "%~1" == "/help-devel" (
-	call :print-info-help UHDG
+	call :print-info UHDG
 	goto :EOF
 )
 
 if /i "%~1" == "/help-readme" (
-	call :print-info-help UHDGR
+	call :print-info UHDGR
 	goto :EOF
 )
 
 if /i "%~1" == "/list" (
-	call :print-info-extension-list
+	call :print-info "L"
 	goto :EOF
 )
 
@@ -686,64 +686,6 @@ goto :EOF
 
 :: ========================================================================
 
-::G>## `:print-info`
-::G>
-::G>Extract the marked data and print.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - the marker
-::G>
-::G>The markers used specifically by this tool:
-::G>
-::G>* `U`     - to print usage only
-::G>* `UH`    - to print help, `/help`
-::G>* `UHD`   - to print help in details, `/help-more`
-::G>* `UHDG`  - to print full help including internals, `/help-devel`
-::G>* `UHDGR` - to print a text for a README file, `/help-readme`
-::G>* `L`     - to print a list of supported extensions, `/list`
-::G>
-
-:print-info
-for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:print-info-extension-list`
-::G>
-::G>Prints the list of supported extensions with `/list`.
-::G>
-
-:print-info-extension-list
-call :print-info "L"
-goto :EOF
-
-:: ========================================================================
-
-::G>## `:print-info-help`
-::G>
-::G>Prints different parts of the documentation.
-::G>
-::G>Arguments
-::G>
-::G>* `%1` - the marker
-::G>
-::G>The markers used specifically by this tool:
-::G>
-::G>* `U`     - to print usage only
-::G>* `UH`    - to print help with `/help`
-::G>* `UHD`   - to print help in details with `/help-more`
-::G>* `UHDG`  - to print all internals with `/help-devel`
-::G>* `UHDGR` - to print a text for a README file with `/help-readme`
-::G>
-
-:print-info-help
-call :print-info "%~1"
-goto :EOF
-
-:: ========================================================================
-
 ::G>## `:print-hybrid-prolog`
 ::G>
 ::G>This internal subroutine is a real workhorse. It creates
@@ -829,6 +771,30 @@ if defined tag (
 	setlocal
 )
 
+goto :EOF
+
+:: ========================================================================
+
+::G>## `:print-info`
+::G>
+::G>Extract and print different parts of the documentation.
+::G>
+::G>Arguments
+::G>
+::G>* `%1` - the marker
+::G>
+::G>The markers used specifically by this tool:
+::G>
+::G>* `U`     - to print usage only
+::G>* `UH`    - to print help with `/help`
+::G>* `UHD`   - to print help in details with `/help-more`
+::G>* `UHDG`  - to print all internals with `/help-devel`
+::G>* `UHDGR` - to print a text for a README file with `/help-readme`
+::G>* `L`     - to print a list of supported extensions with `/list`
+::G>
+
+:print-info
+for /f "tokens=1,* delims=>" %%a in ( 'findstr /r "^::[%~1]>" "%~f0"' ) do echo:%%b
 goto :EOF
 
 :: ========================================================================

@@ -19,14 +19,12 @@
   * [.vbs](#vbs)
   * [.wsf](#wsf)
 * [Hybridization internals](#hybridization-internals)
-  * [`:print-info`](#print-info)
-  * [`:print-info-extension-list`](#print-info-extension-list)
-  * [`:print-info-help`](#print-info-help)
   * [`:print-hybrid-prolog`](#print-hybrid-prolog)
     * [Common case (tagged)](#common-case-tagged)
     * [Common case (prefixed)](#common-case-prefixed)
     * [Special case (`.wsf`)](#special-case-wsf)
     * [Special case (prefix = `@`)](#special-case-prefix--)
+  * [`:print-info`](#print-info)
   * [`:warn`](#warn)
 * [AUTHORS and CONTRIBUTORS](#authors-and-contributors)
 * [SEE ALSO](#see-also)
@@ -251,43 +249,6 @@ further it becomes:
 
 This section discovers all guts of the hybridization.
 
-## `:print-info`
-
-Extract the marked data and print.
-
-Arguments
-
-* `%1` - the marker
-
-The markers used specifically by this tool:
-
-* `U`     - to print usage only
-* `UH`    - to print help, `/help`
-* `UHD`   - to print help in details, `/help-more`
-* `UHDG`  - to print full help including internals, `/help-devel`
-* `UHDGR` - to print a text for a README file, `/help-readme`
-* `L`     - to print a list of supported extensions, `/list`
-
-## `:print-info-extension-list`
-
-Prints the list of supported extensions with `/list`.
-
-## `:print-info-help`
-
-Prints different parts of the documentation.
-
-Arguments
-
-* `%1` - the marker
-
-The markers used specifically by this tool:
-
-* `U`     - to print usage only
-* `UH`    - to print help with `/help`
-* `UHD`   - to print help in details with `/help-more`
-* `UHDG`  - to print all internals with `/help-devel`
-* `UHDGR` - to print a text for a README file with `/help-readme`
-
 ## `:print-hybrid-prolog`
 
 This internal subroutine is a real workhorse. It creates
@@ -347,6 +308,23 @@ It has higher priority and is processed prior others producing a
 code similar to:
 
     @engine pattern %*
+
+## `:print-info`
+
+Extract and print different parts of the documentation.
+
+Arguments
+
+* `%1` - the marker
+
+The markers used specifically by this tool:
+
+* `U`     - to print usage only
+* `UH`    - to print help with `/help`
+* `UHD`   - to print help in details with `/help-more`
+* `UHDG`  - to print all internals with `/help-devel`
+* `UHDGR` - to print a text for a README file with `/help-readme`
+* `L`     - to print a list of supported extensions with `/list`
 
 ## `:warn`
 
