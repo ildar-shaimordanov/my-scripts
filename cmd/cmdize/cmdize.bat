@@ -4,7 +4,7 @@
 ::U>
 ::U>    cmdize /help | /help-more | /help-devel | /help-readme
 ::U>    cmdize /list
-::U>    cmdize [/e ENGINE] [/x EXTENSION] [/p] FILE ...
+::U>    cmdize [/w] [/e ENGINE] [/x EXTENSION] [/p] FILE ...
 ::U>
 ::U># OPTIONS
 ::U>
@@ -13,6 +13,7 @@
 ::U>* `/help-devel`  - Show extremely detailed help including internal details.
 ::U>* `/help-readme` - Generate a text for a README file
 ::U>* `/list` - Show the list of supported file extensions and specific options.
+::U>* `/w` - Create the simple batch invoker.
 ::U>* `/e` - Set the engine for using as the script runner.
 ::U>* `/x` - Set another extension to consider another file type.
 ::U>* `/p` - Display on standard output instead of creating a new file.
@@ -110,6 +111,12 @@ set "CMDIZE_EXT="
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
 
+if /i "%~1" == "/w" (
+	set "CMDIZE_WRAP=1"
+	shift /1
+	goto :cmdize_loop_begin
+)
+
 if /i "%~1" == "/e" (
 	set "CMDIZE_ENGINE=%~2"
 	shift /1
@@ -190,6 +197,11 @@ goto :cmdize_loop_begin
 :cmdize.a3x
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=AutoIt3"
 
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
+
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" ";"
 type "%~f1"
 goto :EOF
@@ -203,6 +215,11 @@ goto :EOF
 
 :cmdize.ahk
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=AutoHotKey"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" ";"
 type "%~f1"
@@ -224,6 +241,11 @@ goto :EOF
 :cmdize.html
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=start mshta"
 
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
+
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "<!-- :" ": -->"
 type "%~f1"
 goto :EOF
@@ -241,6 +263,11 @@ goto :EOF
 
 :cmdize.jl
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=julia"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "0<#= :" "=#0;"
 type "%~f1"
@@ -282,6 +309,11 @@ for %%s in (
 	set "CMDIZE_ENGINE=%%~b //nologo //e:%%~c"
 )
 
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
+
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "0</*! ::" "*/0;"
 type "%~f1"
 goto :EOF
@@ -295,6 +327,11 @@ goto :EOF
 
 :cmdize.kix
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=kix32"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" ";"
 type "%~f1"
@@ -313,6 +350,11 @@ goto :EOF
 
 :cmdize.php
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=php -n -q"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "<?php/* :" "*/ ?>"
 type "%~f1"
@@ -334,6 +376,11 @@ goto :EOF
 
 :cmdize.pl
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=perl -x -S"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "@rem = '--*-Perl-*--" "@rem ';"
 echo:#!perl
@@ -363,7 +410,12 @@ goto :EOF
 ::D>
 
 :cmdize.ps1
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=powershell -NoLogo -NoProfile -ExecutionPolicy Bypass"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE% -File" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 echo:^<# :
 echo:@echo off
@@ -373,7 +425,7 @@ echo:rem executed using ScriptBlock instead of Invoke-Expression as default.
 echo:set "PS1_ISB="
 echo:set "PS1_FILE=%%~f0"
 echo:set "PS1_ARGS=%%*"
-echo:%CMDIZE_ENGINE% "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;$a=@(@(if($a.count){$a})|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''});$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
+echo:%CMDIZE_ENGINE% -Command "$a=($Env:PS1_ARGS|sls -Pattern '\"(.*?)\"(?=\s|$)|(\S+)' -AllMatches).Matches;$a=@(@(if($a.count){$a})|%%%%{$_.value -Replace '^\"','' -Replace '\"$',''});$f=gc $Env:PS1_FILE -Raw;if($Env:PS1_ISB){$input|&{[ScriptBlock]::Create('rv f,a -Scope Script;'+$f).Invoke($a)}}else{$i=$input;iex $('$input=$i;$args=$a;rv i,f,a;'+$f)}"
 echo:goto :EOF
 echo:#^>
 type "%~f1"
@@ -392,6 +444,11 @@ goto :EOF
 :cmdize.py
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=python"
 
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
+
 echo:0^<0# : ^^
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "'''" "'''"
 type "%~f1"
@@ -408,6 +465,11 @@ goto :EOF
 
 :cmdize.rb
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=ruby"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 echo:@break #^^
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" "=begin" "=end"
@@ -426,6 +488,11 @@ goto :EOF
 
 :cmdize.sh
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=sh"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
 
 call :print-hybrid-prolog "%CMDIZE_ENGINE%" ": << '____CMD____'" "____CMD____"
 type "%~f1"
@@ -454,6 +521,11 @@ for %%s in (
 	"wscript wscript vbscript"
 ) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
 	set "CMDIZE_ENGINE=%%~b //nologo //e:%%~c"
+)
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
 )
 
 copy /y nul + nul /a "%TEMP%\%~n0.$$" /a 1>nul
@@ -543,6 +615,11 @@ for %%s in (
 	"wscript wscript"
 ) do for /f "tokens=1-3" %%a in ( "%%~s" ) do if /i "%CMDIZE_ENGINE%" == "%%~a" (
 	set "CMDIZE_ENGINE=%%~b //nologo"
+)
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
 )
 
 for /f "tokens=1,* delims=:" %%n in ( 'findstr /i /n /r "<?xml.*?>" "%~f1"' ) do for /f "tokens=1,2,* delims=?" %%a in ( "%%~o" ) do for /f "tokens=1,*" %%d in ( "%%b" ) do (
@@ -650,7 +727,7 @@ goto :EOF
 ::G>* `%2` - opening tag (to hide batch commands wrapping within tags)
 ::G>* `%3` - closing tag (ditto)
 ::G>* `%4` - prefix (used to hide batch commands in place)
-::G>* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; and `?.wsf`
+::G>* `%5` - pattern, usually `f0` or `dpn0.extension`or `?.wsf`
 ::G>for WSF-files only
 ::G>
 ::G>### Common case (tagged)
@@ -696,12 +773,12 @@ goto :EOF
 ::G>It has higher priority and is processed prior others producing a
 ::G>code similar to:
 ::G>
-::G>    @engine pattern %* & @goto :EOF
+::G>    @engine pattern %*
 ::G>
 
 :print-hybrid-prolog
 if "%~4" == "@" (
-	echo:@%~1 "%%~%~5" %%* ^& @goto :EOF
+	echo:@%~1 "%%~%~5" %%*
 	goto :EOF
 )
 

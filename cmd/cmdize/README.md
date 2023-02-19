@@ -39,7 +39,7 @@ Converts a script into a batch file.
 
     cmdize /help | /help-more | /help-devel | /help-readme
     cmdize /list
-    cmdize [/e ENGINE] [/x EXTENSION] [/p] FILE ...
+    cmdize [/w] [/e ENGINE] [/x EXTENSION] [/p] FILE ...
 
 # OPTIONS
 
@@ -48,6 +48,7 @@ Converts a script into a batch file.
 * `/help-devel`  - Show extremely detailed help including internal details.
 * `/help-readme` - Generate a text for a README file
 * `/list` - Show the list of supported file extensions and specific options.
+* `/w` - Create the simple batch invoker.
 * `/e` - Set the engine for using as the script runner.
 * `/x` - Set another extension to consider another file type.
 * `/p` - Display on standard output instead of creating a new file.
@@ -270,7 +271,7 @@ Arguments
 * `%2` - opening tag (to hide batch commands wrapping within tags)
 * `%3` - closing tag (ditto)
 * `%4` - prefix (used to hide batch commands in place)
-* `%5` - pattern `f0` or `dpn0.extension` if `%4` == `@`; and `?.wsf`
+* `%5` - pattern, usually `f0` or `dpn0.extension`or `?.wsf`
 for WSF-files only
 
 ### Common case (tagged)
@@ -316,7 +317,7 @@ It's almost the same as tagged common case:
 It has higher priority and is processed prior others producing a
 code similar to:
 
-    @engine pattern %* & @goto :EOF
+    @engine pattern %*
 
 ## `:warn`
 
