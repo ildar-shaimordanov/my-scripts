@@ -262,7 +262,6 @@ Arguments
 * `%3` - closing tag (ditto)
 * `%4` - prefix (used to hide batch commands in place)
 * `%5` - pattern, usually `f0` or `dpn0.extension`or `?.wsf`
-for WSF-files only
 
 ### Common case (tagged)
 

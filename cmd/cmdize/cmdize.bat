@@ -558,46 +558,43 @@ for /f "usebackq" %%s in ( "%TEMP%\%~n0.$$" ) do (
 )
 del /q "%TEMP%\%~n0.$$"
 
-for /f "tokens=1,* delims=:" %%r in ( 'findstr /n /r "^" "%~f1"' ) do (
-	rem Filtering and commenting "Option Explicit".
+:: Filtering and commenting "Option Explicit".
 
-	rem Weird and insane attempt to implement it using capabilities
-	rem of batch scripting only.
+:: Weird and insane attempt to implement it using capabilities of batch
+:: scripting only.
 
-	rem This ugly code tries as much as it can to recognize and
-	rem comment out this directive. It's flexible enough to find
-	rem the directive even the string contains an arbitrary amount
-	rem of whitespaces. It fails if both "Option" and "Explicit"
-	rem are located on different lines. But it's too hard to imagine
-	rem that someone practices such a strange coding style.
+:: This ugly code tries as much as it can to recognize and comment out
+:: this directive. It's flexible enough to find the directive even the
+:: string contains an arbitrary amount of whitespaces. It fails if both
+:: "Option" and "Explicit" are located on different lines. But it's too
+:: hard to imagine that someone practices such a strange coding style.
 
-	rem In the other hand, it still tries to recognize the rest of
-	rem the line after the directive and put it to the next line,
-	rem if it contains an executable code.
+:: In the other hand, it still tries to recognize the rest of the line
+:: after the directive and put it to the next line, if it contains an
+:: executable code.
 
-	if "%%s" == "" (
+for /f "tokens=1,* delims=:" %%r in ( 'findstr /n /r "^" "%~f1"' ) do if "%%s" == "" (
+	echo:%%s
+) else for /f "tokens=1,*" %%a in ( "%%s" ) do if /i not "%%a" == "Option" (
+	echo:%%s
+) else for /f "tokens=1,* delims=':	 " %%i in ( "%%b" ) do if /i not "%%i" == "Explicit" (
+	echo:%%s
+) else (
+	call :warn Commenting "Option Explicit" in "%~1"
+	echo:rem To avoid compilation error due to embedding into a batch file,
+	echo:rem the following line was commented out automatically.
+	set /p "=rem " <nul
+
+	if /i "%%b" == "Explicit" (
+		rem Option Explicit
 		echo:%%s
-	) else for /f "tokens=1,*" %%a in ( "%%s" ) do if /i not "%%a" == "Option" (
+	) else for /f "tokens=1,* delims='" %%i in ( "%%b" ) do if /i "%%i" == "Explicit" (
+		rem Option Explicit {QUOTE} ...
 		echo:%%s
-	) else for /f "tokens=1,* delims=':	 " %%i in ( "%%b" ) do if /i not "%%i" == "Explicit" (
-		echo:%%s
-	) else (
-		call :warn Commenting "Option Explicit" in "%~1"
-		echo:rem To avoid compilation error due to embedding into a batch file,
-		echo:rem the following line was commented out automatically.
-		set /p "=rem " <nul
-
-		if /i "%%b" == "Explicit" (
-			rem Option Explicit
-			echo:%%s
-		) else for /f "tokens=1,* delims='" %%i in ( "%%b" ) do if /i "%%i" == "Explicit" (
-			rem Option Explicit {QUOTE} ...
-			echo:%%s
-		) else for /f "tokens=1,* delims=:	 " %%i in ( "%%b" ) do if /i "%%i" == "Explicit" (
-			rem Option Explicit {COLON|TAB|SPACE} ...
-			echo:%%a %%i
-			echo:%%j
-		)
+	) else for /f "tokens=1,* delims=:	 " %%i in ( "%%b" ) do if /i "%%i" == "Explicit" (
+		rem Option Explicit {COLON|TAB|SPACE} ...
+		echo:%%a %%i
+		echo:%%j
 	)
 )
 goto :EOF
@@ -699,7 +696,6 @@ goto :EOF
 ::G>* `%3` - closing tag (ditto)
 ::G>* `%4` - prefix (used to hide batch commands in place)
 ::G>* `%5` - pattern, usually `f0` or `dpn0.extension`or `?.wsf`
-::G>for WSF-files only
 ::G>
 ::G>### Common case (tagged)
 ::G>
