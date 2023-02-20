@@ -47,7 +47,7 @@ for %%f in (
 
 :: Fail, if BusyBox not found and download not required
 if not defined BB_EXE if /i not "%~1" == "--download" (
-	>&2 echo:ERROR: BusyBox binary not found. Run "%~n0 --download" first.
+	call :error BusyBox binary not found. Run "%~n0 --download" first.
 	exit /b 1
 )
 
@@ -56,8 +56,8 @@ if not defined BB_EXE if /i not "%~1" == "--download" (
 :: Try to download
 if /i "%~1" == "--download" (
 	for %%p in ( "powershell.exe" ) do if "%%~$PATH:p" == "" (
-		>&2 echo:%%p is required
-		goto :EOF
+		call :error %%p is required
+		exit /b 1
 	)
 
 	set "BB_URL="
@@ -70,8 +70,8 @@ if /i "%~1" == "--download" (
 		set "BB_URL=https://frippery.org/files/busybox/busybox64.exe"
 		set "BB_DST=%~dp0busybox64.exe"
 	) else (
-		>&2 echo:win32 or win64 required
-		goto :EOF
+		call :error win32 or win64 required
+		exit /b 1
 	)
 
 	echo:Downloading started...
@@ -102,12 +102,20 @@ set "HISTFILE=%TEMP%\.ash_history"
 
 :: ========================================================================
 
-if defined BB_DEBUG (
-	>&2 echo:+ "%BB_EXE%" sh "%~f0" %*
-)
+if defined BB_DEBUG call :warn + "%BB_EXE%" sh "%~f0" %*
 
 "%BB_EXE%" sh "%~f0" %*
 exit /b %ERRORLEVEL%
+
+:: ========================================================================
+
+:error
+call :warn ERROR: %*
+goto :EOF
+
+:warn
+>&2 echo:%*
+goto :EOF
 
 :: ========================================================================
 
