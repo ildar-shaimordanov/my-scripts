@@ -1,3 +1,17 @@
+
+===========================================================================
+
+:: .tcl
+:: https://www.tutorialspoint.com/tcl-tk/tcl_basic_syntax.htm
+
+::if 0 {
+@echo off
+tclsh86t "%~f0" %*
+goto :EOF
+}
+
+===========================================================================
+
 :: .lua (v5.2+ only)
 :: https://www.lua.org/manual/5.2/readme.html#changes
 :: https://www.lua.org/manual/5.2/manual.html#3.3.4
