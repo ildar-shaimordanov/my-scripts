@@ -3,6 +3,11 @@
 * [USAGE](#usage)
 * [OPTIONS](#options)
 * [DESCRIPTION](#description)
+* [OPTIONS](#options-1)
+  * [`/p`](#p)
+  * [`/w`](#w)
+  * [`/e ENGINE`](#e-engine)
+  * [`/x EXTENSION`](#x-extension)
 * [DETAILS](#details)
   * [.au3, .a3x](#au3-a3x)
   * [.ahk](#ahk)
@@ -46,26 +51,24 @@ Converts a script into a batch file.
 * `/help-devel`  - Show extremely detailed help including internal details.
 * `/help-readme` - Generate a text for a README file
 * `/list` - Show the list of supported file extensions and specific options.
+* `/p` - Display on standard output instead of creating a new file.
 * `/w` - Create the simple batch invoker.
 * `/e` - Set the engine for using as the script runner.
 * `/x` - Set another extension to consider another file type.
-* `/p` - Display on standard output instead of creating a new file.
 
 # DESCRIPTION
 
-This script takes the original script and converts it to the
-batch file. The final script is polyglot file (or hybrid) that is
-interpreted as the batch script invoking the interpreter of the
-original script.
+This tool takes an original script file and converts it to the
+polyglot script, the batch script consisting of two parts: the body
+of the original script and the special, sometimes tricky portion
+of the code that is recognizable and executable correctly by both
+parts. This portion is called prolog.
 
-Here and further polyglots are called as hybrids (pure polyglots
-implemented purely on syntax of batch and the particular language)
-and chimeras (polyglots using some tricks like temporary files or
-environment variables).
-
-The portion of the batch code added to the body of the original
-script is called prolog. And the process of adding it is called
-hybridization.
+There are two terms to distinguish some differences. The first one
+is hybrid, the polyglot completely based on the syntax of the batch
+and prticular language). Another one is chimera, the polyglot using
+some stuff like temporary files or environment variables (in the
+other words, requesting capabilities outside languages).
 
 Below is the example of javascript in batch applicable for Windows
 JScript only and not supporting other engines like NodeJS, Rhino etc.
@@ -75,8 +78,30 @@ JScript only and not supporting other engines like NodeJS, Rhino etc.
     */
     WScript.Echo("Hello");
 
-Follow the link to learn more about polyglots:
-https://en.wikipedia.org/wiki/Polyglot_(computing)
+# OPTIONS
+
+The order of the options is not fixed. Nevertheless, any specified
+option takes effect until another one is specified. It allows to
+set one option per each file declared after the option.
+
+## `/p`
+
+Display on standard output instead of creating a new file.
+
+## `/w`
+
+Create the separate batch file invoking the original script.
+
+## `/e ENGINE`
+
+Set the engine. It is used for running the script. You can alter
+the executor and its options (for example, Chakra, NodeJS or Rhino
+for javascript files).
+
+## `/x EXTENSION`
+
+Set another extension. It can be useful to alter the file type when
+the original file has the extension not supported by this tool.
 
 # DETAILS
 
@@ -353,9 +378,14 @@ author has opportunity to discuss many aspects of batch scripting.
 
 # SEE ALSO
 
+Follow these links to learn more around polyglots:
+
+* https://en.wikipedia.org/wiki/Polyglot_(computing)
+* https://rosettacode.org/wiki/Multiline_shebang
+
 Find this text and more details following by this link below.
 
-https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
+* https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
 
 # ABOUT THIS PAGE
 

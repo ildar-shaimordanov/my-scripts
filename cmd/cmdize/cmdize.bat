@@ -13,29 +13,27 @@
 ::U>* `/help-devel`  - Show extremely detailed help including internal details.
 ::U>* `/help-readme` - Generate a text for a README file
 ::U>* `/list` - Show the list of supported file extensions and specific options.
+::U>* `/p` - Display on standard output instead of creating a new file.
 ::U>* `/w` - Create the simple batch invoker.
 ::U>* `/e` - Set the engine for using as the script runner.
 ::U>* `/x` - Set another extension to consider another file type.
-::U>* `/p` - Display on standard output instead of creating a new file.
 ::U>
 
 :: ========================================================================
 
 ::H># DESCRIPTION
 ::H>
-::H>This script takes the original script and converts it to the
-::H>batch file. The final script is polyglot file (or hybrid) that is
-::H>interpreted as the batch script invoking the interpreter of the
-::H>original script.
+::H>This tool takes an original script file and converts it to the
+::H>polyglot script, the batch script consisting of two parts: the body
+::H>of the original script and the special, sometimes tricky portion
+::H>of the code that is recognizable and executable correctly by both
+::H>parts. This portion is called prolog.
 ::H>
-::H>Here and further polyglots are called as hybrids (pure polyglots
-::H>implemented purely on syntax of batch and the particular language)
-::H>and chimeras (polyglots using some tricks like temporary files or
-::H>environment variables).
-::H>
-::H>The portion of the batch code added to the body of the original
-::H>script is called prolog. And the process of adding it is called
-::H>hybridization.
+::H>There are two terms to distinguish some differences. The first one
+::H>is hybrid, the polyglot completely based on the syntax of the batch
+::H>and prticular language). Another one is chimera, the polyglot using
+::H>some stuff like temporary files or environment variables (in the
+::H>other words, requesting capabilities outside languages).
 ::H>
 ::H>Below is the example of javascript in batch applicable for Windows
 ::H>JScript only and not supporting other engines like NodeJS, Rhino etc.
@@ -45,8 +43,11 @@
 ::H>    */
 ::H>    WScript.Echo("Hello");
 ::H>
-::H>Follow the link to learn more about polyglots:
-::H>https://en.wikipedia.org/wiki/Polyglot_(computing)
+::H># OPTIONS
+::H>
+::H>The order of the options is not fixed. Nevertheless, any specified
+::H>option takes effect until another one is specified. It allows to
+::H>set one option per each file declared after the option.
 ::H>
 
 @echo off
@@ -93,11 +94,34 @@ set "CMDIZE_EXT="
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
 
+::H>## `/p`
+::H>
+::H>Display on standard output instead of creating a new file.
+::H>
+
+if /i "%~1" == "/p" (
+	set "CMDIZE_MAYBE=& rem "
+	shift /1
+	goto :cmdize_loop_begin
+)
+
+::H>## `/w`
+::H>
+::H>Create the separate batch file invoking the original script.
+::H>
+
 if /i "%~1" == "/w" (
 	set "CMDIZE_WRAP=1"
 	shift /1
 	goto :cmdize_loop_begin
 )
+
+::H>## `/e ENGINE`
+::H>
+::H>Set the engine. It is used for running the script. You can alter
+::H>the executor and its options (for example, Chakra, NodeJS or Rhino
+::H>for javascript files).
+::H>
 
 if /i "%~1" == "/e" (
 	set "CMDIZE_ENGINE=%~2"
@@ -106,11 +130,11 @@ if /i "%~1" == "/e" (
 	goto :cmdize_loop_begin
 )
 
-if /i "%~1" == "/p" (
-	set "CMDIZE_MAYBE=& rem "
-	shift /1
-	goto :cmdize_loop_begin
-)
+::H>## `/x EXTENSION`
+::H>
+::H>Set another extension. It can be useful to alter the file type when
+::H>the original file has the extension not supported by this tool.
+::H>
 
 if /i "%~1" == "/x" (
 	set "CMDIZE_EXT_ALT=%~2"
@@ -830,9 +854,14 @@ goto :EOF
 ::H>
 ::H># SEE ALSO
 ::H>
+::H>Follow these links to learn more around polyglots:
+::H>
+::H>* https://en.wikipedia.org/wiki/Polyglot_(computing)
+::H>* https://rosettacode.org/wiki/Multiline_shebang
+::H>
 ::H>Find this text and more details following by this link below.
 ::H>
-::H>https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
+::H>* https://github.com/ildar-shaimordanov/my-scripts/blob/master/cmd/cmdize/README.md
 ::H>
 
 :: ========================================================================

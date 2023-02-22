@@ -1,33 +1,62 @@
 
 ===========================================================================
 
-:: .tcl
-:: https://www.tutorialspoint.com/tcl-tk/tcl_basic_syntax.htm
+:: .lua
 
-::if 0 {
+:: v5.2+ only
+
+:: * https://www.lua.org/manual/5.2/readme.html#changes
+:: * https://www.lua.org/manual/5.2/manual.html#3.3.4
+:: * https://forum.script-coding.com/viewtopic.php?pid=150252#p150252
+
+::____CMD____::--[[
 @echo off
-tclsh86t "%~f0" %*
+lua "%~f0" %*
 goto :EOF
-}
+]]
 
 ===========================================================================
 
-:: .lua (v5.2+ only)
-:: https://www.lua.org/manual/5.2/readme.html#changes
-:: https://www.lua.org/manual/5.2/manual.html#3.3.4
-:: https://forum.script-coding.com/viewtopic.php?pid=150252#p150252
+:: .pl
 
-:: Convert Lua file.
-:cmdize.lua	/e luaNN
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=lua"
-call :print-prolog "%CMDIZE_ENGINE%" "::____LUNAR_EXPLORER____::--[[" "--]]"
-type "%~f1"
+alternative 1
+
+@rem = <<'____CMD____';
+@echo off
+perl "%~f0" %*
 goto :EOF
+____CMD____
+
+alternative 2
+
+@echo off
+perl -x "%~f0" %*
+goto :EOF
+#!perl
+
+===========================================================================
+
+:: .rb
+
+alternative 1
+
+@rem = %Q{
+@echo off
+ruby "%~f0" %*
+goto :EOF
+}
+
+alternative 2
+
+@echo off
+ruby -x "%~f0" %*
+goto :EOF
+#!ruby
 
 ===========================================================================
 
 :: .sql
-:: https://forum.script-coding.com/viewtopic.php?pid=150294#p150294
+:: * https://forum.script-coding.com/viewtopic.php?pid=150294#p150294
 
 @echo off
 for /f "tokens=1 delims=:" %%n in ( 'findstr /n /r /c:"^-- SQL --" "%~f0"' ) do (
@@ -49,5 +78,20 @@ echo:)
 echo:goto :EOF
 echo:-- SQL --
 goto :EOF
+
+===========================================================================
+
+:: .tcl
+:: * https://www.tutorialspoint.com/tcl-tk/tcl_basic_syntax.htm
+:: * https://wiki.tcl-lang.org/page/if
+:: * https://wiki.tcl-lang.org/page/if+0+{
+
+:: inner curly brakets must be consistent
+
+::if 0 {
+@echo off
+tclsh86t "%~f0" %*
+goto :EOF
+}
 
 ===========================================================================
