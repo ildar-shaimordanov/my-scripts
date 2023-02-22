@@ -43,8 +43,6 @@
 ::H>    */
 ::H>    WScript.Echo("Hello");
 ::H>
-::H># OPTIONS
-::H>
 ::H>The order of the options is not fixed. Nevertheless, any specified
 ::H>option takes effect until another one is specified. It allows to
 ::H>set one option per each file declared after the option.

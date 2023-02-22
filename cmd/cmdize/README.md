@@ -3,7 +3,6 @@
 * [USAGE](#usage)
 * [OPTIONS](#options)
 * [DESCRIPTION](#description)
-* [OPTIONS](#options-1)
   * [`/p`](#p)
   * [`/w`](#w)
   * [`/e ENGINE`](#e-engine)
@@ -77,8 +76,6 @@ JScript only and not supporting other engines like NodeJS, Rhino etc.
     @cscript //nologo //e:javascript "%~f0" %* & @goto :EOF
     */
     WScript.Echo("Hello");
-
-# OPTIONS
 
 The order of the options is not fixed. Nevertheless, any specified
 option takes effect until another one is specified. It allows to
