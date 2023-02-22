@@ -168,6 +168,23 @@ support to old DOSes.
 
 * https://perldoc.perl.org/perlwin32
 
+More alternatives for Perl.
+
+Using the Perl option:
+
+    @echo off
+    perl -x "%~f0" %*
+    goto :EOF
+    #!perl
+
+Using the Perl syntax:
+
+    @rem = <<'____CMD____';
+    @echo off
+    perl "%~f0" %*
+    goto :EOF
+    ____CMD____
+
 ## .ps1
 
 Very-very-very complicated case. It's too hard to implement a

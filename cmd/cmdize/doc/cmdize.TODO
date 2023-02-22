@@ -17,44 +17,6 @@ goto :EOF
 
 ===========================================================================
 
-:: .pl
-
-alternative 1
-
-@rem = <<'____CMD____';
-@echo off
-perl "%~f0" %*
-goto :EOF
-____CMD____
-
-alternative 2
-
-@echo off
-perl -x "%~f0" %*
-goto :EOF
-#!perl
-
-===========================================================================
-
-:: .rb
-
-alternative 1
-
-@rem = %Q{
-@echo off
-ruby "%~f0" %*
-goto :EOF
-}
-
-alternative 2
-
-@echo off
-ruby -x "%~f0" %*
-goto :EOF
-#!ruby
-
-===========================================================================
-
 :: .sql
 :: * https://forum.script-coding.com/viewtopic.php?pid=150294#p150294
 

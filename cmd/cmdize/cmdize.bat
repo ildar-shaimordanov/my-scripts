@@ -389,9 +389,26 @@ goto :EOF
 ::D>
 ::D>* https://perldoc.perl.org/perlwin32
 ::D>
+::D>More alternatives for Perl.
+::D>
+::D>Using the Perl option:
+::D>
+::D>    @echo off
+::D>    perl -x "%~f0" %*
+::D>    goto :EOF
+::D>    #!perl
+::D>
+::D>Using the Perl syntax:
+::D>
+::D>    @rem = <<'____CMD____';
+::D>    @echo off
+::D>    perl "%~f0" %*
+::D>    goto :EOF
+::D>    ____CMD____
+::D>
 
 :cmdize.pl
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=perl -x -S"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=perl"
 
 if defined CMDIZE_WRAP (
 	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
