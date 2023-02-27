@@ -62,13 +62,13 @@ This tool takes an original script file and converts it to the
 polyglot script, the batch script consisting of two parts: the body
 of the original script and the special, sometimes tricky portion
 of the code that is recognizable and executable correctly by both
-parts. This portion is called prolog.
+languages. This portion is called prolog.
 
 There are two terms to distinguish some differences. The first one
 is hybrid, the polyglot completely based on the syntax of the batch
 and prticular language). Another one is chimera, the polyglot using
-some stuff like temporary files or environment variables (in the
-other words, requesting capabilities outside languages).
+some stuff like temporary files, pipes or environment variables
+(in the other words, requesting capabilities outside languages).
 
 Below is the example of javascript in batch applicable for Windows
 JScript only and not supporting other engines like NodeJS, Rhino etc.
