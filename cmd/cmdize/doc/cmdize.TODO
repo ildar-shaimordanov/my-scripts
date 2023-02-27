@@ -17,6 +17,34 @@ goto :EOF
 
 ===========================================================================
 
+:: .raku
+
+:: https://www.cyberforum.ru/post16775977.html
+
+:: the first attempt for Raku hybridization
+
+@rem = q:to/use strict;/;
+@echo off
+raku -e "('no strict;' ~ (slurp shift @*ARGS)).EVAL" "%~f0" %*
+goto :EOF
+use strict;
+
+say "Hello! I am Raku.";
+say @*ARGS;
+
+:: the second attempt for Raku hybridization
+
+@rem = q:to/use strict;/;
+@echo off
+raku -e "('no strict;' ~ (slurp q<%~f0>)).EVAL" %*
+goto :EOF
+use strict;
+
+say "Hello! I am Raku.";
+say @*ARGS;
+
+===========================================================================
+
 :: .sql
 :: * https://forum.script-coding.com/viewtopic.php?pid=150294#p150294
 
