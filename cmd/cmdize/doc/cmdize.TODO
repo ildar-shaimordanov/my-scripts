@@ -42,18 +42,3 @@ echo:-- SQL --
 goto :EOF
 
 ===========================================================================
-
-:: .tcl
-:: * https://www.tutorialspoint.com/tcl-tk/tcl_basic_syntax.htm
-:: * https://wiki.tcl-lang.org/page/if
-:: * https://wiki.tcl-lang.org/page/if+0+{
-
-:: inner curly brakets must be consistent
-
-::if 0 {
-@echo off
-tclsh86t "%~f0" %*
-goto :EOF
-}
-
-===========================================================================

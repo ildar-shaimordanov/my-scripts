@@ -558,6 +558,38 @@ goto :EOF
 
 :: ========================================================================
 
+::L>.tcl
+
+::D>## .tcl
+::D>
+::D>Tcl doesn't have block comments. Anything placed within `if 0 { ... }`
+::D>is never executed. So tclers use it as the good way for doing block
+::D>commenting.
+::D>
+::D>Be noticed: if you have needs to add into the prolog some text
+::D>or code having curly brackets, you must keep them consistent -
+::D>the number of opening brackets must equal to the number of closing
+::D>brackets. Otherwise tcl fails to execute the hybrid.
+::D>
+::D>* https://www.tutorialspoint.com/tcl-tk/tcl_basic_syntax.htm
+::D>* https://wiki.tcl-lang.org/page/if
+::D>* https://wiki.tcl-lang.org/page/if+0+{
+::D>
+
+:cmdize.tcl
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=tclsh86t"
+
+if defined CMDIZE_WRAP (
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	goto :EOF
+)
+
+call :print-hybrid-prolog "%CMDIZE_ENGINE%" "::if 0 {" "}"
+type "%~f1"
+goto :EOF
+
+:: ========================================================================
+
 ::L>.vbs	[/e :cscript|:wscript|...]
 
 ::D>## .vbs

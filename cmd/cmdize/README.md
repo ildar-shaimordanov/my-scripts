@@ -20,6 +20,7 @@
   * [.py](#py)
   * [.rb](#rb)
   * [.sh](#sh)
+  * [.tcl](#tcl)
   * [.vbs](#vbs)
   * [.wsf](#wsf)
 * [Hybridization internals](#hybridization-internals)
@@ -239,6 +240,21 @@ Ruby supports one more way of hybridization:
 
 * http://forum.script-coding.com/viewtopic.php?id=11535
 * http://www.dostips.com/forum/viewtopic.php?f=3&t=7110#p46654
+
+## .tcl
+
+Tcl doesn't have block comments. Anything placed within `if 0 { ... }`
+is never executed. So tclers use it as the good way for doing block
+commenting.
+
+Be noticed: if you have needs to add into the prolog some text
+or code having curly brackets, you must keep them consistent -
+the number of opening brackets must equal to the number of closing
+brackets. Otherwise tcl fails to execute the hybrid.
+
+* https://www.tutorialspoint.com/tcl-tk/tcl_basic_syntax.htm
+* https://wiki.tcl-lang.org/page/if
+* https://wiki.tcl-lang.org/page/if+0+{
 
 ## .vbs
 
