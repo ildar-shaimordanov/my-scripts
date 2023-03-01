@@ -1,0 +1,3 @@
+# string-utils
+
+Shell scripts for manipulating with strings. Just for fun...
