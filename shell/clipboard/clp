@@ -192,7 +192,7 @@ do
 
 	f | t | c )
 		CLIP_ENC="$ENCODING"
-		CLIP_ENC_OPTS="$CLIP_ENC_OPTS -$arg$OPTARG"
+		CLIP_ENC_OPTS="$CLIP_ENC_OPTS -$arg $OPTARG"
 		[ -n "$CLIP_ENC" ] || warn_not_supported iconv
 		;;
 
