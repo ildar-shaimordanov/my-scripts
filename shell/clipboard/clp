@@ -14,6 +14,8 @@ UNIX2DOS=''
 CLIP_ENC=''
 ENCODING=''
 
+DIRECTION=''
+
 VERBOSELY=''
 
 # =========================================================================
@@ -36,6 +38,10 @@ Encoding options
 	-t encoding
 		Encodings for input and output, respectively
 	-c	Discard silently unconvertible characters
+
+Stream controlling options
+	-I	Force to read data from STDIN and copy to clipboard
+	-O	Force to take data from clipboard and paste to STDOUT
 
 Information options
 	-h	Display this help message
@@ -172,7 +178,7 @@ warn_not_supported() {
 	warn "$1 not supported"
 }
 
-while getopts ":hVvudf:t:c" arg
+while getopts ":hVvudf:t:cIO" arg
 do
 	case "$arg" in
 	h ) print_usage ; exit ;;
@@ -196,12 +202,31 @@ do
 		[ -n "$CLIP_ENC" ] || warn_not_supported iconv
 		;;
 
+	I | O )
+		[ -z "$DIRECTION" ] || die "Either -I or -O allowed, not both"
+		DIRECTION="$arg"
+		;;
+
 	: ) die "Argument expected for -$OPTARG" ;;
 	* ) die "Illegal option: -$OPTARG" ;;
 	esac
 done
 
-if [ -t 0 ]
+# If the direction wasn't specified intentionally, set it to the default
+# value from the script use case.
+
+if [ -z "$DIRECTION" ]
+then
+	if [ -t 0 ]
+	then
+		DIRECTION='O'
+	elif [ -t 1 ]
+	then
+		DIRECTION='I'
+	fi
+fi
+
+if [ "$DIRECTION" = "O" ]
 then
 	# clp
 	# clp | ...
@@ -209,7 +234,7 @@ then
 	CLIP_RUN="$CLIP_GET"
 	CLIP_RUN="$CLIP_RUN${CLIP_EOL:+ | $CLIP_EOL $CLIP_EOL_OPTS}"
 	CLIP_RUN="$CLIP_RUN${CLIP_ENC:+ | $CLIP_ENC $CLIP_ENC_OPTS}"
-elif [ -t 1 ]
+elif [ "$DIRECTION" = "I" ]
 then
 	# ... | clp
 	[ -n "$CLIP_PUT" ] || die "No tool to copy to clipboard"

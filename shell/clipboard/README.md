@@ -26,6 +26,10 @@ Encoding options
 		Encodings for input and output, respectively
 	-c	Discard silently unconvertible characters
 
+Stream controlling options
+	-I	Force to read data from STDIN and copy to clipboard
+	-O	Force to take data from clipboard and paste to STDOUT
+
 Information options
 	-h	Display this help message
 	-v	Display the executable command
