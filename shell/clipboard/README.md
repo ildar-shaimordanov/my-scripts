@@ -27,8 +27,8 @@ Encoding options
 	-c	Discard silently unconvertible characters
 
 Stream controlling options
-	-I	Force to read data from STDIN and copy to clipboard
-	-O	Force to take data from clipboard and paste to STDOUT
+	-I	Force to copy STDIN to clipboard
+	-O	Force to paste from clipboard to STDOUT
 
 Information options
 	-h	Display this help message
