@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# =========================================================================
+#
+# USAGE
+#     kubectl-discover [KUBECTL_OPTIONS] [-- [PERL_FILTER]]
+#
+# DESCRIPTION
+# Discover kubernetes secrets
+#
+# PREREQUISITES
+# - kubectl
+# - bash
+# - printf, grep, sed, awk
+# - perl, MIME::Base64
+#
+# TODO
+# Rewrite in pure Perl or another language
+#
+# =========================================================================
+
+main() {
+	n="$( minus_minus_argument_position "$@" )"
+
+	kubectl_get_secrets "${@:1:$n-1}" \
+	| normalize \
+	| unsecret "${@:$n+1}"
+}
+
+# =========================================================================
+
+kubectl_get_secrets() {
+	jsonpath='{.data}{"\n"}'
+
+	printf '%s\n' "$@" | grep -q '^[^-]' \
+	|| jsonpath="{range .items.*}$jsonpath"
+
+	kubectl get secrets "$@" -o jsonpath="$jsonpath"
+}
+
+normalize() {
+	sed 's/^map\[//; s/\]$//; s/[ \t]/\n/g'
+}
+
+unsecret() {
+	perl -MMIME::Base64 -aF: -n \
+	-e 'BEGIN { $e ||= 1; $e = eval "sub {$e}" or die $@ }' \
+	-e '$e->() and printf "%s: [%s]\n", $_, decode_base64($F[1]) for $F[0]' \
+	-s -- -e="$@"
+
+}
+
+minus_minus_argument_position() {
+	[ $# -gt 0 ] || { echo "1" ; return ; }
+
+	printf '%s\n' "$@" \
+	| awk '/^--$/ && ! p { p = NR } END { print p ? p : NR + 1 }'
+}
+
+# =========================================================================
+
+main "$@"
+
+# =========================================================================
+
+# EOF
