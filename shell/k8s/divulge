@@ -3,7 +3,7 @@
 # =========================================================================
 #
 # USAGE
-#     kubectl get secrets [NAME] -o json | divulge [options] [REGEX]
+#     kubectl get secrets [NAME] -o json | divulge [OPTIONS] [PATTERN]
 #
 # DESCRIPTION
 # Discover kubernetes secrets
@@ -11,6 +11,10 @@
 # PREREQUISITES
 # - jq
 # - sh
+#
+# COPYRIGHT
+# Copyright (C) 2023 Ildar Shaimordanov
+# MIT License
 #
 # =========================================================================
 
