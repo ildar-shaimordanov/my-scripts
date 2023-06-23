@@ -2,17 +2,18 @@
 
 # =========================================================================
 #
-# USAGE
-#     kubectl get secrets [NAME] -o json | divulge [OPTIONS] [PATTERN]
-#
 # DESCRIPTION
-# Discover kubernetes secrets
+#
+# A companion script for kubectl.
+# Discover kubernetes secrets.
 #
 # PREREQUISITES
+#
 # - jq
 # - sh
 #
 # COPYRIGHT
+#
 # Copyright (C) 2023 Ildar Shaimordanov
 # MIT License
 #
@@ -36,9 +37,9 @@ Options:
   -l  Find longest possible matches
   -x  Extended regex format (ignore whitespace and comments)
 
-  -r  output raw strings, not JSON texts
-  -C  colorize JSON
-  -M  monochrome JSON
+  -r  Output raw strings, not JSON texts
+  -C  Colorize JSON
+  -M  Monochrome JSON
 
 Follow the below link to learn more about regexp:
 https://jqlang.github.io/jq/manual/#Regularexpressions"
@@ -47,7 +48,7 @@ https://jqlang.github.io/jq/manual/#Regularexpressions"
 
 	unset DIVULGE_FLAGS DIVULGE_RAW DIVULGE_OPTS
 
-	while getopts ':gimnpslxrCMh' arg
+	while getopts ':gimnpslxrCM' arg
 	do
 		case "$arg" in
 		g | i | m | n | p | s | l | x )
