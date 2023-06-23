@@ -81,7 +81,8 @@ https://jqlang.github.io/jq/manual/#Regularexpressions"
 | select(. != {})
 | (
 	if $raw == ""
-	then .
+	then
+		.
 	else
 		to_entries
 		| map("raw " + .key + " [" + .value + "]")
