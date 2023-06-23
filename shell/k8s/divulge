@@ -62,23 +62,32 @@ https://jqlang.github.io/jq/manual/#Regularexpressions"
 	shift $(( OPTIND-1 ))
 
 	# shellcheck disable=SC2086
-	jq $DIVULGE_OPTS -r "\
-(if has(\"items\") then .items[] else . end)
+	jq $DIVULGE_OPTS \
+	--arg regex "$1" \
+	--arg flags "$DIVULGE_FLAGS" \
+	--arg raw "$DIVULGE_RAW" \
+	-r '(if has("items") then .items[] else . end)
 | .data
 | select(.)
 | with_entries(
 	select(
 		.key
-		| test(\"$1\"; \"$DIVULGE_FLAGS\")
+		| test($regex; $flags)
 	) | {
 		key: .key,
 		value: .value | @base64d
 	}
 )
-| select(. != {})${DIVULGE_RAW:+
-| to_entries
-| map(\"raw \" + .key + \" [\" + .value + \"]\")
-| .[]}"
+| select(. != {})
+| (
+	if $raw == ""
+	then .
+	else
+		to_entries
+		| map("raw " + .key + " [" + .value + "]")
+		| .[]
+	end
+)'
 }
 
 # =========================================================================
