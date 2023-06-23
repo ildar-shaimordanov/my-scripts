@@ -25,7 +25,7 @@ divulge() {
 Discover kubernetes secrets
 
 Usage:
-    kubectl get secrets [NAME] -o json | divulge [OPTIONS] [PATTERN]
+    kubectl get secrets [NAME] -o json | divulge [OPTIONS] [REGEXP]
 
 Options:
   -g  Global search (find all matches, not just the first)
@@ -41,7 +41,7 @@ Options:
   -C  Colorize JSON
   -M  Monochrome JSON
 
-Follow the below link to learn more about regexp:
+Follow the below link to learn more about REGEXP:
 https://jqlang.github.io/jq/manual/#Regularexpressions"
 		return
 	}
