@@ -1,0 +1,85 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# USAGE
+#     kubectl get secrets [NAME] -o json | divulge [options] [REGEX]
+#
+# DESCRIPTION
+# Discover kubernetes secrets
+#
+# PREREQUISITES
+# - jq
+# - sh
+#
+# =========================================================================
+
+divulge() {
+	[ -t 0 ] && [ $# -eq 0 ] && {
+		echo "\
+Discover kubernetes secrets
+
+Usage:
+    kubectl get secrets [NAME] -o json | divulge [OPTIONS] [PATTERN]
+
+Options:
+  -g  Global search (find all matches, not just the first)
+  -i  Case insensitive search
+  -m  Multi line mode (. will match newlines)
+  -n  Ignore empty matches
+  -p  Both s and m modes are enabled
+  -s  Single line mode (^ -> \A, $ -> \Z)
+  -l  Find longest possible matches
+  -x  Extended regex format (ignore whitespace and comments)
+
+  -r  output raw strings, not JSON texts
+  -C  colorize JSON
+  -M  monochrome JSON
+
+Follow the below link to learn more about regexp:
+https://jqlang.github.io/jq/manual/#Regularexpressions"
+		return
+	}
+
+	unset DIVULGE_FLAGS DIVULGE_RAW DIVULGE_OPTS
+
+	while getopts ':gimnpslxrCMh' arg
+	do
+		case "$arg" in
+		g | i | m | n | p | s | l | x )
+			DIVULGE_FLAGS="$DIVULGE_FLAGS$arg" ;;
+		r )	DIVULGE_RAW=1 ;;
+		C | M )	DIVULGE_OPTS="$DIVULGE_OPTS -$arg" ;;
+		* )	echo "Illegal option: -$OPTARG">&2 ; return 1 ;;
+		esac
+	done
+
+	shift $(( OPTIND-1 ))
+
+	# shellcheck disable=SC2086
+	jq $DIVULGE_OPTS -r "\
+(if has(\"items\") then .items[] else . end)
+| .data
+| select(.)
+| with_entries(
+	select(
+		.key
+		| test(\"$1\"; \"$DIVULGE_FLAGS\")
+	) | {
+		key: .key,
+		value: .value | @base64d
+	}
+)
+| select(. != {})${DIVULGE_RAW:+
+| to_entries
+| map(\"raw \" + .key + \" [\" + .value + \"]\")
+| .[]}"
+}
+
+# =========================================================================
+
+divulge "$@"
+
+# =========================================================================
+
+# EOF
