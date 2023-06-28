@@ -73,14 +73,13 @@ https://jqlang.github.io/jq/manual/#Regularexpressions"
 	select(
 		.key
 		| test($regex; $flags)
-	) | {
-		key: .key,
-		value: .value | @base64d
-	}
+	)
+	| .value |= @base64d
 )
-| select(. != {})
 | (
-	if $raw == "" then . else
+	if $raw == "" then
+		select(. != {})
+	else
 		to_entries
 		| map("raw " + .key + " [" + .value + "]")
 		| .[]
