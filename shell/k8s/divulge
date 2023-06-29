@@ -37,7 +37,8 @@ Options:
   -l  Find longest possible matches
   -x  Extended regex format (ignore whitespace and comments)
 
-  -r  Output raw strings, not JSON texts
+  -r  Output raw strings, not JSON texts; values are placed between [ and ]
+      and marked with the prefix unsafe, if contain at least a whitespace
   -C  Colorize JSON
   -M  Monochrome JSON
 
@@ -77,11 +78,21 @@ https://jqlang.github.io/jq/manual/#Regularexpressions"
 	| .value |= @base64d
 )
 | (
-	if $raw == "" then
+	if $raw == ""
+	then
 		select(. != {})
 	else
 		to_entries
-		| map("raw " + .key + " [" + .value + "]")
+		| map(
+			(
+				if .value | test("\\s")
+				then
+					"unsafe "
+				else
+					"safe   "
+				end
+			) + .key + " [" + .value + "]"
+		)
 		| .[]
 	end
 )'
