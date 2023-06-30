@@ -3,19 +3,20 @@
 # =========================================================================
 #
 # DESCRIPTION
-#
-# A companion script for kubectl.
-# Discover kubernetes secrets.
+# A companion script for kubectl to discover kubernetes secrets.
 #
 # PREREQUISITES
-#
 # - jq
 # - sh
 #
 # COPYRIGHT
-#
 # Copyright (C) 2023 Ildar Shaimordanov
 # MIT License
+#
+# SEE ALSO
+# - https://github.com/elsesiy/kubectl-view-secret
+# - https://github.com/boo1ean/kusd
+# - https://github.com/mfuentesg/ksd
 #
 # =========================================================================
 
