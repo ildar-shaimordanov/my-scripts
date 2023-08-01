@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# =========================================================================
+
+main() {
+	trap 'rm_empty' EXIT
+
+	TEEFILE="tee-$( date '+%Y-%m-%d-%H-%M-%S' ).log"
+
+	warn "Store to file: $TEEFILE"
+
+	unbuf="$( command -v stdbuf )"
+	${unbuf:+$unbuf -i0 -o0 -e0} tee "$TEEFILE"
+}
+
+# =========================================================================
+
+rm_empty() {
+	if [ -s "$TEEFILE" ]
+	then
+		warn "Stored to file: $TEEFILE"
+	else
+		warn "Remove empty file: $TEEFILE"
+		rm -f "$TEEFILE"
+	fi
+}
+
+warn() {
+	echo "$*" >&2
+}
+
+# =========================================================================
+
+main "$@"
+
+# =========================================================================
+
+# EOF
