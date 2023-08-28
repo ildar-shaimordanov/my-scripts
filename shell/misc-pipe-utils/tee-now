@@ -4,42 +4,35 @@
 
 print_usage() {
 	echo "\
-Usage: ... | tee-now [OPTIONS]
-Copy standard input to a file named as a label and timestamp.
+Usage: ... | tee-now [OPTIONS] [LABEL]
+Copy standard input to a file named 'LABEL-YYYY-mm-dd-HH-MM-SS.log'.
+If no LABEL is specified, defaults to 'tee'.
 
 Options
 	-a		Append to the file, don't overwrite
 	-i		Ignore an interrupt signal
-	-l LABEL	Use LABEL
 	-h		Print this help and exit
 "
 }
 
 main() {
-	TEEDEFAULT="tee"
-	TEELABEL="$TEEDEFAULT"
-
 	TEEOPTS=""
 
 	while getopts ":ail:h" arg
 	do
 		case "$arg" in
 		a | i )	TEEOPTS="$TEEOPTS -$arg" ;;
-		l )	TEELABEL="$OPTARG" ;;
 		h )	print_usage ; exit ;;
 		* )	warn "Bad option: [$OPTARG]: Skipping" ;;
 		esac
 	done
 
-	if [ -z "$TEELABEL" ] || echo "$TEELABEL" | grep -E '[^0-9A-Za-z_-]'
-	then
-		warn "Bad name: '$TEELABEL': Continue with '$TEEDEFAULT'"
-		TEELABEL="$TEEDEFAULT"
-	fi
+	shift $(( OPTIND-1 ))
+
+	TEELABEL="${1:-tee}"
+	TEEFILE="$TEELABEL-$( date '+%Y-%m-%d-%H-%M-%S' ).log"
 
 	trap 'rm_empty' EXIT
-
-	TEEFILE="$TEELABEL-$( date '+%Y-%m-%d-%H-%M-%S' ).log"
 
 	warn "Store to file: $TEEFILE"
 
