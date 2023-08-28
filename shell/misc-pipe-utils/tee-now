@@ -2,15 +2,50 @@
 
 # =========================================================================
 
+print_usage() {
+	echo "\
+Usage: ... | tee-now [OPTIONS]
+Copy standard input to a file named as a label and timestamp.
+
+Options
+	-a		Append to the file, don't overwrite
+	-i		Ignore an interrupt signal
+	-l LABEL	Use LABEL
+	-h		Print this help and exit
+"
+}
+
 main() {
+	TEEDEFAULT="tee"
+	TEELABEL="$TEEDEFAULT"
+
+	TEEOPTS=""
+
+	while getopts ":ail:h" arg
+	do
+		case "$arg" in
+		a | i )	TEEOPTS="$TEEOPTS -$arg" ;;
+		l )	TEELABEL="$OPTARG" ;;
+		h )	print_usage ; exit ;;
+		* )	warn "Bad option: [$OPTARG]: Skipping" ;;
+		esac
+	done
+
+	if [ -z "$TEELABEL" ] || echo "$TEELABEL" | grep -E '[^0-9A-Za-z_-]'
+	then
+		warn "Bad name: '$TEELABEL': Continue with '$TEEDEFAULT'"
+		TEELABEL="$TEEDEFAULT"
+	fi
+
 	trap 'rm_empty' EXIT
 
-	TEEFILE="tee-$( date '+%Y-%m-%d-%H-%M-%S' ).log"
+	TEEFILE="$TEELABEL-$( date '+%Y-%m-%d-%H-%M-%S' ).log"
 
 	warn "Store to file: $TEEFILE"
 
 	unbuf="$( command -v stdbuf )"
-	${unbuf:+$unbuf -i0 -o0 -e0} tee "$TEEFILE"
+	# shellcheck disable=SC2086
+	${unbuf:+$unbuf -i0 -o0 -e0} tee $TEEOPTS "$TEEFILE"
 }
 
 # =========================================================================
