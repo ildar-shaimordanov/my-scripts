@@ -87,7 +87,7 @@ ENGINE=""
 
 for n in openssl curl
 do
-	command -v $n >/dev/null && {
+	ENGINE_PATH="$( command -v $n )" && {
 		ENGINE="$n"
 		break
 	}
@@ -115,12 +115,14 @@ done
 
 age() {
 	[ "$1" = "${1%:*}" ] && set -- "$1:443"
+
+	[ -n "$VERBOSE" ] || exec 2>/dev/null
+
+	warn "# Running: $ENGINE_PATH"
 	age_$ENGINE "$1"
 }
 
 age_openssl() {
-	[ -n "$VERBOSE" ] || exec 2>/dev/null
-
 	openssl s_client -servername "${1%:*}" -connect "$1" </dev/null \
 	| openssl x509 -dates -noout
 }
@@ -132,12 +134,12 @@ age_curl() {
 	# Exit immediately if no certificate information is captured. When
 	# verbosity is enabled, SSL negotiation is printed.
 	[ -n "$cert_info" ] || {
-		[ -n "$VERBOSE" ] && warn "$full_info"
+		warn "$full_info"
 		return 1
 	}
 
 	# Print the certificate details, when verbosity is on.
-	[ -n "$VERBOSE" ] && warn "$cert_info"
+	warn "$cert_info"
 
 	# Extract dates and convert output to the openssl-like view.
 	echo "$cert_info" \
