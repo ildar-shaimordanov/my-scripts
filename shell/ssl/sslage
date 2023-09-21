@@ -80,20 +80,20 @@ shift $(( OPTIND-1 ))
 
 # Uncomment one of the following line for testing under BusyBox or Cygwin
 # with the curl embedded to Windows
-#PATH="C:/Windows/System32;$PATH"
-#PATH="/cygdrive/c/Windows/System32:$PATH"
+#PATH="${SYSTEMROOT//\\/\/}/System32;$PATH"
+#PATH="$( cygpath "${SYSTEMROOT//\\/\/}" )/System32:$PATH"
 
-AGE=""
+ENGINE=""
 
 for n in openssl curl
 do
 	command -v $n >/dev/null && {
-		AGE="$n"
+		ENGINE="$n"
 		break
 	}
 done
 
-[ -n "$AGE" ] || die "No proper tool"
+[ -n "$ENGINE" ] || die "No proper tool"
 
 # =========================================================================
 
@@ -115,7 +115,7 @@ done
 
 age() {
 	[ "$1" = "${1%:*}" ] && set -- "$1:443"
-	age_$AGE "$1"
+	age_$ENGINE "$1"
 }
 
 age_openssl() {
