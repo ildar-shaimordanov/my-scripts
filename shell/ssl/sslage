@@ -78,16 +78,31 @@ shift $(( OPTIND-1 ))
 
 # =========================================================================
 
-# Uncomment one of the following line for testing under BusyBox or Cygwin
-# with the curl embedded to Windows
-#PATH="${SYSTEMROOT//\\/\/}/System32;$PATH"
-#PATH="$( cygpath "${SYSTEMROOT//\\/\/}" )/System32:$PATH"
+# This trick is used to check drawbacks, probably related to the
+# implementation of schannel in Windows. The curl shipped with
+# Git-for-Windows seems having the same issue. Nevertheless, another
+# curl implementations -- standalone and parts of Cygwin -- work fine.
+
+[ -n "$SSLAGE_USE_EMBEDDED_CURL" ] && {
+	# shellcheck disable=SC2123
+	case "$( uname -o )" in
+	Cygwin )
+		PATH="$( cygpath -S ):$PATH"
+		;;
+	'MS/Windows' )
+		PATH="$( echo "$SYSTEMROOT" | sed 's#\\#/#g' )/System32;$PATH"
+		;;
+	* )
+		unset SSLAGE_USE_EMBEDDED_CURL
+		;;
+	esac
+}
 
 ENGINE=""
 
-for n in openssl curl
+for n in ${SSLAGE_USE_EMBEDDED_CURL:+curl} openssl curl
 do
-	ENGINE_PATH="$( command -v $n )" && {
+	ENGINE_PATH="$( command -v "$n" )" && {
 		ENGINE="$n"
 		break
 	}
@@ -119,7 +134,7 @@ age() {
 	[ -n "$VERBOSE" ] || exec 2>/dev/null
 
 	warn "# Running: $ENGINE_PATH"
-	age_$ENGINE "$1"
+	"age_$ENGINE" "$1"
 }
 
 age_openssl() {
