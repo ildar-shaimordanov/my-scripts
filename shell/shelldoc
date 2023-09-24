@@ -36,7 +36,7 @@ Generate markdown documentation
 Options
 	-l LVL	Use filenames to print section headers of level 1 to 6;
 		0 means don't print filenames. Defaults to 1.
-	-D	Show demo generating documentation from this script.
+	-D	Show demo by generating documentation for this script.
 	-h	Print this message and exit.
 "
 }
