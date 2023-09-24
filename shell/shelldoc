@@ -1,0 +1,120 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Generate markdown documentation
+#
+# Copyright (C) 2023 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+# +++
+#
+# Generate markdown documentation from shell scripts or any files
+# containing the specially formatted sections of comments depicted with
+# the `#` character.
+#
+# !!! -h
+#
+# **See also**
+#
+# Few examples only.
+#
+# * https://github.com/Alimektor/shelldoc
+# * https://github.com/charlesdaniels/shelldoc
+#
+# ---
+
+# =========================================================================
+
+print_usage() {
+	echo "\
+Usage: shelldoc [OPTIONS] [FILES]
+Generate markdown documentation
+
+Options
+	-l LVL	Use filenames to print section headers of level 1 to 6;
+		0 means don't print filenames. Defaults to 1.
+	-D	Show demo generating documentation from this script.
+	-h	Print this message and exit.
+"
+}
+
+# =========================================================================
+
+extract_doc() {
+	extract_doc_awk "$@"
+}
+
+extract_doc_awk() {
+	awk -v level="$HEADER_LEVEL" '
+BEGIN {
+	header = sprintf("%" level "s", "");
+	gsub(/ /, "#", header);
+}
+
+# Look for the markers and change the state only.
+$0 == "# +++" { indoc = 1; next; }
+$0 == "# ---" { indoc = 0; next; }
+
+indoc && header && file != FILENAME {
+	file = FILENAME;
+	print header " `" FILENAME "`";
+}
+
+indoc && /^# !!!( .*)?$/ {
+	sub(/^# !!!/, FILENAME);
+
+	# A command outcome should be marked up as a code, so it is
+	# indented and fenced with new lines in both sides.
+	print "";
+	while ( ( $0 | getline outcome ) > 0 ) print "    " outcome;
+	close($0);
+	print "";
+
+	next;
+}
+
+indoc { sub(/^# ?/, ""); print; }
+' "$@"
+}
+
+# =========================================================================
+
+SHOW_DEMO=''
+HEADER_LEVEL=1
+
+while getopts "hl:D" arg
+do
+	case "$arg" in
+	h ) print_usage ; exit ;;
+	D ) SHOW_DEMO=1 ;;
+	l )
+		case "$OPTARG" in
+		[0-6] ) HEADER_LEVEL="$OPTARG" ;;
+		* )
+			echo "Expected [0-6]. Received: $OPTARG"
+			exit 1
+			;;
+		esac
+		;;
+	esac
+done
+
+shift $(( OPTIND-1 ))
+
+[ -n "$SHOW_DEMO" ] && set -- "$0"
+
+[ $# -eq 0 ] && set -- ./*
+
+[ $# -eq 0 ] && {
+	echo "No files - do nothing" >&2
+	exit 1
+}
+
+extract_doc "$@"
+
+# =========================================================================
+
+# EOF
