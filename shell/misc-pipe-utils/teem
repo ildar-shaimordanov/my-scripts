@@ -73,9 +73,9 @@ main "$@"
 
 # +++
 #
-# *teem* means *to rain heavily*. Here *teem* stands for *tee modified*,
-# implying that the standard `tee` tool is modified, and keeps also
-# connection with the meaning of the word, that's every new running
+# *teem* means *rain heavily*. Here *teem* stands for *tee modified*,
+# implying that action of the standard `tee` tool is modified, and keeps
+# also connection with the meaning of the word, that's every new running
 # leads to teeming with new file.
 #
 # !!! -h
