@@ -52,13 +52,16 @@ Information options
 
 # shellcheck disable=SC3028
 print_version() {
-	exec 1>&2
-	exec 2>/dev/null
-	uname -s || cmd /c ver || echo "${OSTYPE:-${OS:-unknown}}"
-	printf '%s=%s\n' \
-	imp "${CLIP_DEV:-${CLIP_IMP:-${CLIP_GET%% *},${CLIP_PUT%% *}}}" \
-	eol "$DOS2UNIX,$UNIX2DOS" \
-	enc "$ENCODING"
+	os="$(
+		exec 2>/dev/null
+		uname -s || cmd /c ver
+	)"
+
+	warn "\
+${os:-${OSTYPE:-${OS:-unknown}}}
+imp=${CLIP_DEV:-${CLIP_IMP:-$CLIP_GET,$CLIP_PUT}}
+eol=$DOS2UNIX,$UNIX2DOS
+enc=$ENCODING"
 }
 
 # =========================================================================
@@ -114,13 +117,13 @@ esac
 if CLIP_IMP="$( command -v xsel )"
 then
 	# Unixes: first attempt - preferable way
-	CLIP_GET='xsel --clipboard --output'
-	CLIP_PUT='xsel --clipboard --input'
+	CLIP_GET="$CLIP_IMP --clipboard --output"
+	CLIP_PUT="$CLIP_IMP --clipboard --input"
 elif CLIP_IMP="$( command -v xclip )"
 then
 	# Unixes: second attempt - another way
-	CLIP_GET='xclip -selection clipboard -out'
-	CLIP_PUT='xclip -selection clipboard -in'
+	CLIP_GET="$CLIP_IMP -selection clipboard -out"
+	CLIP_PUT="$CLIP_IMP -selection clipboard -in"
 elif [ "$CLIP_OS" = "darwin" ]
 then
 	# OSX? It has its own way
