@@ -1,0 +1,78 @@
+#!/bin/sh
+
+# =========================================================================
+
+print_usage() {
+	echo "\
+Usage: $( basename "$0" ) [PACKAGE...|-a]
+
+Query cygwin.com and show available versions for PACKAGE
+or all installed packages with the '-a' option (too slow).
+"
+}
+
+# =========================================================================
+
+main() {
+	[ $# -gt 0 ] || {
+		print_usage
+		exit
+	}
+
+	[ "$1" = "-a" ] && set --
+
+	cygcheck --check-setup --dump-only "$@" \
+	| check_online_packages
+}
+
+# =========================================================================
+
+check_requisites() {
+	lookup_tool cygcheck
+	lookup_tool wget curl
+	lookup_tool awk gawk
+}
+
+# =========================================================================
+
+check_online_packages() {
+	# skip the header
+	read -r
+	read -r
+
+	while read -r package version
+	do
+		load_package "$package" \
+		| parse_package_info "$package" "$version"
+	done
+}
+
+# =========================================================================
+
+load_package() {
+	wget -qO - "https://cygwin.com/packages/summary/$1.html"
+#	curl -s "https://cygwin.com/packages/summary/$1.html"
+}
+
+# =========================================================================
+
+parse_package_info() {
+	awk -v package="$1" -v version="$2" '
+	BEGIN { printf "Package: %s %s\n", package, version; }
+	/<table class="pkgtable">/ { intable = 1 }
+	/<\/table>/ { intable = 0 }
+	intable && /<td>/ {
+		sub(/<tr><td>/, "");
+		sub(/<.*>/, "");
+		eq = version == $0 ? "*" : " ";
+		printf "Avail: %s %s\n", eq, $0;
+	}'
+}
+
+# =========================================================================
+
+main "$@"
+
+# =========================================================================
+
+# EOF
