@@ -27,14 +27,6 @@ main() {
 
 # =========================================================================
 
-check_requisites() {
-	lookup_tool cygcheck
-	lookup_tool wget curl
-	lookup_tool awk gawk
-}
-
-# =========================================================================
-
 check_online_packages() {
 	# skip the header
 	read -r
@@ -59,8 +51,10 @@ load_package() {
 parse_package_info() {
 	awk -v package="$1" -v version="$2" '
 	BEGIN { printf "Package: %s %s\n", package, version; }
+
 	/<table class="pkgtable">/ { intable = 1 }
 	/<\/table>/ { intable = 0 }
+
 	intable && /<td>/ {
 		sub(/<tr><td>/, "");
 		sub(/<.*>/, "");
