@@ -15,7 +15,7 @@ document.getElementsByClassName || (function() {
 	return function getElementsByClassName(className, parent) {
 		var result = [];
 
-		var cn = getArrangedClassName(className);
+		var cn = getArrangedClassName(String(className));
 		var els = ( parent || document ).getElementsByTagName('*');
 		for (var i = 0; i < els.length; i++) {
 			var cni = getArrangedClassName(els[i].className);
@@ -27,4 +27,3 @@ document.getElementsByClassName || (function() {
 		return result;
 	};
 })();
-
