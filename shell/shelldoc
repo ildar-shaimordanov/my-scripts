@@ -55,19 +55,23 @@ BEGIN {
 }
 
 # Look for the markers and change the state only.
+# Do not use a flip-flop operator to keep the code simpler.
 $0 == "# +++" { indoc = 1; next; }
 $0 == "# ---" { indoc = 0; next; }
 
+# Print filenames as headers
 indoc && header && file != FILENAME {
 	file = FILENAME;
 	print header " `" FILENAME "`";
 }
 
+# Check if there is a code invocation and run it.
 indoc && /^# !!!( .*)?$/ {
 	sub(/^# !!!/, FILENAME);
 
 	# A command outcome should be marked up as a code, so it is
-	# indented and fenced with new lines in both sides.
+	# indented with 4 whitespaces and fenced with new lines in both
+	# sides.
 	print "";
 	while ( ( $0 | getline outcome ) > 0 ) print "    " outcome;
 	close($0);
@@ -76,6 +80,7 @@ indoc && /^# !!!( .*)?$/ {
 	next;
 }
 
+# Finally, print the result
 indoc { sub(/^# ?/, ""); print; }
 ' "$@"
 }

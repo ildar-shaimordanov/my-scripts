@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# +++
+#
+# Compare two directories
+#
+# Example:
+#
+#     diff DIR1 DIR2
+#
+# ---
+
+cd_ls() {
+	cd "$1" && find .
+}
+
+
+
+diff <( cd_ls "$1" ) <( cd_ls "$2" )
