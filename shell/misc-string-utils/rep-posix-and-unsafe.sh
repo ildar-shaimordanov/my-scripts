@@ -5,7 +5,7 @@
 # * `$1` - string
 # * `$2` - number or repetition
 #
-# POSIX-compliant version, safe and awful
+# POSIX-compliant version, unsafe
 #
 # Example: print 10 "#"
 #

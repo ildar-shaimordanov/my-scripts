@@ -19,20 +19,20 @@ Example: print 10 "#"
 
     rep "#" 10
 
-# `./rep-safe.sh`
+# `./rep-posix-and-unsafe.sh`
 
 Repeat the given string the particular number of times
 
 * `$1` - string
 * `$2` - number or repetition
 
-POSIX-compliant version, safe and awful
+POSIX-compliant version, unsafe
 
 Example: print 10 "#"
 
     rep "#" 10
 
-# `./rep-unsafe.sh`
+# `./rep-posix-safe-and-awful.sh`
 
 Repeat the given string the particular number of times
 
