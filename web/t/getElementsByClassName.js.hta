@@ -1,0 +1,25 @@
+<html>
+<body>
+
+<div id="body">
+<div class="qwe rty asd fgh zxc">line 1</div>
+<div class="fgh asd">line 2</div>
+<div class="zxc asd qwe">line 3</div>
+</div>
+<button onclick="clickit()">Click me!</button>
+
+<script src="../getElementsByClassName.js"></script>
+<script>
+
+function clickit() {
+	var body = document.getElementById('body');
+	var list = document.getElementsByClassName('zxc asd', body);
+
+	for (var i = 0; i < list.length; i++) {
+		alert([list[i].className, list[i].innerHTML]);
+	}
+}
+
+</script>
+</body>
+</html>

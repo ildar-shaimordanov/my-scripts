@@ -8,8 +8,21 @@ document.getElementsByClassName || (function() {
 		.replace(/^\s+|\s+$/g, '')
 		.toLowerCase()
 		.split(/\s+/)
-		.sort()
-		.join(' ');
+		.sort();
+	}
+
+	function contains(a, b) {
+		var found = 0;
+		var j = 0;
+
+		for (var i = 0; i < a.length; i++) {
+			if ( a[i] == b[j] ) {
+				found++;
+				j++;
+			}
+		}
+
+		return found == b.length;
 	}
 
 	return function getElementsByClassName(className, parent) {
@@ -19,7 +32,7 @@ document.getElementsByClassName || (function() {
 		var els = ( parent || document ).getElementsByTagName('*');
 		for (var i = 0; i < els.length; i++) {
 			var cni = getArrangedClassName(els[i].className);
-			if ( cni.indexOf(cn) > -1 ) {
+			if ( contains(cni, cn) ) {
 				result.push(els[i]);
 			}
 		}
