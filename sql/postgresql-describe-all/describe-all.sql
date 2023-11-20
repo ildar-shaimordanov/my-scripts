@@ -35,7 +35,7 @@ union all
     , pa.attnum as n
     , pa.attname as column_name
     , case
-      when data_type = 'numeric' and numeric_precision is not null
+      when numeric_precision is not null
       then format('%s (%s, %s)', data_type, numeric_precision, numeric_scale)
       when character_maximum_length is not null
       then format('%s (%s)', data_type, character_maximum_length)
