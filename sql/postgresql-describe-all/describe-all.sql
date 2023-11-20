@@ -36,9 +36,9 @@ union all
     , pa.attname as column_name
     , case
       when data_type = 'numeric' and numeric_precision is not null
-      then data_type || ' (' || numeric_precision || ', ' || numeric_scale || ')'
+      then format('%s (%s, %s)', data_type, numeric_precision, numeric_scale)
       when character_maximum_length is not null
-      then data_type || ' (' || character_maximum_length || ')'
+      then format('%s (%s)', data_type, character_maximum_length)
       else data_type
       end as column_type
     , c.is_nullable as nullable
