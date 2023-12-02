@@ -1,8 +1,8 @@
 <!-- toc-begin -->
 # Table of Content
 * [USAGE](#usage)
-* [OPTIONS](#options)
 * [DESCRIPTION](#description)
+* [OPTIONS](#options)
   * [`/p[:on]`, `/p:off`](#pon-poff)
   * [`/w[:on]`, `/w:off`](#won-woff)
   * [`/e ENGINE`](#e-engine)
@@ -45,18 +45,6 @@ Converts a script into a batch file.
     cmdize /list
     cmdize [/w[:on|:off]] [/e ENGINE] [/x EXTENSION] [/p[:on|:off]] FILE ...
 
-# OPTIONS
-
-* `/help`        - Show this help and description.
-* `/help:more`   - Show more details.
-* `/help:devel`  - Show extremely detailed help including internal details.
-* `/help:readme` - Generate a text for a README file
-* `/list` - Show the list of supported file extensions and specific options.
-* `/p` - Control displaying to standard output or a file.
-* `/w` - Control creating a standalone or hybrid file.
-* `/e` - Set the engine for using as the script runner.
-* `/x` - Set another extension to consider another file type.
-
 # DESCRIPTION
 
 This tool takes an original script file and converts it to the
@@ -85,6 +73,18 @@ JScript only and not supporting other engines like NodeJS, Rhino etc.
 
 This script provides more universal way to embed javascript to a batch
 file applicable for other engines. You can try it using the script.
+
+# OPTIONS
+
+* `/help`        - Show this help and description.
+* `/help:more`   - Show more details.
+* `/help:devel`  - Show extremely detailed help including internal details.
+* `/help:readme` - Generate a text for a README file
+* `/list` - Show the list of supported file extensions and specific options.
+* `/p` - Control displaying to standard output or a file.
+* `/w` - Control creating a standalone or hybrid file.
+* `/e` - Set the engine for using as the script runner.
+* `/x` - Set another extension to consider another file type.
 
 ## `/p[:on]`, `/p:off`
 

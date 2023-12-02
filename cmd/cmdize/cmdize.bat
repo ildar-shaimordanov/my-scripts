@@ -6,18 +6,6 @@
 ::U>    cmdize /list
 ::U>    cmdize [/w[:on|:off]] [/e ENGINE] [/x EXTENSION] [/p[:on|:off]] FILE ...
 ::U>
-::U># OPTIONS
-::U>
-::U>* `/help`        - Show this help and description.
-::U>* `/help:more`   - Show more details.
-::U>* `/help:devel`  - Show extremely detailed help including internal details.
-::U>* `/help:readme` - Generate a text for a README file
-::U>* `/list` - Show the list of supported file extensions and specific options.
-::U>* `/p` - Control displaying to standard output or a file.
-::U>* `/w` - Control creating a standalone or hybrid file.
-::U>* `/e` - Set the engine for using as the script runner.
-::U>* `/x` - Set another extension to consider another file type.
-::U>
 
 :: ========================================================================
 
@@ -50,6 +38,21 @@
 ::H>This script provides more universal way to embed javascript to a batch
 ::H>file applicable for other engines. You can try it using the script.
 ::H>
+
+:: ========================================================================
+
+::U># OPTIONS
+::U>
+::U>* `/help`        - Show this help and description.
+::U>* `/help:more`   - Show more details.
+::U>* `/help:devel`  - Show extremely detailed help including internal details.
+::U>* `/help:readme` - Generate a text for a README file
+::U>* `/list` - Show the list of supported file extensions and specific options.
+::U>* `/p` - Control displaying to standard output or a file.
+::U>* `/w` - Control creating a standalone or hybrid file.
+::U>* `/e` - Set the engine for using as the script runner.
+::U>* `/x` - Set another extension to consider another file type.
+::U>
 
 @echo off
 
