@@ -3,10 +3,11 @@
 * [USAGE](#usage)
 * [OPTIONS](#options)
 * [DESCRIPTION](#description)
-  * [`/p`](#p)
-  * [`/w`](#w)
+  * [`/p[:on]`, `/p:off`](#pon-poff)
+  * [`/w[:on]`, `/w:off`](#won-woff)
   * [`/e ENGINE`](#e-engine)
   * [`/x EXTENSION`](#x-extension)
+  * [FILE](#file)
 * [DETAILS](#details)
   * [.au3, .a3x](#au3-a3x)
   * [.ahk](#ahk)
@@ -40,19 +41,19 @@ Converts a script into a batch file.
 
 # USAGE
 
-    cmdize /help | /help-more | /help-devel | /help-readme
+    cmdize [/help[:more|:devel|:readme]]
     cmdize /list
-    cmdize [/w] [/e ENGINE] [/x EXTENSION] [/p] FILE ...
+    cmdize [/w[:on|:off]] [/e ENGINE] [/x EXTENSION] [/p[:on|:off]] FILE ...
 
 # OPTIONS
 
 * `/help`        - Show this help and description.
-* `/help-more`   - Show more details.
-* `/help-devel`  - Show extremely detailed help including internal details.
-* `/help-readme` - Generate a text for a README file
+* `/help:more`   - Show more details.
+* `/help:devel`  - Show extremely detailed help including internal details.
+* `/help:readme` - Generate a text for a README file
 * `/list` - Show the list of supported file extensions and specific options.
-* `/p` - Display on standard output instead of creating a new file.
-* `/w` - Create the simple batch invoker.
+* `/p` - Control displaying to standard output or a file.
+* `/w` - Control creating a standalone or hybrid file.
 * `/e` - Set the engine for using as the script runner.
 * `/x` - Set another extension to consider another file type.
 
@@ -70,6 +71,10 @@ and prticular language). Another one is chimera, the polyglot using
 some stuff like temporary files, pipes or environment variables
 (in the other words, requesting capabilities outside languages).
 
+The order of the options is not fixed. Nevertheless, any specified
+option takes effect until another one is specified. It allows to
+set one option per each file declared after the option.
+
 Below is the example of javascript in batch applicable for Windows
 JScript only and not supporting other engines like NodeJS, Rhino etc.
 
@@ -78,17 +83,16 @@ JScript only and not supporting other engines like NodeJS, Rhino etc.
     */
     WScript.Echo("Hello");
 
-The order of the options is not fixed. Nevertheless, any specified
-option takes effect until another one is specified. It allows to
-set one option per each file declared after the option.
+This script provides more universal way to embed javascript to a batch
+file applicable for other engines. You can try it using the script.
 
-## `/p`
+## `/p[:on]`, `/p:off`
 
-Display on standard output instead of creating a new file.
+Control displaying to standard output or a file.
 
-## `/w`
+## `/w[:on]`, `/w:off`
 
-Create the separate batch file invoking the original script.
+Control creating a standalone or hybrid file.
 
 ## `/e ENGINE`
 
@@ -101,6 +105,11 @@ for javascript files).
 Set another extension. It can be useful to alter the file type when
 the original file has the extension not supported by this tool.
 
+## FILE
+
+If no options provided, let's consider the argument as a file. It
+should exist, otherwise, an error is thrown and the script continues
+processing the rest of its arguments.
 # DETAILS
 
 More description, more links, more details about implementation in
@@ -422,7 +431,7 @@ Find this text and more details following by this link below.
 This document is the part of the script and generated using the
 following command:
 
-    ./cmdize.bat /help-readme | git-md-toc -cut > README.md
+    ./cmdize.bat /help:readme | git-md-toc -cut > README.md
 
 Any changes in the script are supposed to be replicated to this
 document file.

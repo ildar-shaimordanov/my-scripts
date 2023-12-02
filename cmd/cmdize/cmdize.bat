@@ -2,19 +2,19 @@
 ::U>
 ::U># USAGE
 ::U>
-::U>    cmdize /help | /help-more | /help-devel | /help-readme
+::U>    cmdize [/help[:more|:devel|:readme]]
 ::U>    cmdize /list
-::U>    cmdize [/w] [/e ENGINE] [/x EXTENSION] [/p] FILE ...
+::U>    cmdize [/w[:on|:off]] [/e ENGINE] [/x EXTENSION] [/p[:on|:off]] FILE ...
 ::U>
 ::U># OPTIONS
 ::U>
 ::U>* `/help`        - Show this help and description.
-::U>* `/help-more`   - Show more details.
-::U>* `/help-devel`  - Show extremely detailed help including internal details.
-::U>* `/help-readme` - Generate a text for a README file
+::U>* `/help:more`   - Show more details.
+::U>* `/help:devel`  - Show extremely detailed help including internal details.
+::U>* `/help:readme` - Generate a text for a README file
 ::U>* `/list` - Show the list of supported file extensions and specific options.
-::U>* `/p` - Display on standard output instead of creating a new file.
-::U>* `/w` - Create the simple batch invoker.
+::U>* `/p` - Control displaying to standard output or a file.
+::U>* `/w` - Control creating a standalone or hybrid file.
 ::U>* `/e` - Set the engine for using as the script runner.
 ::U>* `/x` - Set another extension to consider another file type.
 ::U>
@@ -35,6 +35,10 @@
 ::H>some stuff like temporary files, pipes or environment variables
 ::H>(in the other words, requesting capabilities outside languages).
 ::H>
+::H>The order of the options is not fixed. Nevertheless, any specified
+::H>option takes effect until another one is specified. It allows to
+::H>set one option per each file declared after the option.
+::H>
 ::H>Below is the example of javascript in batch applicable for Windows
 ::H>JScript only and not supporting other engines like NodeJS, Rhino etc.
 ::H>
@@ -43,40 +47,21 @@
 ::H>    */
 ::H>    WScript.Echo("Hello");
 ::H>
-::H>The order of the options is not fixed. Nevertheless, any specified
-::H>option takes effect until another one is specified. It allows to
-::H>set one option per each file declared after the option.
+::H>This script provides more universal way to embed javascript to a batch
+::H>file applicable for other engines. You can try it using the script.
 ::H>
 
 @echo off
 
-if "%~1" == "" (
-	call :print-info U
-	goto :EOF
-)
-
-if /i "%~1" == "/help" (
-	call :print-info UH
-	goto :EOF
-)
-
-if /i "%~1" == "/help-more" (
-	call :print-info UHD
-	goto :EOF
-)
-
-if /i "%~1" == "/help-devel" (
-	call :print-info UHDG
-	goto :EOF
-)
-
-if /i "%~1" == "/help-readme" (
-	call :print-info UHDGR
-	goto :EOF
-)
-
-if /i "%~1" == "/list" (
-	call :print-info "L"
+for %%s in (
+	"/		U"
+	"//help		UH"
+	"//help:more	UHD"
+	"//help:devel	UHDG"
+	"//help:readme	UHDGR"
+	"//list		L"
+) do for /f "tokens=1,*" %%a in ( "%%~s" ) do if /i "/%~1" == "%%~a" (
+	call :print-info %%~b
 	goto :EOF
 )
 
@@ -85,31 +70,41 @@ setlocal
 set "CMDIZE_ERROR=0"
 set "CMDIZE_WRAP="
 set "CMDIZE_ENGINE="
-set "CMDIZE_MAYBE=>"
+set "CMDIZE_MAYBE_STDOUT=& rem "
+set "CMDIZE_MAYBE_FILE=>"
+set "CMDIZE_MAYBE=%CMDIZE_MAYBE_FILE%"
 set "CMDIZE_EXT_ALT="
 set "CMDIZE_EXT="
 
 :cmdize_loop_begin
 if "%~1" == "" exit /b %CMDIZE_ERROR%
 
-::H>## `/p`
+::H>## `/p[:on]`, `/p:off`
 ::H>
-::H>Display on standard output instead of creating a new file.
+::H>Control displaying to standard output or a file.
 ::H>
 
-if /i "%~1" == "/p" (
-	set "CMDIZE_MAYBE=& rem "
+for %%s in (
+	"/p	%CMDIZE_MAYBE_STDOUT%"
+	"/p:on	%CMDIZE_MAYBE_STDOUT%"
+	"/p:off	%CMDIZE_MAYBE_FILE%"
+) do for /f "tokens=1,*" %%a in ( "%%~s" ) do if /i "%~1" == "%%~a" (
+	set "CMDIZE_MAYBE=%%~b"
 	shift /1
 	goto :cmdize_loop_begin
 )
 
-::H>## `/w`
+::H>## `/w[:on]`, `/w:off`
 ::H>
-::H>Create the separate batch file invoking the original script.
+::H>Control creating a standalone or hybrid file.
 ::H>
 
-if /i "%~1" == "/w" (
-	set "CMDIZE_WRAP=1"
+for %%s in (
+	"/w	1"
+	"/w:on	1"
+	"/w:off"
+) do for /f "tokens=1,*" %%a in ( "%%~s" ) do if /i "%~1" == "%%~a" (
+	set "CMDIZE_WRAP=%%~b"
 	shift /1
 	goto :cmdize_loop_begin
 )
@@ -141,16 +136,24 @@ if /i "%~1" == "/x" (
 	goto :cmdize_loop_begin
 )
 
-if defined CMDIZE_EXT_ALT if not "%CMDIZE_EXT_ALT:~0,1%" == "." (
-	call :warn Replace "%CMDIZE_EXT_ALT%" with ".%CMDIZE_EXT_ALT%"
-	set "CMDIZE_EXT_ALT=.%CMDIZE_EXT_ALT%"
-)
+::H>## FILE
+::H>
+::H>If no options provided, let's consider the argument as a file. It
+::H>should exist, otherwise, an error is thrown and the script continues
+::H>processing the rest of its arguments.
 
 if not exist "%~f1" (
 	set "CMDIZE_ERROR=1"
 	call :warn File not found: "%~1"
 	shift /1
 	goto :cmdize_loop_begin
+)
+
+:: Continue handling as a file with the options defined previously.
+
+if defined CMDIZE_EXT_ALT if not "%CMDIZE_EXT_ALT:~0,1%" == "." (
+	call :warn Replace "%CMDIZE_EXT_ALT%" with ".%CMDIZE_EXT_ALT%"
+	set "CMDIZE_EXT_ALT=.%CMDIZE_EXT_ALT%"
 )
 
 if defined CMDIZE_EXT_ALT (
@@ -446,7 +449,8 @@ goto :EOF
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=powershell -NoLogo -NoProfile -ExecutionPolicy Bypass"
 
 if defined CMDIZE_WRAP (
-	call :print-hybrid-prolog "%CMDIZE_ENGINE% -File" "" "" @ dpn0%~x1
+	set "CMDIZE_ENGINE=%CMDIZE_ENGINE% -File"
+	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
 	goto :EOF
 )
 
@@ -918,7 +922,7 @@ goto :EOF
 ::R>This document is the part of the script and generated using the
 ::R>following command:
 ::R>
-::R>    ./cmdize.bat /help-readme | git-md-toc -cut > README.md
+::R>    ./cmdize.bat /help:readme | git-md-toc -cut > README.md
 ::R>
 ::R>Any changes in the script are supposed to be replicated to this
 ::R>document file.
