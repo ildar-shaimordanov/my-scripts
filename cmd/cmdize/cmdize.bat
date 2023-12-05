@@ -452,8 +452,7 @@ goto :EOF
 if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=powershell -NoLogo -NoProfile -ExecutionPolicy Bypass"
 
 if defined CMDIZE_WRAP (
-	set "CMDIZE_ENGINE=%CMDIZE_ENGINE% -File"
-	call :print-hybrid-prolog "%CMDIZE_ENGINE%" "" "" @ dpn0%~x1
+	call :print-hybrid-prolog "%CMDIZE_ENGINE% -File" "" "" @ dpn0%~x1
 	goto :EOF
 )
 
