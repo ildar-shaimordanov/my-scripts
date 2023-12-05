@@ -426,9 +426,18 @@ goto :EOF
 
 :: ========================================================================
 
-::L>.ps1
+::L>.ps1	[/e :powershell|:pwsh|...]
 
 ::D>## .ps1
+::D>
+::D>These engines are special:
+::D>
+::D>* `/e :powershell`
+::D>* `/e :pwsh`
+::D>
+::D>They stand as a shortcut for the predefined command line options:
+::D>
+::D>    ... -NoLogo -NoProfile -ExecutionPolicy Bypass
 ::D>
 ::D>Very-very-very complicated case. It's too hard to implement a
 ::D>universal and pure hybrid. In fact it's chimera because it uses
@@ -449,7 +458,14 @@ goto :EOF
 ::D>
 
 :cmdize.ps1
-if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=powershell -NoLogo -NoProfile -ExecutionPolicy Bypass"
+if not defined CMDIZE_ENGINE set "CMDIZE_ENGINE=:powershell"
+
+for %%s in (
+	":powershell"
+	":pwsh"
+) do if /i "%CMDIZE_ENGINE%" == "%%~s" for /f "delims=:" %%a in ( "%%~s" ) do (
+	set "CMDIZE_ENGINE=%%~a -NoLogo -NoProfile -ExecutionPolicy Bypass"
+)
 
 if defined CMDIZE_WRAP (
 	call :print-hybrid-prolog "%CMDIZE_ENGINE% -File" "" "" @ dpn0%~x1

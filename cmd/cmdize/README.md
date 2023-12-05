@@ -194,6 +194,15 @@ Using the Perl syntax:
 
 ## .ps1
 
+These engines are special:
+
+* `/e :powershell`
+* `/e :pwsh`
+
+They stand as a shortcut for the predefined command line options:
+
+    ... -NoLogo -NoProfile -ExecutionPolicy Bypass
+
 Very-very-very complicated case. It's too hard to implement a
 universal and pure hybrid. In fact it's chimera because it uses
 environment variables and can fail and can require additional
