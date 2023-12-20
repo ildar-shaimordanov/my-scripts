@@ -1,12 +1,3 @@
-# `./body.sh`
-
-Print the first line of STDIN as an output header and continue executing
-the provided command.
-
-Example:
-
-    ps -ef | body grep $USER
-
 # `./teem`
 
 *teem* means *rain heavily*. Here *teem* stands for *tee modified*,
@@ -24,12 +15,4 @@ leads to teeming with new file.
     	-i	Ignore an interrupt signal
     	-h	Print this help and exit
     
-
-# `./try.sh`
-
-Execute any command silently.
-
-Example:
-
-    try sleep 10
 
