@@ -1,5 +1,5 @@
 #!/bin/sh
 
-../shelldoc -l0 \
+../run-shelldoc -l0 \
 | git-md-toc -cut \
 > README.md
