@@ -32,13 +32,22 @@ $string = [System.Text.Encoding]::UTF8.GetString($bytes)
 base64 encoding
 
 ```powershell
-$base64 = [System.Convert]::ToBase64String($bytes)
+$filename = ...
+$string = Get-Content $filename -Raw -Encoding utf8
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($string)
+$base64 = [System.Convert]::ToBase64String($bytes
+#, [Base64FormattingOptions]::InsertLineBreaks	# to insert a line break every 76 characters
+#, [Base64FormattingOptions]::None		# to not insert line breaks
+)
 ```
 
 base64 decoding
 
 ```powershell
+$filename = ...
+$base64 = Get-Content $filename -Raw
 $bytes = [System.Convert]::FromBase64String($base64)
+$string = [System.Text.Encoding]::UTF8.GetString($bytes) 
 ```
 
 stdin to stdout
