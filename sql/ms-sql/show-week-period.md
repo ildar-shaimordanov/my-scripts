@@ -10,7 +10,7 @@ declare @monday date; set @monday = datetrunc(iso_week, @someday);
 declare @sunday date; set @sunday = dateadd(day, 6, @monday);
 
 select datepart(iso_week, @someday) as "Неделя"
-concat(
+, concat(
     format(@monday, 'd.MMM.yyyy', 'ru-RU')
     , '-'
     , format(@sunday, 'd.MMM.yyyy', 'ru-RU')
