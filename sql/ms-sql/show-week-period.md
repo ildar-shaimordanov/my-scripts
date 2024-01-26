@@ -68,3 +68,19 @@ select datepart(iso_week, @someday) as "Неделя"
     , format(@sunday, 'd.MMM.yyyy', 'ru-RU')
 ) as "Период";
 ```
+
+А началось с этого. Я не большой знаток MSSQL, поэтому породил такого монстра. Сохранил его для истории - для прикола, лулзов и просто just for fun.
+
+```sql
+with init_weekdiff as ( select 0 as weekdiff ) -- /!\ - работать здесь :-)
+, init_someday as ( select dateadd(week, weekdiff, current_timestamp) as someday from init_weekdiff )
+, init_monday as ( select someday, datetrunc(iso_week, someday) as monday from init_someday )
+, init_sunday as ( select someday, monday, dateadd(day, 6, monday) as sunday from init_monday )
+select datepart(iso_week, someday) as "Неделя"
+, concat(
+    format(monday, 'd.MMM.yyyy', 'ru-RU')
+    , '-'
+    , format(sunday, 'd.MMM.yyyy', 'ru-RU')
+  ) as "Период"
+from init_sunday;
+```
