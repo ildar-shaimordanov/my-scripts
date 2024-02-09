@@ -16,7 +16,6 @@ Copy standard input to a file named 'LABEL-YYYY-mm-dd-HH-MM-SS.log'.
 If no LABEL is specified, defaults to 'tee'.
 
 Options
-	-a	Append to the file, don't overwrite
 	-i	Ignore an interrupt signal
 	-h	Print this help and exit
 "
@@ -25,10 +24,10 @@ Options
 main() {
 	TEEOPTS=""
 
-	while getopts ":ail:h" arg
+	while getopts ":il:h" arg
 	do
 		case "$arg" in
-		a | i )	TEEOPTS="$TEEOPTS -$arg" ;;
+		i )	TEEOPTS="$TEEOPTS -$arg" ;;
 		h )	print_usage ; exit ;;
 		* )	warn "Bad option: [$OPTARG]: Skipping" ;;
 		esac

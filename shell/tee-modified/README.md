@@ -11,7 +11,6 @@ leads to teeming with new file.
     If no LABEL is specified, defaults to 'tee'.
     
     Options
-    	-a	Append to the file, don't overwrite
     	-i	Ignore an interrupt signal
     	-h	Print this help and exit
     
