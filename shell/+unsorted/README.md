@@ -7,6 +7,47 @@ Example:
 
     ps -ef | body grep $USER
 
+# `./cal-1-v`
+
+Emulate `cal -1 -v` to print one month vertically.
+
+
+        February 2024   
+    Su     4 11 18 25   
+    Mo     5 12 19 26   
+    Tu     6 13 20 27   
+    We     7 14 21 28   
+    Th  1  8 15 22 29   
+    Fr  2  9 16 23      
+    Sa  3 10 17 24      
+
+
+It doesn't work with BusyBox because of no support for the `-1` option there.
+
+Based on this discussion
+https://www.cyberforum.ru/shell/thread3153320.html
+
+# `./cal-1-weekdays`
+
+Count numbers of each weekdays in one month.
+
+
+        February 2024   
+    Su Mo Tu We Th Fr Sa
+                 1  2  3
+     4  5  6  7  8  9 10
+    11 12 13 14 15 16 17
+    18 19 20 21 22 23 24
+    25 26 27 28 29      
+                        
+     4  4  4  4  5  4  4
+
+
+It doesn't work with BusyBox because of no support for the `-1` option there.
+
+Based on this discussion
+https://www.cyberforum.ru/shell/thread3153320.html
+
 # `./def.sh`
 
 Description

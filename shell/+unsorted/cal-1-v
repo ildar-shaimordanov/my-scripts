@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# +++
+#
+# Emulate `cal -1 -v` to print one month vertically.
+#
+# !!!
+#
+# It doesn't work with BusyBox because of no support for the `-1` option there.
+#
+# Based on this discussion
+# https://www.cyberforum.ru/shell/thread3153320.html
+#
+# ---
+
+calendar() {
+	cal "$@" -1
+}
+
+vertical() {
+	awk '
+BEGIN { getline; print }
+
+{
+	delta = NR == 3 ? 7 - NF : 0;
+	for (i = 1; i <= NF; i++) s[NR, i + delta] = $i
+}
+
+END {
+	for (j = 1; j <= 7; j++)
+	for (i = 2; i <= NR; i++)
+	printf "%2s%s", s[i, j], i == NR ? ORS : OFS
+}
+'
+}
+
+calendar "$@" | vertical

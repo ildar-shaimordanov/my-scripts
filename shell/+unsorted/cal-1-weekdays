@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# +++
+#
+# Count numbers of each weekdays in one month.
+#
+# !!!
+#
+# It doesn't work with BusyBox because of no support for the `-1` option there.
+#
+# Based on this discussion
+# https://www.cyberforum.ru/shell/thread3153320.html
+#
+# ---
+
+calendar() {
+	cal "$@"
+}
+
+count_weekdays() {
+	awk '
+1
+
+NR >= 3 {
+	delta = NR == 3 ? 7 - NF : 0
+	for (i = 1; i <= NF; i++) counts[i + delta]++
+}
+
+END {
+	for (i = 1; i <= 7; i++) printf "%2s%s", counts[i], i == 7 ? ORS : OFS
+}
+'
+}
+
+calendar "$@" | count_weekdays
