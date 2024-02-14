@@ -34,3 +34,26 @@ For sure, you can modify all of them for your needs to filter excess data and qu
   * https://postgrespro.ru/docs/postgresql/9.5/catalog-pg-description
   * https://postgrespro.ru/docs/postgresql/9.5/view-pg-tables
 
+# Appendix 1
+
+## Prerequisites
+
+* https://github.com/dbeaver/dbeaver
+* https://github.com/ildar-shaimordanov/jsxt
+
+## Step by step procedure
+
+1. Launch Dbeaver and connect to the server
+2. Run the  `describe-all.sql` script in Dbeaver
+3. Export data to some XMLFILE
+4. Run the command `wsx describe-all.js XMLFILE > HTMLFILE`
+5. Open HTMLFILE in a browser or Excel
+
+## The "describe-all.js" script algorithm
+
+1. Load the exported XML file
+2. Transform to another XML
+3. Load `describe-all.xsd`
+4. Validate the new XML
+5. Load `describe-all.xsl`
+6. Transform XML to HTML
