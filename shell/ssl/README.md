@@ -42,13 +42,14 @@ certificate details and to display error if something goes wrong.
 
 The certificate age is estimated as the number of the whole days. So,
 if today is the last day of the certificate validity, it's assumed
-that the certificate is expired already. I tried to implement the
-script POSIX-compliant as much as possible.
+that the certificate is expired already.
 
-Initially it's been the shell script with `awk` inline script having
-almost 50% of the script size. Later I improved it and added the
-function validating the certificate age implemented in pure shell. I
-decided to keep the previous `awk`-based implementation. Just for fan.
+I tried to implement the script POSIX-compliant as much as possible.
+
+Initially it was a shell script with `awk` inline program spreading
+on almost 50% of the script content. Later I improved it and added the
+function validating the certificate age implemented on pure shell, but
+decided to keep the previous `awk`-based implementation. Just for fun.
 
 
 # SEE ALSO
