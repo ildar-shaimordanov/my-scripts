@@ -83,6 +83,13 @@ Example:
 
     diff DIR1 DIR2
 
+# `./dmesg-T`
+
+Emulate `dmesg -T` to print human-readable timestamps.
+
+Answered in this thread
+https://stackoverflow.com/q/27503386/3627676
+
 # `./prefixtrude.sh`
 
 Extract the common leading substring from the input strings
