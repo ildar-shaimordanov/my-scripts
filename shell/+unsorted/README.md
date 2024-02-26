@@ -181,3 +181,13 @@ Example:
 
     try sleep 10
 
+# `./tty_size.sh`
+
+Print a terminal size in columns or lines.
+
+Don't rely on the variables `COLUMNS` and `LINES` because POSIX
+or minimalistic shells like dash update them every time a terminal
+is resized.
+
+More details about these variables are given in this page:
+https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
