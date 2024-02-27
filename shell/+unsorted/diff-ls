@@ -2,18 +2,16 @@
 
 # +++
 #
-# Compare two directories
+# Compare two sorted directories
 #
 # Example:
 #
-#     diff DIR1 DIR2
+#     diff-ls DIR1 DIR2
 #
 # ---
 
 cd_ls() {
-	cd "$1" && find .
+	cd "$1" && find . | sort
 }
-
-
 
 diff <( cd_ls "$1" ) <( cd_ls "$2" )

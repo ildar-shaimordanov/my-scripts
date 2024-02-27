@@ -12,13 +12,19 @@
 # ---
 
 tty_cols() {
+	command -v stty >/dev/null \
+	&& stty size </dev/tty | ( read -r l c ; echo "$c" ) \
+	&& return
+
 	command -v tput >/dev/null && tput cols && return
 	command -v ttysize >/dev/null && ttysize w && return
-	command -v stty >/dev/null && stty size | ( read -r l c ; echo "$c" ) && return
 }
 
 tty_lines() {
+	command -v stty >/dev/null \
+	&& stty size </dev/tty | ( read -r l c ; echo "$c" ) \
+	&& return
+
 	command -v tput >/dev/null && tput lines && return
 	command -v ttysize >/dev/null && ttysize h && return
-	command -v stty >/dev/null && stty size | ( read -r l c ; echo "$l" ) && return
 }

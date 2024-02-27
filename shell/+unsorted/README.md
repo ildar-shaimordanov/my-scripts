@@ -7,7 +7,7 @@ Example:
 
     ps -ef | body grep $USER
 
-# `./cal-1-v`
+# `./cal-1-vertical`
 
 Emulate `cal -1 -v` to print one month vertically.
 
@@ -87,13 +87,13 @@ https://unix.stackexchange.com/a/268309/440611
 
 # `./diff-ls`
 
-Compare two directories
+Compare two sorted directories
 
 Example:
 
-    diff DIR1 DIR2
+    diff-ls DIR1 DIR2
 
-# `./dmesg-T`
+# `./dmesg-T.sh`
 
 Emulate `dmesg -T` to print human-readable timestamps.
 
@@ -108,40 +108,18 @@ Example: print "qwe"
 
     printf '%s\n' qwerty qweasd | prefixtrude
 
-# `./rep.bash`
+# `./rep.sh`
 
 Repeat the given string the particular number of times
 
 * `$1` - string
 * `$2` - number or repetition
 
-This version uses a lot of bashisms
+There are three implementations:
 
-Example: print 10 "#"
-
-    rep "#" 10
-
-# `./rep-posix-and-unsafe.sh`
-
-Repeat the given string the particular number of times
-
-* `$1` - string
-* `$2` - number or repetition
-
-POSIX-compliant version, unsafe
-
-Example: print 10 "#"
-
-    rep "#" 10
-
-# `./rep-posix-safe-and-awful.sh`
-
-Repeat the given string the particular number of times
-
-* `$1` - string
-* `$2` - number or repetition
-
-POSIX-compliant version, safe and awful
+* bash only, full of bashisms
+* POSIX-compliant
+* POSIX-compliant, safe and awful
 
 Example: print 10 "#"
 
