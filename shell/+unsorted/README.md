@@ -162,6 +162,7 @@ leads to teeming with new file.
     Options
     	-i	Ignore an interrupt signal
     	-h	Print this help and exit
+    
 
 # `./trap_debug.bash`
 
@@ -217,3 +218,4 @@ is resized.
 
 More details about these variables are given in this page:
 https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
+
