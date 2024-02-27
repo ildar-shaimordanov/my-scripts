@@ -48,6 +48,16 @@ It doesn't work with BusyBox because of no support for the `-1` option there.
 Based on this discussion
 https://www.cyberforum.ru/shell/thread3153320.html
 
+# `./cap`
+
+*cap* and *tee* are plumbing fitting. If the last one is used to change
+direction of pipes, the first one is used to stop flows and seal end
+of a pipe.
+
+Here *cap* is used to stop flowing long lines out of a terminal
+width. In the other words, everything wider will be cropped by the
+terminal width.
+
 # `./def.sh`
 
 Description

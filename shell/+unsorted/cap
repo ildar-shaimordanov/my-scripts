@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Stop printing lines longer than a terminal width
+#
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+[ -t 0 ] &&  {
+	echo "\
+Stop printing lines longer than a terminal width
+Usage: ... | cap
+"
+	exit
+}
+
+# =========================================================================
+
+cut -c 1-$(
+	command -v stty >/dev/null \
+	&& stty size </dev/tty | ( read -r l c ; echo "$c" ) \
+	&& exit
+
+	command -v tput >/dev/null && tput cols && exit
+	command -v ttysize >/dev/null && ttysize w && exit
+)
+
+# =========================================================================
+
+# +++
+#
+# *cap* and *tee* are plumbing fitting. If the last one is used to change
+# direction of pipes, the first one is used to stop flows and seal end
+# of a pipe.
+#
+# Here *cap* is used to stop flowing long lines out of a terminal
+# width. In the other words, everything wider will be cropped by the
+# terminal width.
+#
+# ---
+
+# =========================================================================
+
+# EOF
