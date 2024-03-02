@@ -20,7 +20,14 @@
 :: the caller, the second invocation returns to the caller directly.
 ::
 :: Initially this trick was discussed in this thread:
-:: http://forum.script-coding.com/viewtopic.php?pid=94390#p94390
+:: https://forum.script-coding.com/viewtopic.php?pid=94390#p94390
+::
+:: More discussions in these threads:
+:: https://www.dostips.com/forum/viewtopic.php?f=3&t=6491
+:: https://www.dostips.com/forum/viewtopic.php?f=3&t=6537
+::
+:: Another heredoc implementations are discussed in this thread:
+:: https://stackoverflow.com/q/1015163/3627676
 @if not "%~1" == "" (
 	(echo on & goto) 2>nul
 	for /f "tokens=*" %%f in ( 'call echo:%%~f0' ) do @call "%~f0" %* "%%~f"
@@ -65,9 +72,6 @@ are part of the heredoc content within parentheses of the script block.
 
 :: ========================================================================
 
-:: Another heredoc implementations are discussed in this thread:
-:: https://stackoverflow.com/q/1015163/3627676
-::
 :: :: Everything below can be copied-and-pasted in to your scripts.
 
 :heredoc [:]LABEL [FILENAME]
