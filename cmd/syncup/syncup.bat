@@ -121,17 +121,17 @@ echo:==============================
 
 :: ========================================================================
 
-call :log "Creating the list of symbolic links"
+call :log 1.link "Creating the list of symbolic links"
 call :search.links "%syncup.cfgfile%" > "%syncup.lnkfile%"
 
 :: ========================================================================
 
-call :log "Backing up"
+call :log 2.bkup "Backing up"
 "%syncup.rootdir%\nnbackup.exe" -f "%syncup.cfgfile%" -x "@%syncup.lnkfile%" -dx "@%syncup.lnkfile%" %syncup.nocopy% -o "%syncup.drive%\." -log "%syncup.logfile%"
 
 :: ========================================================================
 
-call :log "Exit code = %ERRORLEVEL%"
+call :log 3.stop "Exit code = %ERRORLEVEL%"
 
 echo:
 echo:==============================
@@ -140,6 +140,9 @@ echo:Stopping: %~f0 %*
 echo:
 echo:==============================
 echo:
+set syncup.time
+echo:
+echo:==============================
 
 :: ========================================================================
 
@@ -177,8 +180,9 @@ goto :EOF
 :: ========================================================================
 
 :log
+set "syncup.time.%~1=%DATE: =0% %TIME: =0%"
 echo:
-echo:%DATE: =0% %TIME: =0% %~1
+echo:%DATE: =0% %TIME: =0% %~2
 echo:
 goto :EOF
 
