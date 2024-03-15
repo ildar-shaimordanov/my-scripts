@@ -22,6 +22,10 @@ if /i "%~1" == "list" (
 
 setlocal
 
+set "syncup.time.1.link="
+set "syncup.time.2.bkup="
+set "syncup.time.3.stop="
+
 :: ========================================================================
 
 if /i "%~1" == "run" (
@@ -140,7 +144,7 @@ echo:Stopping: %~f0 %*
 echo:
 echo:==============================
 echo:
-set syncup.time
+set syncup
 echo:
 echo:==============================
 
