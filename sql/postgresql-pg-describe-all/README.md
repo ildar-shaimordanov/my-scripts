@@ -44,16 +44,16 @@ For sure, you can modify all of them for your needs to filter excess data and qu
 ## Step by step procedure
 
 1. Launch Dbeaver and connect to the server
-2. Run the  `describe-all.sql` script in Dbeaver
+2. Run the  `pg-describe.sql` script in Dbeaver
 3. Export data to some XMLFILE
-4. Run the command `wsx describe-all.js XMLFILE > HTMLFILE`
+4. Run the command `wsx pg-describe.js XMLFILE > HTMLFILE`
 5. Open HTMLFILE in a browser or Excel
 
-## The "describe-all.js" script algorithm
+## The "pg-describe.js" script algorithm
 
 1. Load the exported XML file
 2. Transform to another XML
-3. Load `describe-all.xsd`
+3. Load `pg-describe.xsd`
 4. Validate the new XML
-5. Load `describe-all.xsl`
+5. Load `pg-describe.xsl`
 6. Transform XML to HTML
