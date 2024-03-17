@@ -29,7 +29,7 @@
 
 def() {
 	eval "DEF_$1=\"$1() {
-\$( cat )
+\$( while IFS='' read -r line ; do printf '%s\n' \"\$line\" ; done )
 }\" ; eval \"\$DEF_$1\""
 }
 
