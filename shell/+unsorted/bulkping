@@ -36,24 +36,13 @@ bulkping() {
 
 # =========================================================================
 
-die() {
-	warn "$*"
-	exit 1
-}
-
-warn() {
-	echo "$*" >&2
-}
-
-# =========================================================================
-
 while getopts ':f:m:' arg
 do
 	case "$arg" in
 	f ) PING_FILE="$OPTARG" ;;
 	m ) MAX_PINGS="$OPTARG" ;;
-	: ) die "Argument is required: -$OPTARG" ;;
-	* ) die "Bad option: -$OPTARG" ;;
+	: ) echo "Argument is required: -$OPTARG" >&2 ; exit 1 ;;
+	* ) echo "Bad option: -$OPTARG" >&2 ; exit 1 ;;
 	esac
 done
 
