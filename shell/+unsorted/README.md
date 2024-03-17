@@ -7,6 +7,21 @@ Example:
 
     ps -ef | body grep $USER
 
+# `./bulkping`
+
+Read hosts from stdin, file or command line and do ping towards them in
+parallel. Print to stderr the hosts that return errors when ping them.
+
+Example:
+
+    printf '%s\n' goo.gl goog.le | bulkping
+
+Requirements:
+
+* sh
+* xargs
+* ping
+
 # `./cal-1-vertical`
 
 Emulate `cal -1 -v` to print one month vertically.
@@ -141,6 +156,18 @@ leads to teeming with new file.
     	-i	Ignore an interrupt signal
     	-h	Print this help and exit
     
+
+# `./tmuxa.sh`
+
+Create a new session named as "$1" if it doesn't exist and attach to it.
+Additional options and commands are applicable.
+
+Any other clients attached to this session will be detached, if the
+`TMUX_DETACH` variable is set to any non-empty value.
+
+Example: run the session "my_work"
+
+    tmuxa my_work
 
 # `./trap_debug.bash`
 

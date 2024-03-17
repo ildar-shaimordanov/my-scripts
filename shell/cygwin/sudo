@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Being Administrators, invoke the command directly
+id -G | grep -qw 544 && {
+	"$@"
+	exit $?
+}
+
+# The CYG_SUDO variable is used to control the command invocation
+[ -z "$CYG_SUDO" ] && {
+	mintty="$( which mintty 2>/dev/null )"
+	export CYG_SUDO="$$"
+	cygstart --wait --action=runas $mintty /bin/bash "$0" "$@"
+	exit $?
+}
+
+# Now we are able to:
+# -- launch the command
+# -- display the message
+# -- return the exit code
+"$@"
+RETVAL=$?
+
+echo "$0: Press <Enter> to close window..."
+read
+
+exit $RETVAL

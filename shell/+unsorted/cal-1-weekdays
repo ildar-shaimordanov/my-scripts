@@ -4,7 +4,7 @@
 #
 # Count numbers of each weekdays in one month.
 #
-# !!!
+# !!! 2 2024
 #
 # It doesn't work with BusyBox because of no support for the `-1` option there.
 #
