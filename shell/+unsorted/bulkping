@@ -24,10 +24,14 @@ MAX_PINGS=10
 PING_FILE=''
 
 bulkping() {
+	# Windows has its own version of ping utility with its own set
+	# of options. Let's take it into account and provide all the
+	# arguments correctly. It affects on execution under BusyBox.
 	# shellcheck disable=SC2016
 	xargs ${MAX_PINGS:+-P "$MAX_PINGS"} -r ${PING_FILE:+-a "$PING_FILE"} \
 	-IX sh \
-	-c 'ping -n -c 1 "X" >/dev/null 2>&1 || { echo "X" >&2 ; exit 1 ; }'
+	-c 'ping -n $1 1 "X" >/dev/null 2>&1 || { echo "X" >&2 ; exit 1 ; }' \
+	- "$( case "$( uname -s )" in Window* ) ;; * ) echo '-c' ;; esac )"
 }
 
 # =========================================================================
