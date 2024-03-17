@@ -89,6 +89,7 @@ fi
 # Requirements:
 #
 # * sh
+# * uname
 # * xargs
 # * ping
 #

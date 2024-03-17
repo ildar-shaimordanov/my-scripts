@@ -19,6 +19,7 @@ Example:
 Requirements:
 
 * sh
+* uname
 * xargs
 * ping
 
