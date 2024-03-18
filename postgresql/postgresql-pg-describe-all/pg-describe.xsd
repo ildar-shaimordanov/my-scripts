@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
+<!--
+Copyright (C) 2023, 2024 Ildar Shaimordanov
+MIT License
+-->
+
 <xsd:element name="__SQL__" type="data-records-type" />
 
 <xsd:complexType name="data-records-type">

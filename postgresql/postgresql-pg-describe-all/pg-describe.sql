@@ -1,3 +1,5 @@
+-- Copyright (C) 2023, 2024 Ildar Shaimordanov
+-- MIT License
 with all_descriptions as (
   select
       pn.nspname as table_schema

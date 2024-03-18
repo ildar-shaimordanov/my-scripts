@@ -1,3 +1,5 @@
+// Copyright (C) 2023, 2024 Ildar Shaimordanov
+// MIT License
 var XML = require('xml');
 
 var xml_root_name = '__SQL__';
