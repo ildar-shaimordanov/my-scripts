@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Check the role of the current host in the cluster
+#
+# COPYRIGHT
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+# export PGUSER declared in bashrc
+
+. ~/.bashrc
+export PGUSER
+
+SQL="\
+select inet_server_addr() as address
+, case
+  when pg_is_in_recovery() then 'standby'
+  else 'master' end
+  as mode
+"
+
+psql -F' ' -Atqc "$SQL"

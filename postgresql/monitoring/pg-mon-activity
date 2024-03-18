@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Monitor user activity
+#
+# COPYRIGHT
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+LINES="${1:-5}"
+
+SQL="\
+select pid
+, usename as user
+, regexp_replace(query, '\\s+', ' ', 'g') as query
+from pg_stat_activity
+where pid in ( %s )
+"
+
+pg_users="$(
+	ps -o pid,%cpu,user -a -e --no-headers \
+	| grep postgres \
+	| sort -k2 -r \
+	| head -n "$LINES"
+)"
+
+echo "$pg_users"
+
+echo "$pg_users" \
+| awk -v ORS='' 'NR > 1 { $1 = "," $1 } { printf $1 }' \
+| xargs printf "$SQL" \
+| sudo -i -u postgres psql -f - \
+| sed '1 s/ \( *\)\(query\)/ \2\1/'

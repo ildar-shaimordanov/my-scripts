@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Lookup for a master in the cluster
+#
+# COPYRIGHT
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+SQL="\
+select substring(conninfo, '.*\yhost=(\S+).*')
+from pg_stat_wal_receiver
+"
+
+echo "$SQL" \
+| sudo -i -u postgres psql -Atq -f -

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Monitor time-expensive queries
+#
+# COPYRIGHT
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+SQL="\
+select calls
+, round(total_exec_time::numeric, 2) as total_time
+, round(mean_exec_time::numeric, 2) as mean_time
+, round((100 * total_exec_time / sum(total_exec_time) over ())::numeric, 2)
+  as cpu_use
+, regexp_replace(query, '\\s+', ' ', 'g') as query
+from pg_stat_statements
+order by total_exec_time desc
+limit 10
+"
+
+echo "$SQL" \
+| sudo -i -u postgres psql -f - \
+| sed '1 s/ \( *\)\(query\)/ \2\1/'
