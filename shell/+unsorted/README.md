@@ -12,8 +12,10 @@ Example:
 Read hosts from stdin, file or command line and do ping towards them in
 parallel. Print to stderr the hosts that return errors when ping them.
 
-Example:
+Examples:
 
+    bulkping goo.gl goog.le
+    bulkping -f FILENAME
     printf '%s\n' goo.gl goog.le | bulkping
 
 Requirements:
