@@ -17,6 +17,7 @@ Options
 	-m MAX	Ping at most MAX hosts at a time.
 		0 (default) means pinging as many as possible at a time.
 		Empty string means to ping sequentially.
+	-x	Debug mode: display each pinging set of commands
 "
 }
 
@@ -24,6 +25,7 @@ Options
 
 MAX_PINGS=0
 PING_FILE=''
+DEBUG_PING=''
 
 bulkping() {
 	# Windows has its own version of ping utility with its own set
@@ -36,18 +38,19 @@ bulkping() {
 
 	# shellcheck disable=SC2016
 	xargs ${MAX_PINGS:+-P "$MAX_PINGS"} -r ${PING_FILE:+-a "$PING_FILE"} \
-	-IX sh \
+	-IX sh ${DEBUG_PING:+-x} \
 	-c 'R=OK ; ping "$@" "X" >/dev/null 2>&1 || R=FAIL ; echo "X $R"' \
 	- "$@"
 }
 
 # =========================================================================
 
-while getopts ':f:m:' arg
+while getopts ':f:m:x' arg
 do
 	case "$arg" in
 	f ) PING_FILE="$OPTARG" ;;
 	m ) MAX_PINGS="$OPTARG" ;;
+	x ) DEBUG_PING=1 ;;
 	: ) echo "Argument is required: -$OPTARG" >&2 ; exit 1 ;;
 	* ) echo "Bad option: -$OPTARG" >&2 ; exit 1 ;;
 	esac
