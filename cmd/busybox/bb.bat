@@ -19,6 +19,7 @@
 ::   Download the latest 32-bit or 64-bit build of BusyBox
 ::     bb --download win32
 ::     bb --download win64
+::     bb --download win64u
 ::
 :: SEE ALSO
 ::   Learn more about BusyBox following these links:
@@ -69,8 +70,11 @@ if /i "%~1" == "--download" (
 	) else if /i "%~2" == "win64" (
 		set "BB_URL=https://frippery.org/files/busybox/busybox64.exe"
 		set "BB_DST=%~dp0busybox64.exe"
+	) else if /i "%~2" == "win64u" (
+		set "BB_URL=https://frippery.org/files/busybox/busybox64u.exe"
+		set "BB_DST=%~dp0busybox64u.exe"
 	) else (
-		call :error win32 or win64 required
+		call :error win32, win64 or win64u required
 		exit /b 1
 	)
 
