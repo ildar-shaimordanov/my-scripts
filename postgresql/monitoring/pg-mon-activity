@@ -29,7 +29,6 @@ pg_users="$(
 echo "$pg_users"
 
 echo "$pg_users" \
-| awk -v ORS='' 'NR > 1 { $1 = "," $1 } { printf $1 }' \
-| xargs printf "$SQL" \
+| awk -v SQL="$SQL" 'NR > 1 { $1 = "," $1 } { s = s $1 } END { printf SQL, s }' \
 | sudo -i -u postgres psql -f - \
 | sed '1 s/ \( *\)\(query\)/ \2\1/'
