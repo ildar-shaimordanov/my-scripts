@@ -143,6 +143,12 @@ Example: print 10 "#"
 
     rep "#" 10
 
+# `./sponge`
+
+slurp a stuff and burp...
+
+    ... | sponge [-a] file
+
 # `./teem`
 
 *teem* means *rain heavily*. Here *teem* stands for *tee modified*,
@@ -171,6 +177,14 @@ Any other clients attached to this session will be detached, if the
 Example: run the session "my_work"
 
     tmuxa my_work
+
+# `./transpose`
+
+Transpose a table
+
+    $ printf '%s %s\n' 1 2 3 4 5 6 | ./transpose
+    1 3 5
+    2 4 6
 
 # `./trap_debug.bash`
 

@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# +++
+#
+# slurp a stuff and burp...
+#
+#     ... | sponge [-a] file
+#
+# ---
+
+sponge() (
+	case "$1" in
+	-a | --append	) append=1  ; file="$2" ;;
+	*		) append="" ; file="$1" ;;
+	esac
+
+	awk -v append="$append" -v file="$file" '
+NR == 1	{ lines = $0 }
+NR != 1	{ lines = lines ORS $0 }
+
+END	{
+	if ( ! file ) { file = "-" }
+	if ( append ) {
+		print lines >> file;
+	} else {
+		print lines >  file;
+	}
+}'
+)
+
+sponge "$@"
