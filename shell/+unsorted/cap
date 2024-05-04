@@ -2,7 +2,7 @@
 
 # =========================================================================
 #
-# Stop printing lines longer than a terminal width
+# Stop printing the rest of each line that lengths exceed a terminal width
 #
 # Copyright (C) 2024 Ildar Shaimordanov
 # MIT License

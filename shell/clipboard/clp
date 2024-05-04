@@ -1,6 +1,13 @@
 #!/bin/sh
 
 # =========================================================================
+#
+# Copy data from and/or to the clipboard
+#
+# Copyright (C) 2021-2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
 
 CLIP_GET=''
 CLIP_PUT=''

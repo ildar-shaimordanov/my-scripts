@@ -10,7 +10,7 @@
 # ---
 
 body() {
-	read -r HEAD
-	echo "$HEAD"
+	IFS= read -r HEAD
+	printf '%s\n' "$HEAD"
 	"$@"
 }
