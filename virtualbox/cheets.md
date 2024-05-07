@@ -1,6 +1,6 @@
 # Commands
 
-There are few commands only.
+There are few commands only. Most of them can be performed in GUI.
 
 ## List of all VMs
 
@@ -10,13 +10,19 @@ There are few commands only.
 
     vboxmanage list -s runningvms
 
-## Show a specific IP-address for a specific VM
+## Show network settings for VM
+
+Show a specific IP-address for the VM
 
     vboxmanage guestproperty get {uuid|name} /VirtualBox/GuestInfo/Net/0/V4/IP
 
-## Show all IP-addresses for a secific VM
+Show al IP-addresses for the VM
 
     vboxmanage guestproperty enumerate {uuid|name} --patterns "*/V?/IP"
+
+Show configured NICs only for the VM
+
+    vboxmanage showvminfo {uuid|name} | awk '$1 == "NIC" && $NF != "disabled"'
 
 ## Start VM in a headless mode
 
