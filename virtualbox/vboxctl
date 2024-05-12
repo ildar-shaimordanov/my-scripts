@@ -1,0 +1,259 @@
+#!/bin/bash
+
+# =========================================================================
+#
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+ME="$( basename "$0" )"
+
+print_usage() {
+	warn "\
+Manage VirtualBox VMs
+Usage:
+	$ME status
+	$ME start|stop|shutdown|poweroff {uuid|name}
+	$ME reset|restart|reboot {uuid|name}
+	$ME pause|resume {uuid|name}
+	$ME savestate|discardstate {uuid|name}
+	$ME exec {uuid|name} [ssh options] [-- command]
+	$ME ip {uuid|name}
+"
+}
+
+# =========================================================================
+
+# +++
+#
+# # NAME
+#
+# `vboxctl` - manage VirtualBox VMs
+#
+# # SYNOPSIS
+#
+#     vboxctl command [OPTIONS]
+#
+# # DESCRIPTION
+#
+# This script is supposed to simplify and unify invocation of a few
+# useful commands.
+#
+# ---
+
+main() {
+	case "$1" in
+	status \
+	| start | stop | shutdown | poweroff \
+	| reset | restart | reboot \
+	| pause | resume \
+	| savestate | discardstate \
+	| exec | ip )
+		"$@"
+		;;
+	* )
+		print_usage
+		;;
+	esac
+}
+
+# =========================================================================
+
+# +++
+#
+# ## Show the name, uuid and current state per each VM
+#
+#     vboxmanage list --long vms \
+#     | grep -E '^(Name|UUID|State)'
+#
+# ---
+
+status() {
+	vboxmanage list --long vms \
+	| perl -nle '
+s/^(Name|UUID|State):\s+/$1:\t/ and do {
+	print;
+	print "" if $1 eq "State";
+}'
+}
+
+# =========================================================================
+
+# +++
+#
+# ## Start and stop/shudown/poweroff VM
+#
+#     vboxmanage startvm $VM --type headless
+#     vboxmanage controlvm $VM poweroff
+#
+# ## Restart/reboot/reset VM
+#
+#     vboxmanage controlvm $VM reset
+#
+# ## Pause and resume VM
+#
+#     vboxmanage controlvm $VM pause
+#     vboxmanage controlvm $VM resume
+#
+# ## Save and discard state VM
+#
+#     vboxmanage controlvm $VM savestate
+#     vboxmanage discardstate $VM
+#
+# ---
+
+start() { vboxmanage startvm "$1" --type headless ; }
+
+for n in poweroff reset pause resume savestate
+do
+	eval "$n() { vboxmanage controlvm \"\$1\" $n ; }"
+done
+
+for n in stop shutdown
+do
+	eval "$n() { poweroff \"\$1\" ; }"
+done
+
+for n in restart reboot
+do
+	eval "$n() { reset \"\$1\" ; }"
+done
+
+discardstate() { vboxmanage discardstate "$1" ; }
+
+# =========================================================================
+
+# +++
+#
+# ## Connect to VM via SSH
+#
+# It is assumed the command should be executed similar to `kubectl
+# exec`. However, it's still experimental and there is no guarantee it
+# is going to be left in the future.
+#
+# ---
+
+exec() {
+	ip=( $(
+		vboxmanage guestproperty enumerate "$1" \
+		--patterns '*/Net/*/V?/IP' \
+		| awk -F '[:,] +' '{ print $4 }'
+	) )
+
+	case ${#ip[@]} in
+	1 ) shift ; ssh "$ip" "$@" ;;
+	0 ) die "No IP found for $1" ;;
+	* ) die "Too many IPs for $1: ${ip[*]}" ;;
+	esac
+}
+
+# =========================================================================
+
+# +++
+#
+# ## Show VM network interfaces
+#
+# It looks like invoking the following two commands and combining their
+# output into the `ifconfig`-like result.
+#
+#     vboxmanage guestproperty enumerate $VM --patterns '*/Net/*' \
+#     | awk -F '[:,] +' '{ print $2, $4 }' \
+#     | sort
+#
+#     vboxmanage showvminfo $VM \
+#     | awk '$1 == "NIC" && $NF != "disabled"'
+#
+# ---
+
+ip() {
+	collectinfo "$1" | parseinfo
+}
+
+collectinfo() {
+	vboxmanage guestproperty enumerate "$1" --patterns '*/Net/*' \
+	&& vboxmanage showvminfo "$1"
+}
+
+parseinfo() {
+	perl -nle '
+m{ Net/ (\d+) / ([^,]+) , \s+ value: \s+ ([^,]+) }x
+and do {
+	$macs->{$3} = $1 if $2 eq "MAC";
+	$ifs->{$1}->{$2} = $3;
+};
+
+( $rest = $_ ) =~ s{ ^NIC \s+ \d+: \s+ }{}x
+and %{ $nic } = $rest =~ m{ ([^:]+) : \s+ ([^,]+) (?: , \s+ | $ ) }gx
+and $mac = $nic->{MAC}
+and ( $id = $macs->{ $mac } ) ne ""
+and do {
+	$ifs->{ $id }->{NIC} = $_;
+	$ifs->{ $id } = { %{ $ifs->{ $id } }, %{ $nic } };
+};
+
+END {
+#	# for debugging
+# 	use Data::Dumper;
+# 	print Dumper $ifs;
+
+	for $n ( sort keys %{ $ifs } ) {
+		$if = $ifs->{$n};
+
+		printf "%s", $if->{Name};
+
+		printf "\tMAC %s  Connected %s  Status %s\n"
+		, $if->{MAC}
+		, $if->{"Cable connected"} || "<Unknown>"
+		, $if->{Status};
+
+		$if->{Attachment}
+		and printf "\tlink %s\n"
+		, $if->{Attachment};
+
+		$if->{"V4/IP"}
+		and printf "\tinet %s  mask %s  brd %s\n"
+		, $if->{"V4/IP"}
+		, $if->{"V4/Netmask"}
+		, $if->{"V4/Broadcast"};
+
+		print "";
+	}
+}'
+}
+
+# =========================================================================
+
+die() {
+	warn "${*-Died!}"
+	exit 1
+}
+
+warn() {
+	echo "${*-Warning!}" >&2
+}
+
+# =========================================================================
+
+main "$@"
+
+# =========================================================================
+
+# +++
+#
+# # REQUIREMENTS
+#
+# * vboxmanage
+# * bash
+# * perl
+# * awk
+#
+# # SEE ALSO
+#
+# * https://github.com/stockrt/vboxctl
+#
+# ---
+
+# =========================================================================
+
+# EOF
