@@ -124,13 +124,13 @@ esac
 if CLIP_IMP="$( command -v xsel )"
 then
 	# Unixes: first attempt - preferable way
-	CLIP_GET="$CLIP_IMP --clipboard --output"
-	CLIP_PUT="$CLIP_IMP --clipboard --input"
+	CLIP_GET="$CLIP_IMP --${CLP_SELECTION:-clipboard} --output"
+	CLIP_PUT="$CLIP_IMP --${CLP_SELECTION:-clipboard} --input"
 elif CLIP_IMP="$( command -v xclip )"
 then
 	# Unixes: second attempt - another way
-	CLIP_GET="$CLIP_IMP -selection clipboard -out"
-	CLIP_PUT="$CLIP_IMP -selection clipboard -in"
+	CLIP_GET="$CLIP_IMP -selection ${CLP_SELECTION:-clipboard} -out"
+	CLIP_PUT="$CLIP_IMP -selection ${CLP_SELECTION:-clipboard} -in"
 elif [ "$CLIP_OS" = "darwin" ]
 then
 	# OSX? It has its own way
