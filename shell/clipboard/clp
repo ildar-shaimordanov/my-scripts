@@ -4,7 +4,7 @@
 #
 # Copy data from and/or to the clipboard
 #
-# Copyright (C) 2021-2024 Ildar Shaimordanov
+# Copyright (C) 2020-2024 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -191,9 +191,9 @@ warn_not_supported() {
 while getopts ":hVvudf:t:cIO" arg
 do
 	case "$arg" in
-	h ) print_usage ; exit ;;
-	V ) print_version ; exit ;;
-	v ) VERBOSELY=1 ;;
+	h )	print_usage ; exit ;;
+	V )	print_version ; exit ;;
+	v )	VERBOSELY=1 ;;
 
 	u )
 		CLIP_EOL="$DOS2UNIX"

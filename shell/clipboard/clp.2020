@@ -1,0 +1,17 @@
+clip() {
+	# clip | ...
+	[ -t 1 ] || { cat - </dev/clipboard ; return ; }
+
+	# ... | clip
+	[ -t 0 ] || { cat - >/dev/clipboard ; return ; }
+
+	# clip '...'
+	[ $# -eq 0 ] || { clip | eval "$@" | clip ; return $? ; }
+
+	cat - <<USAGE
+Usage:
+    clip | ....
+    .... | clip
+    clip '....'
+USAGE
+}
