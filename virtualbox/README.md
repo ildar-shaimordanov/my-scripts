@@ -1,3 +1,19 @@
+<!-- toc-begin -->
+# Table of Content
+* [NAME](#name)
+* [SYNOPSIS](#synopsis)
+* [DESCRIPTION](#description)
+  * [Show the name, uuid and current state per each VM](#show-the-name-uuid-and-current-state-per-each-vm)
+  * [Start and stop/shudown/poweroff VM](#start-and-stopshudownpoweroff-vm)
+  * [Restart/reboot/reset VM](#restartrebootreset-vm)
+  * [Pause and resume VM](#pause-and-resume-vm)
+  * [Save and discard state VM](#save-and-discard-state-vm)
+  * [Connect to VM via SSH](#connect-to-vm-via-ssh)
+  * [Show VM network interfaces](#show-vm-network-interfaces)
+* [REQUIREMENTS](#requirements)
+* [SEE ALSO](#see-also)
+<!-- toc-end -->
+
 
 # NAME
 
@@ -69,4 +85,4 @@ output into the `ifconfig`-like result.
 # SEE ALSO
 
 * https://github.com/stockrt/vboxctl
-
+* https://github.com/janth/vbox-snippets
