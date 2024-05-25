@@ -65,14 +65,14 @@ main() {
 # ## Show the name, uuid and current state per each VM
 #
 #     vboxmanage list --long vms \
-#     | grep -E '^(Name|UUID|State)'
+#     | grep -E '^(Name|UUID|State):  +'
 #
 # ---
 
 status() {
 	vboxmanage list --long vms \
 	| perl -nle '
-s/^(Name|UUID|State):\s+/$1:\t/ and do {
+s/^(Name|UUID|State):\s\s+/$1:\t/ and do {
 	print;
 	print "" if $1 eq "State";
 }'
@@ -179,33 +179,42 @@ parseinfo() {
 	perl -nle '
 m{ Net/ (\d+) / ([^,]+) , \s+ value: \s+ ([^,]+) }x
 and do {
-	$macs->{$3} = $1 if $2 eq "MAC";
-	$ifs->{$1}->{$2} = $3;
+	$net_info->{$1}->{$2} = $3;
+	next;
 };
 
-( $rest = $_ ) =~ s{ ^NIC \s+ \d+: \s+ }{}x
-and %{ $nic } = $rest =~ m{ ([^:]+) : \s+ ([^,]+) (?: , \s+ | $ ) }gx
-and $mac = $nic->{MAC}
-and ( $id = $macs->{ $mac } ) ne ""
+( $rest = $_ ) =~ s{ ^NIC \s+ \d+ : \s+ }{}x
+and %nic = $rest =~ m{ ([^:]+) : \s+ ([^,]+) (?: , \s+ | $ ) }gx
+and $mac = $nic{MAC}
 and do {
-	$ifs->{ $id }->{NIC} = $_;
-	$ifs->{ $id } = { %{ $ifs->{ $id } }, %{ $nic } };
+	$ifs->{$mac} = $nic_info->{$mac} = { %nic } if $mac;
+	next;
 };
 
 END {
+	for $n ( sort keys %{ $net_info } ) {
+		$mac = $net_info->{$n}->{MAC} or next;
+		$ifs->{$mac} = { %{ $nic_info->{$mac} }, %{ $net_info->{$n} } };
+	}
+
+
 #	# for debugging
 # 	use Data::Dumper;
+# 	$Data::Dumper::Indent = 1;
+# 	print Dumper $net_info;
+# 	print Dumper $nic_info;
 # 	print Dumper $ifs;
 
-	for $n ( sort keys %{ $ifs } ) {
+	for $n ( keys %{ $ifs } ) {
 		$if = $ifs->{$n};
 
-		printf "%s", $if->{Name};
+		printf "%s:", $if->{Name} || "?";
 
-		printf "\tMAC %s  Connected %s  Status %s\n"
+		printf "\tMAC %s  Type %s  Connected %s  Status %s\n"
 		, $if->{MAC}
-		, $if->{"Cable connected"} || "<Unknown>"
-		, $if->{Status};
+		, $if->{Type} || "?"
+		, $if->{"Cable connected"} || "?"
+		, $if->{Status} || "?";
 
 		$if->{Attachment}
 		and printf "\tlink %s\n"
@@ -214,8 +223,8 @@ END {
 		$if->{"V4/IP"}
 		and printf "\tinet %s  mask %s  brd %s\n"
 		, $if->{"V4/IP"}
-		, $if->{"V4/Netmask"}
-		, $if->{"V4/Broadcast"};
+		, $if->{"V4/Netmask"} || "?"
+		, $if->{"V4/Broadcast"} || "?";
 
 		print "";
 	}
