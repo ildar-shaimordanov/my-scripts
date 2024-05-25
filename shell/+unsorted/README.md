@@ -103,6 +103,15 @@ https://unix.stackexchange.com/a/268309/440611
 
     defn() { code=$(cat) ; eval "${1}_code=\$code; $1() { $code; }" ; }
 
+# `./diff-color.sh`
+
+Compare two files and and colorize the output
+
+Example:
+
+    cdiff DIR1 DIR2
+    vdiff DIR1 DIR2
+
 # `./diff-ls`
 
 Compare two sorted directories
