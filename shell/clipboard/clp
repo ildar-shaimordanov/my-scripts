@@ -85,13 +85,13 @@ warn() {
 # =========================================================================
 
 # shellcheck disable=SC2016
-getclip() {
+getclip_posh() {
 	posh \
 	'Get-Clipboard -Raw | Write-Host -NoNewLine'
 }
 
 # shellcheck disable=SC2016
-putclip() {
+putclip_posh() {
 	posh \
 	'$b = @(); $i = [Console]::OpenStandardInput();' \
 	'do { $b += @{ c = 0; d = [byte[]]::new(1048576) } }' \
@@ -145,8 +145,8 @@ then
 elif CLIP_IMP="$( lookup_command powershell pwsh )"
 then
 	# BusyBox, UnxUtils or something else?
-	CLIP_GET='getclip'
-	CLIP_PUT='putclip'
+	CLIP_GET='getclip_posh'
+	CLIP_PUT='putclip_posh'
 fi
 
 # =========================================================================
