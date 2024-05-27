@@ -61,5 +61,5 @@ union all
 )
 select *
 from all_descriptions ad
-where table_schema like '%sm' -- project-related
+where table_schema = 'public' -- !!! -- project-related
 order by table_schema, table_name nulls first, n nulls first
