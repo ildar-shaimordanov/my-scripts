@@ -38,24 +38,38 @@ where table_schema not in ( 'information_schema', 'pg_catalog', 'pg_toast', 'pub
 
 For sure, you can modify all of them for your needs to filter excess data and query needful information only.
 
-## See also
-
-* https://gist.github.com/alexanderlz/7302623
-* https://www.sqlshack.com/learn-sql-inner-join-vs-left-join/
-* https://postgrespro.ru/docs/postgresql/9.5/catalogs
-  * https://postgrespro.ru/docs/postgresql/9.5/catalog-pg-attribute
-  * https://postgrespro.ru/docs/postgresql/9.5/catalog-pg-class
-  * https://postgrespro.ru/docs/postgresql/9.5/catalog-pg-description
-  * https://postgrespro.ru/docs/postgresql/9.5/view-pg-tables
-
 # Appendix 1: Export data to LibreOffice
+
+## Prerequisites
+
+* psql
+* bash
+
+It's assumed that psql is executed under a configured user (using the `PGUSER` variable with friends and `~/.pgpass` file).
 
 ## Step by step procedure
 
 1. Place the `pg-describe.sh` and `pg-describe.sql` files.
 2. Give the execution permission for the first one
-3. Run it to collect what you want in TAB separated file (TSV)
+3. Run it to collect what you want in TAB separated files (TSV)
 4. Insert each resulting file as a separate LibreOffice sheet
+
+## Actions in LibreOffice
+
+Adding TSV files as sheets
+
+* En: Sheet | Insert Sheet | From file | Browse
+* Ru: Лист | Вставить лист | Из файла | Обзор
+
+Turn autofilter
+
+* En: Data | AutoFilter
+* Ru: Данные | Автофильтр
+
+Freeze headers
+
+* En: View | Freeze Cells | Freeze First Row
+* Ru: Вид | Фиксировать ячейки | Фиксировать первую строку
 
 # Appendix 2: Export data to MS Excel
 
@@ -80,3 +94,16 @@ For sure, you can modify all of them for your needs to filter excess data and qu
 4. Validate the new XML
 5. Load `pg-describe.xsl`
 6. Transform XML to HTML
+
+# Appendix 3: Documentation
+
+* https://gist.github.com/alexanderlz/7302623
+* https://www.sqlshack.com/learn-sql-inner-join-vs-left-join/
+* https://postgrespro.com/docs/postgresql/current/catalogs
+  * https://postgrespro.com/docs/postgresql/current/catalog-pg-attribute
+  * https://postgrespro.com/docs/postgresql/current/catalog-pg-class
+  * https://postgrespro.com/docs/postgresql/current/catalog-pg-description
+  * https://postgrespro.com/docs/postgresql/current/view-pg-tables
+* https://postgrespro.com/docs/postgresql/current/libpq-envars
+* https://postgrespro.com/docs/postgresql/current/libpq-pgpass
+
