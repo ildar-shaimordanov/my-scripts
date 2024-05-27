@@ -36,7 +36,7 @@ where table_schema not in ( 'information_schema', 'pg_catalog', 'pg_toast', 'pub
 
 ... and so on.
 
-For sure, you can modify all of them for your needs to filter excess data and query needful information only.
+For sure, you can modify all of them for your needs to filter excess data and query needful information only. Also you can find `pg-describe*.sh` scripts that simplify and automate this action.
 
 # Appendix 1: Export data to LibreOffice
 
@@ -56,7 +56,7 @@ It's assumed that psql is executed under a configured user (using the `PGUSER` v
 
 ## Actions in LibreOffice
 
-Adding TSV files as sheets
+Add TSV files as sheets
 
 * En: Sheet | Insert Sheet | From file | Browse
 * Ru: Лист | Вставить лист | Из файла | Обзор
