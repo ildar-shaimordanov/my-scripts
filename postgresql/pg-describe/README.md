@@ -10,7 +10,9 @@ There is final version. You can find it as a separate file below. I found and fi
 
 ## Querying
 
-This outer WHERE-clause is very common and is used to collect the project-related things and leave the Postgres-specific stuff out of the filter:
+There are many ways to query the project-related descriptions only. Here are a few ones.
+
+The outest WHERE-clause is general one and is used to collect everything under the `public` schema:
 
 ```sql
 where table_schema = 'public'
@@ -49,10 +51,10 @@ It's assumed that psql is executed under a configured user (using the `PGUSER` v
 
 ## Step by step procedure
 
-1. Place the `pg-describe.sh` and `pg-describe.sql` files.
+1. Put the `pg-describe.sh` and `pg-describe.sql` files next to each other into a convenient for you place, for example in your home directory
 2. Give the execution permission for the first one
-3. Run it to collect what you want in TAB separated files (TSV)
-4. Insert each resulting file as a separate LibreOffice sheet
+3. Run it to collect what you want in files formatted as TAB separated values (TSV)
+4. Open TSV files in LibreOffice or insert each resulting file as a separate LibreOffice sheet
 
 ## Actions in LibreOffice
 
