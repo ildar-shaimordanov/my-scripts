@@ -40,7 +40,8 @@ where datname not in ( 'postgres', 'template0', 'template1' )"
 psql -At -c "$PG_SHOW_DATABASES" \
 | while read -r db
 do
-	psql -AF $'\t' -f "$PG_DESC_FILE" "$db" > "pg-describe-$db.tsv"
+	psql --pset footer=off -AF $'\t' -f "$PG_DESC_FILE" "$db" \
+	> "pg-describe-$db.tsv"
 done
 
 # =========================================================================
