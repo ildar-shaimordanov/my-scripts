@@ -11,7 +11,7 @@
 # External IP address is the IP address that is visible by external 
 # servers that you connect to over Internet.
 #
-# Copyright (C) 2016, 2020-2022 Ildar Shaimordanov
+# Copyright (C) 2016-2024 Ildar Shaimordanov
 #
 # =========================================================================
 
@@ -24,6 +24,38 @@
 # https://askubuntu.com/a/604691
 
 # =========================================================================
+
+show_usage() {
+	echo "\
+USAGE
+  $( basename "$0" ) [OPTIONS]
+
+DESCRIPTION
+  Display the internal and external IP addresses
+
+OPTIONS
+  -i  Display the internal IP address
+  -e  Display the external IP address
+  -v  Turn on verbosity
+  -h  Print this help and exit
+"
+	exit
+}
+
+# =========================================================================
+
+die() {
+	warn "$*"
+	exit 2
+}
+
+warn() {
+	echo "$*" >&2
+}
+
+# =========================================================================
+
+# Load settings
 
 for f in \
 	"$( dirname "$0" )/myip.conf" \
@@ -39,29 +71,30 @@ done
 
 # =========================================================================
 
-show_usage() {
-	cat - <<HELP
-USAGE
-  $( basename "$0" ) [OPTIONS]
+# Set defaults
 
-DESCRIPTION
-  Display the internal and external IP addresses
+# Use Google's public DNS to resolve the internal IP address
+[ -n "$TARGETADDR" ] || TARGETADDR="8.8.8.8"
 
-OPTIONS
-  -i  Display the internal IP address
-  -e  Display the external IP address
-  -v  Turn on verbosity
-  -h  Print this help and exit
-HELP
-	exit
-}
+# Query the specific URL to resolve the external IP address
+[ -n "$IPURL" ] || IPURL="ipecho.net/plain"
 
-die() {
-	echo "$( basename "$0" ): $*" >&2
-	exit 2
+# Define explicitly $IPCMD to gather $IPURL using another tool
+[ -n "$IPCMD" ] || {
+	if   which curl >/dev/null 2>&1
+	then
+		IPCMD="curl -s"
+	elif which wget >/dev/null 2>&1
+	then
+		IPCMD="wget -qO -"
+	else
+		die "Neither curl nor wget installed"
+	fi
 }
 
 # =========================================================================
+
+# Parse options
 
 show_internal=""
 show_external=""
@@ -96,33 +129,13 @@ fi
 
 # =========================================================================
 
-# Use Google's public DNS to resolve the internal IP address
-[ -n "$TARGETADDR" ] || TARGETADDR="8.8.8.8"
-
-# Query the specific URL to resolve the external IP address
-[ -n "$IPURL" ] || IPURL="ipecho.net/plain"
-
-# Define explicitly $IPCMD to gather $IPURL using another tool
-[ -n "$IPCMD" ] || {
-	if   which curl >/dev/null 2>&1
-	then
-		IPCMD="curl -s"
-	elif which wget >/dev/null 2>&1
-	then
-		IPCMD="wget -qO -"
-	else
-		die "Neither curl nor wget installed"
-	fi
-}
-
-# =========================================================================
+# Functions definitions
 
 resolveip() {
 	{
 		gethostip -d "$1" && return
 		getent ahostsv4 "$1" \
-		| grep RAW \
-		| awk '{ print $1; exit }' 
+		| awk '/RAW/ { print $1; exit }'
 	} 2>/dev/null
 }
 
@@ -132,14 +145,16 @@ internalip() {
 	case "$( uname | tr '[:upper:]' '[:lower:]' )" in
 	cygwin* | mingw* | msys* | win* )
 		netstat -rn \
-		| grep -w '0.0.0.0' \
-		| awk '{ print $4 }'
+		| awk '$1 == "0.0.0.0" { print $4 }'
 		return
 		;;
 	esac
 
 	t="$( resolveip "$TARGETADDR" )"
-	[ -n "$t" ] || die "Cannot resolve $TARGETADDR"
+	[ -n "$t" ] || {
+		warn "Cannot resolve $TARGETADDR"
+		return
+	}
 
 	ip route get "$t" \
 	| sed -n 's/.* src \([^ ]*\) .*/\1/p'
@@ -148,10 +163,16 @@ internalip() {
 externalip() {
 	[ -n "$show_verbose" ] && printf "External: "
 
-	eval "$IPCMD '$IPURL' $IPOPEN"
+	# Some resources return their results without a newline and our
+	# final result looks not so good. That's the reason why we do
+	# echo from subshell - it guarantees printing a newline after
+	# an external IP address.
+	echo "$( eval "$IPCMD '$IPURL' $IPOPEN" )"
 }
 
 # =========================================================================
+
+# Main part
 
 [ -n "$show_internal" ] && internalip
 [ -n "$show_external" ] && externalip
