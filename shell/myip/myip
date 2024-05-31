@@ -25,6 +25,22 @@
 
 # =========================================================================
 
+# Load settings
+
+for f in \
+	"$( dirname "$0" )/myip.conf" \
+	~/.myip.conf \
+	/etc/myip.conf
+do
+	[ -f "$f" ] && {
+		# shellcheck source=/dev/null
+		. "$f"
+		break
+	}
+done
+
+# =========================================================================
+
 show_usage() {
 	echo "\
 USAGE
@@ -52,22 +68,6 @@ die() {
 warn() {
 	echo "$*" >&2
 }
-
-# =========================================================================
-
-# Load settings
-
-for f in \
-	"$( dirname "$0" )/myip.conf" \
-	~/.myip.conf \
-	/etc/myip.conf
-do
-	[ -f "$f" ] && {
-		# shellcheck source=/dev/null
-		. "$f"
-		break
-	}
-done
 
 # =========================================================================
 
