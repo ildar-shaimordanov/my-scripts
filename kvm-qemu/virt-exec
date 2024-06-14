@@ -1,0 +1,134 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+ME="$( basename "$0" )"
+
+print_usage() {
+	echo "\
+Execute a command on a virtual domain sending via qemu agent.
+Capture STDOUT, STDERR, ExitCode and transfer them to a host.
+Usage:
+	$ME DOMAIN COMMAND [COMMAND_OPTIONS]
+	$ME DOMAIN SHELL [SHELL_OPTIONS] -c COMMAND_STRING
+"
+}
+
+# =========================================================================
+
+[ $# -ge 2 ] || {
+	print_usage >&2
+	exit 1
+}
+
+VM_NAME="$1"
+VM_CMD_PATH="$2"
+VM_CMD_ARGS='[]'
+
+[ $# -gt 2 ] \
+&& shift 2 \
+&& VM_CMD_ARGS="$(
+	printf '%s\n' "$@" \
+	| awk '{ gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print "\"" $0 "\"" }' \
+	| jq --null-input --compact-output --slurpfile a /dev/stdin '$a'
+)"
+
+# =========================================================================
+
+# prepared input:
+# {"execute":"guest-exec","arguments":{"capture-output":true,"path":STR,"arg":[ARR]}}
+#
+# expected result:
+# {"return":{"pid":INT}}
+
+VM_CMD_EXEC="$(
+	jq --compact-output . <<-!
+	{
+		"execute": "guest-exec",
+		"arguments": {
+			"capture-output": true,
+			"path": "$VM_CMD_PATH",
+			"arg": $VM_CMD_ARGS
+		}
+	}
+	!
+)"
+
+VM_CMD_PID="$(
+	[ -n "$VIRT_EXEC_DEBUG" ] \
+	&& set -o xtrace
+
+	virsh qemu-agent-command "$VM_NAME" --cmd "$VM_CMD_EXEC"
+)" \
+|| exit $?
+
+# =========================================================================
+
+# prepared input:
+# {"execute": "guest-exec-status","arguments":{"pid":INT}}
+#
+# expected results:
+# {"return":{"exited":false}}
+# {"return":{"exited":true,"exitcode":INT,"out-data":STR,"err-data":STR}}
+
+VM_CMD_STATUS="$(
+	jq --compact-output --argjson pid "$VM_CMD_PID" \
+	'.arguments.pid = $pid.return.pid' <<-!
+	{
+		"execute": "guest-exec-status",
+		"arguments": {
+			"pid": 0
+		}
+	}
+	!
+)"
+
+while :
+do
+	VM_CMD_RETURN="$(
+		[ -n "$VIRT_EXEC_DEBUG" ] \
+		&& set -o xtrace
+
+		virsh qemu-agent-command "$VM_NAME" --cmd "$VM_CMD_STATUS"
+	)"
+
+	eval "$(
+		jq --raw-output '
+		.return
+		| to_entries
+		| map(
+			"VM_CMD_RETURN_"
+			+ (.key | gsub("\\W+"; "_") | ascii_upcase)
+			+ "=\""
+			+ (.value | tostring)
+			+ "\""
+		)
+		| .[]' <<-!
+		$VM_CMD_RETURN
+		!
+	)"
+
+	[ ${#VM_CMD_RETURN_ERR_DATA} -gt 0 ] \
+	&& base64 -di <<-! >&2
+	$VM_CMD_RETURN_ERR_DATA
+	!
+
+	[ ${#VM_CMD_RETURN_OUT_DATA} -gt 0 ] \
+	&& base64 -di <<-!
+	$VM_CMD_RETURN_OUT_DATA
+	!
+
+	[ "$VM_CMD_RETURN_EXITED" = "true" ] \
+	&& break
+done
+
+exit $VM_CMD_RETURN_EXITCODE
+
+# =========================================================================
+
+# EOF
