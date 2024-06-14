@@ -11,8 +11,8 @@ ME="$( basename "$0" )"
 
 print_usage() {
 	echo "\
-Execute a command on a virtual domain sending via qemu agent.
-Capture STDOUT, STDERR, ExitCode and transfer them to a host.
+Using qemu agent of a virtual domain send a command and execute it.
+Capture STDOUT, STDERR and ExitCode and transfer all of them to a host.
 Usage:
 	$ME DOMAIN COMMAND [COMMAND_OPTIONS]
 	$ME DOMAIN SHELL [SHELL_OPTIONS] -c COMMAND_STRING
