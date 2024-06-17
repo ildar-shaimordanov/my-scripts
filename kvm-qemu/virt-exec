@@ -35,7 +35,7 @@ VM_CMD_ARGS='[]'
 	shift 2
 	printf '%s\n' "$@" \
 	| jq --raw-input . \
-	| jq --null-input --compact-output --slurpfile a /dev/stdin '$a'
+	| jq --compact-output --slurp .
 )"
 
 # =========================================================================
