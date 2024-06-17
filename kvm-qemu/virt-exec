@@ -34,7 +34,7 @@ VM_CMD_ARGS='[]'
 && shift 2 \
 && VM_CMD_ARGS="$(
 	printf '%s\n' "$@" \
-	| awk '{ gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print "\"" $0 "\"" }' \
+	| jq --raw-input . \
 	| jq --null-input --compact-output --slurpfile a /dev/stdin '$a'
 )"
 
