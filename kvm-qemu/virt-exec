@@ -7,7 +7,7 @@
 #
 # =========================================================================
 
-ME="$( basename "$0" )"
+ME="${0##*/}"
 
 print_usage() {
 	echo "\
@@ -43,6 +43,15 @@ VM_CMD_PIPE="$( [ -t 0 ] || base64 -w0 )"
 
 # =========================================================================
 
+virt_qemu_agent() {
+	[ -n "$VIRT_EXEC_DEBUG" ] \
+	&& set -o xtrace
+
+	virsh qemu-agent-command --domain "$VM_NAME" --cmd "$1"
+}
+
+# =========================================================================
+
 # prepared input:
 # {"execute":"guest-exec","arguments":{"capture-output":true,"input-data":"STR","path":"STR","arg":[ARR]}}
 #
@@ -63,12 +72,7 @@ VM_CMD_EXEC="$(
 	!
 )"
 
-VM_CMD_PID="$(
-	[ -n "$VIRT_EXEC_DEBUG" ] \
-	&& set -o xtrace
-
-	virsh qemu-agent-command "$VM_NAME" --cmd "$VM_CMD_EXEC"
-)" \
+VM_CMD_PID="$( virt_qemu_agent "$VM_CMD_EXEC" )" \
 || exit $?
 
 # =========================================================================
@@ -94,13 +98,9 @@ VM_CMD_STATUS="$(
 
 while :
 do
-	VM_CMD_RETURN="$(
-		[ -n "$VIRT_EXEC_DEBUG" ] \
-		&& set -o xtrace
+	VM_CMD_RETURN="$( virt_qemu_agent "$VM_CMD_STATUS" )"
 
-		virsh qemu-agent-command "$VM_NAME" --cmd "$VM_CMD_STATUS"
-	)"
-
+	# Expand JSON to shell variables VM_CMD_RETURN_*
 	eval "$(
 		jq --raw-output '
 		.return
@@ -128,10 +128,44 @@ do
 	!
 
 	[ "$VM_CMD_RETURN_EXITED" = "true" ] \
+	&& [ ${#VM_CMD_RETURN_ERR_TRUNCATED} -eq 0 ] \
+	&& [ ${#VM_CMD_RETURN_OUT_TRUNCATED} -eq 0 ] \
 	&& break
 done
 
 exit $VM_CMD_RETURN_EXITCODE
+
+# =========================================================================
+
+# +++
+#
+# # USAGE
+#
+# !!! 2>&1
+#
+# # Requirements
+#
+# * virsh
+# * jq - for handling JSON
+# * base64
+# * POSIX shell (like Almquist shell) or bash
+#
+# base64 is required to encode STDIN while preparing "input-data". Also
+# it's used to decode "out-data" and "err-data", both captured from
+# the virtual machine (due to some Linux are shipped with jq 1.5-1 not
+# supporting `@base64d`).
+#
+# To check if execution is available:
+#
+#     virsh qemu-agent-command DOMAIN '{"execute":"guest-info"}' \
+#     | jq '.return.supported_commands[] | select(.name | test("guest-exec"))'
+#
+# # See Also
+#
+# * https://manpages.ubuntu.com/manpages/bionic/man7/qemu-ga-ref.7.html
+# * https://github.com/3hedgehogs/qemu-agent-commands
+#
+# ---
 
 # =========================================================================
 
