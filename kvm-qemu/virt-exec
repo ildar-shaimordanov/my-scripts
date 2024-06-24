@@ -11,11 +11,12 @@ ME="$( basename "$0" )"
 
 print_usage() {
 	echo "\
-Using qemu agent of a virtual domain send a command and execute it.
-Capture STDOUT, STDERR and ExitCode and transfer all of them to a host.
+Execute a command using qemu agent of the virtual machine.
+Enable piping data to STDIN of the virtual machine.
+Capture STDOUT and STDERR and output on the host.
+Return ExitCode of the command.
 Usage:
 	$ME DOMAIN COMMAND [COMMAND_OPTIONS]
-	$ME DOMAIN SHELL [SHELL_OPTIONS] -c COMMAND_STRING
 "
 }
 
@@ -38,6 +39,8 @@ VM_CMD_ARGS='[]'
 	| jq --compact-output --slurp .
 )"
 
+VM_CMD_PIPE="$( [ -t 0 ] || base64 -w0 )"
+
 # =========================================================================
 
 # prepared input:
@@ -52,6 +55,7 @@ VM_CMD_EXEC="$(
 		"execute": "guest-exec",
 		"arguments": {
 			"capture-output": true,
+			"input-data": "$VM_CMD_PIPE",
 			"path": "$VM_CMD_PATH",
 			"arg": $VM_CMD_ARGS
 		}
