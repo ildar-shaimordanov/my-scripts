@@ -44,7 +44,7 @@ VM_CMD_PIPE="$( [ -t 0 ] || base64 -w0 )"
 # =========================================================================
 
 # prepared input:
-# {"execute":"guest-exec","arguments":{"capture-output":true,"path":STR,"arg":[ARR]}}
+# {"execute":"guest-exec","arguments":{"capture-output":true,"input-data":"STR","path":"STR","arg":[ARR]}}
 #
 # expected result:
 # {"return":{"pid":INT}}
