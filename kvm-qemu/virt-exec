@@ -83,6 +83,7 @@ VM_CMD_PID="$( virt_qemu_agent "$VM_CMD_EXEC" )" \
 # expected results:
 # {"return":{"exited":false}}
 # {"return":{"exited":true,"exitcode":INT,"out-data":STR,"err-data":STR}}
+# {"return":{...,"out-truncated":BOOL,"err-truncated":BOOL}}
 
 VM_CMD_STATUS="$(
 	jq --compact-output --argjson pid "$VM_CMD_PID" \
@@ -98,8 +99,6 @@ VM_CMD_STATUS="$(
 
 while :
 do
-#	VM_CMD_RETURN="$( virt_qemu_agent "$VM_CMD_STATUS" )"
-
 	# Expand JSON to shell variables VM_CMD_RETURN_*
 	eval "$(
 		virt_qemu_agent "$VM_CMD_STATUS" \
