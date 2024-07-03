@@ -98,11 +98,12 @@ VM_CMD_STATUS="$(
 
 while :
 do
-	VM_CMD_RETURN="$( virt_qemu_agent "$VM_CMD_STATUS" )"
+#	VM_CMD_RETURN="$( virt_qemu_agent "$VM_CMD_STATUS" )"
 
 	# Expand JSON to shell variables VM_CMD_RETURN_*
 	eval "$(
-		jq --raw-output '
+		virt_qemu_agent "$VM_CMD_STATUS" \
+		| jq --raw-output '
 		.return
 		| to_entries
 		| map(
@@ -112,9 +113,7 @@ do
 			+ (.value | tostring)
 			+ "\""
 		)
-		| .[]' <<-!
-		$VM_CMD_RETURN
-		!
+		| .[]'
 	)"
 
 	[ ${#VM_CMD_RETURN_ERR_DATA} -gt 0 ] \
