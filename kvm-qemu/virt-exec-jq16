@@ -101,8 +101,12 @@ VM_CMD_STATUS="$(
 
 while :
 do
+	# Prepare used variables
+	unset VM_CMD_RETURN_EXITED VM_CMD_RETURN_EXITCODE
+	unset VM_CMD_RETURN_OUT_DATA VM_CMD_RETURN_ERR_DATA
+	unset VM_CMD_RETURN_OUT_TRUNCATED VM_CMD_RETURN_ERR_TRUNCATED
+
 	# Expand JSON to shell variables VM_CMD_RETURN_*
-	unset ${!VM_CMD_RETURN_*}
 	eval "$(
 		virt_qemu_agent "$VM_CMD_STATUS" \
 		| jq --raw-output '
