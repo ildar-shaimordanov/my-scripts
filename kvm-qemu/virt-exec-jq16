@@ -137,7 +137,7 @@ do
 	&& break
 done
 
-exit $VM_CMD_RETURN_EXITCODE
+exit "$VM_CMD_RETURN_EXITCODE"
 
 # =========================================================================
 
