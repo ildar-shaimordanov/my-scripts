@@ -30,6 +30,7 @@ To check if execution is available:
 
 # See Also
 
+* https://www.qemu.org/docs/master/interop/qemu-ga-ref.html
 * https://manpages.ubuntu.com/manpages/bionic/man7/qemu-ga-ref.7.html
 * https://github.com/3hedgehogs/qemu-agent-commands
 
