@@ -33,6 +33,17 @@ END { for (name in host_list) print host_list[name] }
 # ==============================================================================
 
 # +++
+#
+# List all VMs order by all networks
+#
+# Requirements
+#
+# * virsh
+# * xargs
+# * awk
+#
+# Technical details
+#
 # `virsh dumpxml --xpath` outputs results as follows:
 #
 #     <name>VM_NAME</name>
@@ -41,6 +52,7 @@ END { for (name in host_list) print host_list[name] }
 # `xargs -r -n 2` combines two strings in a single one and removes quotes
 #
 # `awk` reorders and groups data accordingly network names
+#
 # ---
 
 # ==============================================================================
