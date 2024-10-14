@@ -49,10 +49,15 @@ Technical details
 
 `virsh dumpxml --xpath` outputs results as follows:
 
-    <name>VM_NAME</name>
+    VM_NAME
      network="VM_NETWORK"
 
-`xargs -r -n 2` combines two strings in a single one and removes quotes
+`xargs -r -n 2` combines two strings in a single one and removes quotes:
 
-`awk` reorders and groups data accordingly network names
+    VM_NAME network=VM_NETWORK
+
+`awk` reorders and groups data accordingly network names:
+
+    VM_NETWORK
+      VM_NAME
 
