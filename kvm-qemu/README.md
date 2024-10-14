@@ -1,3 +1,4 @@
+# `virt-exec`
 
 # USAGE
 
@@ -33,4 +34,25 @@ To check if execution is available:
 * https://www.qemu.org/docs/master/interop/qemu-ga-ref.html
 * https://manpages.ubuntu.com/manpages/bionic/man7/qemu-ga-ref.7.html
 * https://github.com/3hedgehogs/qemu-agent-commands
+
+# `virt-list-dom-by-net`
+
+List all VMs order by all networks
+
+Requirements
+
+* virsh
+* xargs
+* awk
+
+Technical details
+
+`virsh dumpxml --xpath` outputs results as follows:
+
+    <name>VM_NAME</name>
+     network="VM_NETWORK"
+
+`xargs -r -n 2` combines two strings in a single one and removes quotes
+
+`awk` reorders and groups data accordingly network names
 
