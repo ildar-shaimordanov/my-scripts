@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# ==============================================================================
+#
+# virt-list-dom-by-net
+#
+# List all VMs ordered by all networks
+#
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# ==============================================================================
+
+xpath_network='/domain/devices/interface[@type="network"]/source/@network'
+xpath_domname='/domain/name/text()'
+
+# ==============================================================================
+
+virsh list --all --name \
+| while read -r n && [ -n "$n" ]
+do
+	virsh dumpxml "$n" --xpath "$xpath_network | $xpath_domname"
+done \
+| xargs -r -n 2 \
+| awk -v FS='[ =]' '
+! host_list[$3] { host_list[$3] = $3 }
+
+{ host_list[$3] = host_list[$3] "\n  " $1 }
+
+END { for (name in host_list) print host_list[name] }
+'
+
+# ==============================================================================
+
+# +++
+# `virsh dumpxml --xpath` outputs results as follows:
+#
+#     <name>VM_NAME</name>
+#      network="VM_NETWORK"
+#
+# `xargs -r -n 2` combines two strings in a single one and removes quotes
+#
+# `awk` reorders and groups data accordingly network names
+# ---
+
+# ==============================================================================
+
+# EOF
