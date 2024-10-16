@@ -37,7 +37,7 @@ To check if execution is available:
 
 # `virt-list-dom-by-net`
 
-List all VMs order by all networks
+List all VMs ordered by all networks
 
 Requirements
 

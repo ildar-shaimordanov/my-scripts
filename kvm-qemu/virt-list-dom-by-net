@@ -23,18 +23,16 @@ do
 done \
 | xargs -r -n 2 \
 | awk -v FS='[ =]' '
-! host_list[$3] { host_list[$3] = $3 }
-
 { host_list[$3] = host_list[$3] "\n  " $1 }
 
-END { for (name in host_list) print host_list[name] }
+END { for (name in host_list) print name, host_list[name] }
 '
 
 # ==============================================================================
 
 # +++
 #
-# List all VMs order by all networks
+# List all VMs ordered by all networks
 #
 # Requirements
 #
