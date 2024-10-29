@@ -1,0 +1,108 @@
+#!/bin/sh
+
+# =========================================================================
+#
+# Copyright (C) 2024 Ildar Shaimordanov
+# MIT License
+#
+# =========================================================================
+
+print_usage() {
+	echo "\
+Usage: ${0##*/} [-s] [-v[v]] [uid]
+Print an employee number using ldap default settings.
+See ldap.conf(5) for details.
+"
+}
+
+# ==============================================================================
+
+PRINT_SHORT=''
+VERBOSE=0
+
+while getopts 'hsv' arg
+do
+	case "$arg" in
+	h ) print_usage ; exit ;;
+	s ) PRINT_SHORT=1 ;;
+	v ) VERBOSE=$(( VERBOSE+1 )) ;;
+	* ) echo "Bad option: -$arg" >&2 ;;
+	esac
+done
+
+shift $(( OPTIND-1 ))
+
+[ $VERBOSE -eq 0 ] && exec 2>/dev/null
+[ $VERBOSE -gt 1 ] && set -x
+
+# ==============================================================================
+
+main() {
+	fetch_data "$@" | print_data
+}
+
+# ==============================================================================
+
+fetch_data() {
+	ldapsearch \
+		-v \
+		-LLL \
+		-o ldif-wrap=no \
+		-s sub \
+		"(uid=${1:-$USER})" \
+		employeeNumber
+}
+
+print_data() {
+	print_data_sh
+}
+
+print_data_awk() {
+	awk -v print_short="$PRINT_SHORT" '
+	length == 0 || $1 == "dn:" && print_short { next }
+	$1 ~ /::$/ { "echo \""$2"\" | base64 -di" | getline v; $2 = v }
+	print_short { $0 = $2 }
+	1
+	'
+}
+
+print_data_sh() {
+	while read -r k v && [ -n "$k" ]
+	do
+		case "$k" in
+		dn: ) [ -n "$PRINT_SHORT" ] && continue ;;
+		*:: ) v="$( echo "$v" | base64 -di )" ;;
+		esac
+
+		if [ -n "$PRINT_SHORT" ]
+		then
+			echo "$v"
+		else
+			echo "$k $v"
+		fi
+	done
+}
+
+# ==============================================================================
+
+main "$@"
+
+# ==============================================================================
+
+# +++
+#
+# Print an employee number using ldap default settings.
+#
+# !!! -h
+#
+# Requirements
+#
+# * ldapsearch
+# * base64
+# * awk (optionally)
+#
+# ---
+
+# ==============================================================================
+
+# EOF
