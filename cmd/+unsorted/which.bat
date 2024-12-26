@@ -40,6 +40,8 @@ if "%~1" == "" (
 	goto :EOF
 )
 
+:: ========================================================================
+
 setlocal
 
 set "which_all="
@@ -56,13 +58,18 @@ shift
 goto :which_opt_begin
 :which_opt_end
 
+:: ========================================================================
+
 :which_arg_begin
 if "%~1" == "" goto :which_arg_end
 
-echo:%~1 | "%windir%\system32\findstr.exe" /v ": \ * ? ; /" >nul || (
+for /f "delims=:\*?;/" %%a in ( "%~1" ) do if not "%%~a" == "%~1" (
 	echo:%~n0: Name should not consist of drive, paths or wildcards>&2
 	goto :which_arg_continue
 )
+
+:: Check for doskey macros
+:: - doskey binary required, otherwise fails
 
 for /f "tokens=1,* delims==" %%a in ( ' 
 	"%windir%\System32\doskey.exe" /MACROS 
@@ -70,6 +77,9 @@ for /f "tokens=1,* delims==" %%a in ( '
 	echo:%%a=%%b
 	if not defined which_all goto :which_arg_continue
 )
+
+:: Check for cmd builtins
+:: - the list of builtins checked with help binary and ss64 site
 
 for %%b in ( 
 	ASSOC CALL CD CHDIR CLS COLOR COPY DATE DEL DIR ECHO 
@@ -81,19 +91,17 @@ for %%b in (
 	if not defined which_all goto :which_arg_continue
 )
 
-set "which_ext="
-for %%x in ( "%PATHEXT:;=" "%" ) do if /i "%~x1" == "%%~x" set "which_ext=%%~x"
+:: Check for binaries
+:: - use the list of predefined file extensions in PATHEXT
+:: - consider the case when a user specified both name and extension
+:: - start looking for from the current directory first
+:: - then continue from PATH
 
-if defined which_ext (
-	call :which_binary_here "%~1" && if not defined which_all goto :which_arg_continue
-	call :which_binary_path "%~1" && if not defined which_all goto :which_arg_continue
-)
-
-for %%x in ( "%PATHEXT:;=" "%" ) do (
-	call :which_binary_here "%~1%%~x" && if not defined which_all goto :which_arg_continue
-)
-for %%x in ( "%PATHEXT:;=" "%" ) do (
-	call :which_binary_path "%~1%%~x" && if not defined which_all goto :which_arg_continue
+for %%x in ( "%PATHEXT:;=" "%" "" ) do ^
+for %%p in ( "." "%PATH:;=" "%" ) do ^
+if exist "%%~fp\%~1%%~x" (
+	echo:%%~p\%~1%%~x
+	if not defined which_all goto :which_arg_continue
 )
 
 :which_arg_continue
@@ -106,19 +114,6 @@ goto :which_arg_begin
 endlocal
 goto :EOF
 
+:: ========================================================================
 
-:which_binary_here
-if not exist ".\%~1" exit /b 1
-echo:.\%~1
-exit /b 0
-
-
-:which_binary_path
-for %%p in ( "%PATH:;=" "%" ) do for %%q in ( "%%~fp" ) do if exist "%%~fq\%~1" (
-	echo:%%~fq\%~1
-	if not defined which_all exit /b 0
-)
-exit /b 1
-
-
-rem EOF
+:: EOF
