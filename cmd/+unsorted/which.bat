@@ -44,7 +44,7 @@ if "%~1" == "" (
 
 setlocal
 
-set "which_all="
+set "which_find_all="
 
 :which_opt_begin
 set "which_opt=%~1"
@@ -52,7 +52,7 @@ if not defined which_opt goto :which_opt_end
 if not "%which_opt:~0,1%" == "-" goto :which_opt_end
 if "%~1" == "--" goto :which_opt_end
 
-if /i "%~1" == "-a" set which_all=1
+if /i "%~1" == "-a" set which_find_all=1
 shift
 
 goto :which_opt_begin
@@ -75,7 +75,7 @@ for /f "tokens=1,* delims==" %%a in ( '
 	"%windir%\System32\doskey.exe" /MACROS 
 ' ) do if /i "%~1" == "%%a" (
 	echo:%%a=%%b
-	if not defined which_all goto :which_arg_continue
+	if not defined which_find_all goto :which_arg_continue
 )
 
 :: Check for cmd builtins
@@ -88,7 +88,7 @@ for %%b in (
 	SETLOCAL SHIFT START TIME TITLE TYPE VER VERIFY VOL 
 ) do if /i "%~1" == "%%~b" (
 	echo:"%~1" is internal
-	if not defined which_all goto :which_arg_continue
+	if not defined which_find_all goto :which_arg_continue
 )
 
 :: Check for binaries
@@ -101,7 +101,7 @@ for %%x in ( "%PATHEXT:;=" "%" "" ) do ^
 for %%p in ( "." "%PATH:;=" "%" ) do ^
 if exist "%%~fp\%~1%%~x" (
 	echo:%%~p\%~1%%~x
-	if not defined which_all goto :which_arg_continue
+	if not defined which_find_all goto :which_arg_continue
 )
 
 :which_arg_continue
