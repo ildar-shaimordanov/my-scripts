@@ -28,15 +28,11 @@
 ::     http://ss64.com/nt/
 ::
 :: COPYRIGHTS
-:: Copyright (c) 2010, 2014 Ildar Shaimordanov
+:: Copyright (c) 2010, 2014, 2024 Ildar Shaimordanov
 
 @echo off
 
 if "%~1" == "" (
-	for %%p in ( powershell.exe ) do if not "%%~$PATH:p" == "" (
-		"%%~$PATH:p" -NoProfile -NoLogo -Command "cat '%~f0' | where { $_ -match '^::' } | %% { $_ -replace '::', '' }"
-		goto :EOF
-	)
 	for /f "usebackq tokens=* delims=:" %%s in ( "%~f0" ) do (
 		if /i "%%s" == "@echo off" goto :EOF
 		echo:%%s
