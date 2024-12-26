@@ -44,6 +44,9 @@ if "%~1" == "" (
 
 setlocal
 
+set "which_doskey=%windir%\System32\doskey.exe"
+if not exist "%which_doskey%" set "which_doskey="
+
 set "which_find_all="
 
 :which_opt_begin
@@ -69,17 +72,17 @@ for /f "delims=:\*?;/" %%a in ( "%~1" ) do if not "%%~a" == "%~1" (
 )
 
 :: Check for doskey macros
-:: - doskey binary required, otherwise fails
+:: - doskey binary expected
 
-for /f "tokens=1,* delims==" %%a in ( ' 
-	"%windir%\System32\doskey.exe" /MACROS 
+if defined which_doskey for /f "tokens=1,* delims==" %%a in ( '
+	"%which_doskey%" /MACROS
 ' ) do if /i "%~1" == "%%a" (
-	echo:%%a=%%b
+	echo:macro: %%a=%%b
 	if not defined which_find_all goto :which_arg_continue
 )
 
 :: Check for cmd builtins
-:: - the list of builtins checked with help binary and ss64 site
+:: - the list of builtins checked with output of help binary and ss64 site
 
 for %%b in ( 
 	ASSOC CALL CD CHDIR CLS COLOR COPY DATE DEL DIR ECHO 
@@ -87,7 +90,7 @@ for %%b in (
 	PATH PAUSE POPD PROMPT PUSHD RD REM REN RENAME RMDIR SET 
 	SETLOCAL SHIFT START TIME TITLE TYPE VER VERIFY VOL 
 ) do if /i "%~1" == "%%~b" (
-	echo:"%~1" is internal
+	echo:internal: %~1
 	if not defined which_find_all goto :which_arg_continue
 )
 
