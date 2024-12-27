@@ -25,7 +25,8 @@
 :: SEE ALSO:
 ::     DOSKEY /?
 ::     HELP /?
-::     http://ss64.com/nt/
+::     https://ss64.com/nt/syntax-internal.html
+::     https://ss64.com/nt/index.html
 ::
 :: COPYRIGHTS
 :: Copyright (c) 2010, 2014, 2024 Ildar Shaimordanov
@@ -82,13 +83,13 @@ if defined which_doskey for /f "tokens=1,* delims==" %%a in ( '
 )
 
 :: Check for cmd builtins
-:: - the list of builtins checked with output of help binary and ss64 site
+:: - the list of builtins checked with ss64 site (see the header above)
 
-for %%b in ( 
-	ASSOC CALL CD CHDIR CLS COLOR COPY DATE DEL DIR ECHO 
-	ENDLOCAL ERASE EXIT FOR FTYPE GOTO IF MD MKDIR MKLINK MOVE 
-	PATH PAUSE POPD PROMPT PUSHD RD REM REN RENAME RMDIR SET 
-	SETLOCAL SHIFT START TIME TITLE TYPE VER VERIFY VOL 
+for %%b in (
+	 ASSOC BREAK CALL CD CHDIR CLS COLOR COPY DATE DEL DIR DPATH ECHO
+	 ENDLOCAL ERASE EXIT FOR FTYPE GOTO IF KEYS MD MKDIR MKLINK MOVE
+	 PATH PAUSE POPD PROMPT PUSHD RD REM REN RENAME RMDIR SET SETLOCAL
+	 SHIFT START TIME TITLE TYPE VER VERIFY VOL
 ) do if /i "%~1" == "%%~b" (
 	echo:internal: %~1
 	if not defined which_find_all goto :which_arg_continue
