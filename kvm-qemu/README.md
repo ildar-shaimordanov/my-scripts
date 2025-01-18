@@ -5,10 +5,11 @@
 
     Execute a command using qemu agent of the virtual machine.
     Enable piping data to STDIN of the virtual machine.
+    Pass environment variables defined on the host or created in the command line.
     Capture STDOUT and STDERR and output on the host.
     Return ExitCode of the command.
     Usage:
-    	virt-exec DOMAIN COMMAND [COMMAND_OPTIONS]
+    	virt-exec [-e ENV[=VALUE] ...] DOMAIN COMMAND [COMMAND_OPTIONS]
     
 
 

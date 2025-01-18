@@ -2,7 +2,7 @@
 
 # =========================================================================
 #
-# Copyright (C) 2024 Ildar Shaimordanov
+# Copyright (C) 2024, 2025 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -13,19 +13,55 @@ print_usage() {
 	echo "\
 Execute a command using qemu agent of the virtual machine.
 Enable piping data to STDIN of the virtual machine.
+Pass environment variables defined on the host or created in the command line.
 Capture STDOUT and STDERR and output on the host.
 Return ExitCode of the command.
 Usage:
-	$ME DOMAIN COMMAND [COMMAND_OPTIONS]
+	$ME [-e ENV[=VALUE] ...] DOMAIN COMMAND [COMMAND_OPTIONS]
 "
 }
 
 # =========================================================================
 
+data2jsonarr() {
+	printf '%s\n' "$@" \
+	| jq --raw-input . \
+	| jq --compact-output --slurp .
+}
+
+# =========================================================================
+
+VM_CMD_ENVS_RAW=""
+
+while getopts ':e:' arg
+do
+	case "$arg" in
+	e )
+		karg="${OPTARG%%=*}"
+		varg="${OPTARG#*=}"
+		[ "$karg" = "$OPTARG" ] && eval "varg=\"\$$karg\""
+		VM_CMD_ENVS_RAW="\
+$VM_CMD_ENVS_RAW
+$karg=$varg"
+		;;
+	* )
+		echo "$ME: Agrument required for -$OPTARG" >&2
+		exit 2
+		;;
+	esac
+done
+
+shift $(( OPTIND-1 ))
+
 [ $# -ge 2 ] || {
 	print_usage >&2
 	exit 1
 }
+
+VM_CMD_ENVS='[]'
+
+[ "${#VM_CMD_ENVS_RAW}" -gt 0 ] \
+&& VM_CMD_ENVS="$( data2jsonarr "$VM_CMD_ENVS_RAW" )"
 
 VM_NAME="$1"
 
@@ -36,9 +72,7 @@ VM_CMD_ARGS='[]'
 [ $# -gt 2 ] \
 && VM_CMD_ARGS="$(
 	shift 2
-	printf '%s\n' "$@" \
-	| jq --raw-input . \
-	| jq --compact-output --slurp .
+	data2jsonarr "$@"
 )"
 
 VM_CMD_PIPE="$( [ -t 0 ] || base64 -w0 )"
@@ -66,6 +100,7 @@ VM_CMD_EXEC="$(
 		"execute": "guest-exec",
 		"arguments": {
 			"capture-output": true,
+			"env": $VM_CMD_ENVS,
 			"input-data": "$VM_CMD_PIPE",
 			"path": $VM_CMD_PATH,
 			"arg": $VM_CMD_ARGS
