@@ -6,7 +6,7 @@
 #
 # List all VMs ordered by all networks
 #
-# Copyright (C) 2024 Ildar Shaimordanov
+# Copyright (C) 2024, 2025 Ildar Shaimordanov
 # MIT License
 #
 # ==============================================================================
@@ -21,8 +21,7 @@ virsh list --all --name \
 do
 	virsh dumpxml "$n" --xpath "$xpath_network | $xpath_domname"
 done \
-| xargs -r -n 2 \
-| awk -v FS='[ =]' '
+| awk -v RS='\\n\\n' -v FS='\\n\\s+|=?"' '
 { host_list[$3] = host_list[$3] "\n  " $1 }
 
 END { for (name in host_list) print name, host_list[name] }
@@ -37,7 +36,6 @@ END { for (name in host_list) print name, host_list[name] }
 # Requirements
 #
 # * virsh
-# * xargs
 # * awk
 #
 # Technical details
@@ -46,10 +44,6 @@ END { for (name in host_list) print name, host_list[name] }
 #
 #     VM_NAME
 #      network="VM_NETWORK"
-#
-# `xargs -r -n 2` combines two strings in a single one and removes quotes:
-#
-#     VM_NAME network=VM_NETWORK
 #
 # `awk` reorders and groups data accordingly network names:
 #

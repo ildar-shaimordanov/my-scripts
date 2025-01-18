@@ -42,7 +42,6 @@ List all VMs ordered by all networks
 Requirements
 
 * virsh
-* xargs
 * awk
 
 Technical details
@@ -51,10 +50,6 @@ Technical details
 
     VM_NAME
      network="VM_NETWORK"
-
-`xargs -r -n 2` combines two strings in a single one and removes quotes:
-
-    VM_NAME network=VM_NETWORK
 
 `awk` reorders and groups data accordingly network names:
 
