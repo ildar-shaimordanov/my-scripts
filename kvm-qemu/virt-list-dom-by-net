@@ -21,7 +21,7 @@ virsh list --all --name \
 do
 	virsh dumpxml "$n" --xpath "$xpath_network | $xpath_domname"
 done \
-| awk -v RS='\\n\\n' -v FS='\\n\\s+|=?"' '
+| awk -v RS='\n\n' -v FS='\n\\s+|=?"' '
 { host_list[$3] = host_list[$3] "\n  " $1 }
 
 END { for (name in host_list) print name, host_list[name] }
