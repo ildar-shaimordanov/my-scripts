@@ -76,6 +76,10 @@ Here *cap* is used to stop flowing long lines out of a terminal
 width. In the other words, everything wider will be cropped by the
 terminal width.
 
+# `./ctrace.bash`
+
+Print the full stack of execution contexts
+
 # `./def.sh`
 
 Description
@@ -197,6 +201,22 @@ Transpose a table
 
 # `./trap_debug.bash`
 
+Debugging in bash
+
+Example:
+
+```shell
+set -T # debug functions as well
+trap trap_debug DEBUG
+```
+
+Based on the idea published here:
+https://www.cyberforum.ru/blogs/1976142/10017.html
+
+# `./trap_debug_print.bash`
+
+Control output of debugging information
+
 A colon separated lists of patterns used to decide which command lines
 should be shrinked until the length of the matched pattern or skipped
 completely while output. Each pattern is anchored to the beginning
@@ -215,7 +235,7 @@ usually used to output long texts in heredoc.
 
 Functions
 
-* `trap_debug`
+* `trap_debug_print`
 
 This function can be used at the beginning of the script or somewhere
 else to initialize DEBUG trap. It analyzes the $BASH_COMMAND variable,
