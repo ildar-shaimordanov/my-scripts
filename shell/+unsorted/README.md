@@ -179,6 +179,16 @@ leads to teeming with new file.
     	-h	Print this help and exit
     
 
+# `./timer.sh`
+
+Report time consumed by command execution.
+
+Example:
+
+```shell
+timer watch sleep 10
+```
+
 # `./tmuxa.sh`
 
 Create a new session named as "$1" if it doesn't exist and attach to it.
@@ -269,4 +279,16 @@ time a terminal is resized.
 
 More details about these variables are given in this page:
 https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
+
+# `./unhtml.sh`
+
+Remove all styles, scripts and html comments totally, strip html tags
+and leave a naked text only.
+
+# `./x11sudo.sh`
+
+Enable X11 settings of the current user when `sudo`-ing to another one.
+
+Based on this thread:
+https://unix.stackexchange.com/questions/476290/x11-forwarding-does-not-work-if-su-to-another-user
 
