@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# The solution is taken from this SO-answer
+# https://stackoverflow.com/a/49491581/3627676
+
 # Being Administrators, invoke the command directly
 id -G | grep -qw 544 && {
 	"$@"

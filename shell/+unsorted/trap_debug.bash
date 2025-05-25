@@ -12,6 +12,12 @@
 # Based on the idea published here:
 # https://www.cyberforum.ru/blogs/1976142/10017.html
 #
+# Almost the same version (with some ligfht modifications):
+#
+# ```shell
+# trap 'echo "# $LINENO: $BASH_COMMAND" >&2 ; read' DEBUG
+# ```
+#
 # ---
 
 trap_debug() (
