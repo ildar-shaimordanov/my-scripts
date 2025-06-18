@@ -4,7 +4,7 @@
 #
 # Describe all the project-related tables, columns and their descriptions
 #
-# Copyright (C) 2024 Ildar Shaimordanov
+# Copyright (C) 2024, 2025 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -17,7 +17,7 @@ PG_DESC_FILE="$PG_DESC_ORIG"
 PG_SHOW_DATABASES="\
 select datname
 from pg_database
-where datname not in ( 'postgres', 'template0', 'template1' )"
+where datname not in ( 'postgres', 'template0', 'template1', 'template_rbac' )"
 
 # =========================================================================
 
