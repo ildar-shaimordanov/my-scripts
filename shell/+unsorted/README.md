@@ -76,6 +76,25 @@ Here *cap* is used to stop flowing long lines out of a terminal
 width. In the other words, everything wider will be cropped by the
 terminal width.
 
+# `./color.sh`
+
+Use symbolic names of colors like COLOR to colorize the COMMAND output.
+It expects the variables named as COLOR_*.
+
+Usage
+
+    color COLOR COMMAND [ARGUMENTS]
+
+Example
+
+    # Examples of colors
+    COLOR_RED="\e[0;31m'
+    COLOR_YELLOW="\e[0;33m'
+    COLOR_GREEN="\e[0;32m'
+    ...
+    # Display text in green
+    color GREEN echo I am fine
+
 # `./ctrace.bash`
 
 Print the full stack of execution contexts
@@ -223,7 +242,6 @@ trap trap_debug DEBUG
 How to use it without function
 
 ```shell
-trap 'printf "# $LINENO: $BASH_COMMAND" >&2' DEBUG
 trap 'printf "# $LINENO: $BASH_COMMAND" >&2 ; read' DEBUG
 ```
 
