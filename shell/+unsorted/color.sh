@@ -10,9 +10,9 @@
 # Example
 #
 #     # Examples of colors
-#     COLOR_RED="\e[0;31m'
-#     COLOR_YELLOW="\e[0;33m'
-#     COLOR_GREEN="\e[0;32m'
+#     COLOR_RED="\e[0;31m"
+#     COLOR_YELLOW="\e[0;33m"
+#     COLOR_GREEN="\e[0;32m"
 #     ...
 #     # Display text in green
 #     color GREEN echo I am fine
