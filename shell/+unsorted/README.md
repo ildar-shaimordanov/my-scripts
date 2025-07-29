@@ -88,12 +88,15 @@ Usage
 Example
 
     # Examples of colors
-    COLOR_RED="\e[0;31m'
-    COLOR_YELLOW="\e[0;33m'
-    COLOR_GREEN="\e[0;32m'
+    COLOR_RED="\e[0;31m"
+    COLOR_YELLOW="\e[0;33m"
+    COLOR_GREEN="\e[0;32m"
     ...
-    # Display text in green
+    # Display text in green (using color name)
     color GREEN echo I am fine
+    ...
+    # display text in green (using color code)
+    color "\e[0;32m" echo I am fine too
 
 # `./ctrace.bash`
 
