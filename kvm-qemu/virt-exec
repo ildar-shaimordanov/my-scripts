@@ -69,7 +69,7 @@ shift $(( OPTIND-1 ))
 
 [ -n "$VM_CMD_GUEST_CHECK_COMMANDS" ] && [ $# -gt 0 ] && {
 	virsh qemu-agent-command "$1" '{"execute":"guest-info"}' \
-	| jq '.return.supported_commands[] | select(.name | test("guest-exec"))'
+	| jq -c '.return.supported_commands[] | select(.name | test("guest-exec"))'
 	exit
 }
 
