@@ -2,7 +2,7 @@
 #
 # Urlencode any string on pure POSIX shell with no grep/sed/jq.
 #
-# rawurlencode "P@ssw0rd" # results to "P%40ssw0rd"
+# urlencode "P@ssw0rd" # results to "P%40ssw0rd"
 #
 # This implementation is based on these two brilliant ideas:
 # * https://stackoverflow.com/a/10660730
@@ -10,7 +10,7 @@
 #
 # ---
 
-rawurlencode() (
+urlencode() (
 	LANG=C
 	OPTIND=1
 	while getopts ':' arg "-$1"
