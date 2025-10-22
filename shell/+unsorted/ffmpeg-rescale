@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# =========================================================================
+
+print_usage() {
+	echo "\
+Usage: $( basename "$0" ) [-W WIDTH] [-H HEIGHT] FILE...
+
+Scaling works following these rules:
+scale=WIDTH:-2		with -W WIDTH only
+scale=-2:HEIGHT		with -H HEIGHT only
+scale=WIDTH:HEIGHT	with both -W WIDTH -H HEIGHT
+scale=640:-2		if no options specified
+
+Positive numbers mean video resolution in pixels.
+-2 means to keep an aspect ratio and parity.
+"
+}
+
+# =========================================================================
+
+unset width height
+
+while getopts 'W:H:' arg
+do
+	case "$arg" in
+	W ) width="$OPTARG" ;;
+	H ) height="$OPTARG" ;;
+	* ) print_usage >&2 ; exit 1 ;;
+	esac
+done	
+
+shift $(( OPTIND-1 ))
+
+[ $# -gt 0 ] || {
+	print_usage
+	exit
+}
+
+# =========================================================================
+
+scale="${width:--2}:${height:--2}"
+
+[ "$scale" = "-2:-2" ] && scale="640:-2"
+
+for f in "$@"
+do
+	g="$f.${f##*.}"
+	ffmpeg -i "$f" -vf "scale=$scale" -y "$g"
+done
+
+# =========================================================================
+
+# EOF
