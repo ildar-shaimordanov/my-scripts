@@ -40,14 +40,14 @@ color() (
 	esac
 
 	# shellcheck disable=SC2059
-	if [ -n "$color" ] ; then printf "$color" ; fi
+	if [ -n "$color" ] ; then printf -- "$color" ; fi
 
 	shift
 	"$@"
 	result=$?
 
 	# shellcheck disable=SC2059
-	if [ -n "$color" ] ; then printf "${COLOR_RESET:-\033[0m}" ; fi
+	if [ -n "$color" ] ; then printf -- "${COLOR_RESET:-\033[0m}" ; fi
 
 	return $result
 )
