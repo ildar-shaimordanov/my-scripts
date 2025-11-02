@@ -40,8 +40,8 @@ Stream controlling options
 
 Information options
 	-h	Display this help message
-	-v	Display the executable command
-	-V	Display versions of tools
+	-v	Display the invoked commands
+	-V	Display information on tools used by the utility
 
 ```
 

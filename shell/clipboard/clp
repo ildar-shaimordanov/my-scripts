@@ -4,7 +4,7 @@
 #
 # Copy data from and/or to the clipboard
 #
-# Copyright (C) 2020-2024 Ildar Shaimordanov
+# Copyright (C) 2020-2025 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -52,13 +52,13 @@ Stream controlling options
 
 Information options
 	-h	Display this help message
-	-v	Display the executable command
-	-V	Display versions of tools
+	-v	Display the invoked commands
+	-V	Display information on tools used by the utility
 "
 }
 
 # shellcheck disable=SC3028
-print_version() {
+print_tools_info() {
 	os="$(
 		exec 2>/dev/null
 		uname -s || cmd /c ver
@@ -67,7 +67,8 @@ print_version() {
 	warn "\
 ${os:-${OSTYPE:-${OS:-unknown}}}
 imp=${CLIP_DEV:-${CLIP_IMP:-$CLIP_GET,$CLIP_PUT}}
-eol=$DOS2UNIX,$UNIX2DOS
+d2u=$DOS2UNIX
+u2d=$UNIX2DOS
 enc=$ENCODING"
 }
 
@@ -116,10 +117,12 @@ lookup_command() {
 # =========================================================================
 
 # shellcheck disable=SC3028
-case "$OSTYPE" in
-darwin*	) CLIP_OS=darwin ;;
-*	) CLIP_OS='' ;;
-esac
+is_darwin() {
+	case "$OSTYPE" in
+	darwin*	) ;;
+	*	) return 1 ;;
+	esac
+}
 
 if CLIP_IMP="$( command -v xsel )"
 then
@@ -131,7 +134,7 @@ then
 	# Unixes: second attempt - another way
 	CLIP_GET="$CLIP_IMP -selection ${CLP_SELECTION:-clipboard} -out"
 	CLIP_PUT="$CLIP_IMP -selection ${CLP_SELECTION:-clipboard} -in"
-elif [ "$CLIP_OS" = "darwin" ]
+elif is_darwin
 then
 	# OSX? It has its own way
 	CLIP_GET="$( command -v pbpaste )"
@@ -192,7 +195,7 @@ while getopts ":hVvudf:t:cIO" arg
 do
 	case "$arg" in
 	h )	print_usage ; exit ;;
-	V )	print_version ; exit ;;
+	V )	print_tools_info ; exit ;;
 	v )	VERBOSELY=1 ;;
 
 	u )
