@@ -2,7 +2,10 @@
 #
 # Urlencode any string on pure POSIX shell with no grep/sed/jq.
 #
-# urlencode "P@ssw0rd" # results to "P%40ssw0rd"
+# Example:
+#
+#     $ urlencode "P@ssw0rd"
+#     "P%40ssw0rd"
 #
 # This implementation is based on these two brilliant ideas:
 # * https://stackoverflow.com/a/10660730
