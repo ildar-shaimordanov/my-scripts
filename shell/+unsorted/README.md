@@ -153,6 +153,21 @@ Emulate `dmesg -T` to print human-readable timestamps.
 Answered in this thread
 https://stackoverflow.com/q/27503386/3627676
 
+# `./envsubst.sh`
+
+This function covers and expands functionality of the original
+utility. With no options the function takes a current environment and
+passes all found variables to the utility.
+
+# `./get_ipv4.sh`
+
+The function tries to gather an IPv4 address for a specified interface.
+
+Example:
+
+    $ get_ipv4 lo
+    127.0.0.1
+
 # `./prefixtrude.sh`
 
 Extract the common leading substring from the input strings
@@ -312,6 +327,19 @@ https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
 
 Remove all styles, scripts and html comments totally, strip html tags
 and leave a naked text only.
+
+# `./urlencode.sh`
+
+Urlencode any string on pure POSIX shell with no grep/sed/jq.
+
+Example:
+
+    $ urlencode "P@ssw0rd"
+    "P%40ssw0rd"
+
+This implementation is based on these two brilliant ideas:
+* https://stackoverflow.com/a/10660730
+* https://blog.dnmfarrell.com/post/how-to-split-a-string-in-posix-shell/
 
 # `./x11sudo.sh`
 
