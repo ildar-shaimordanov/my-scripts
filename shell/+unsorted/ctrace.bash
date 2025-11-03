@@ -5,7 +5,7 @@
 # ---
 
 ctrace() {
-	set -- 0 ; while caller $1 ; do set -- $(( $1+1 )) ; done
+	set -- 0 ; while caller "$1" ; do set -- $(( $1+1 )) ; done
 }
 
 # Insane version working without loops
