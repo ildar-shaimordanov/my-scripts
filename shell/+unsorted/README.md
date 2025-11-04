@@ -153,6 +153,25 @@ Emulate `dmesg -T` to print human-readable timestamps.
 Answered in this thread
 https://stackoverflow.com/q/27503386/3627676
 
+# `./echo-stderr.sh`
+
+Useful functions for writing to the standard error and exiting with
+non-zero exit code. There are two versions per each function:
+
+* basic, available in the major of shells
+* bash-compatible, supporting the `caller` builtin
+
+Examples:
+
+    # to warn about something
+    warn "Something happened but continue execution."
+
+    # to stop execution when something goes wrong
+    die "Something critical happened. Exiting."
+
+    # stop execution with the exit code = 42
+    DIE=42 die "what a question, what an answer."
+
 # `./envsubst.sh`
 
 This function covers and expands functionality of the original
@@ -208,6 +227,7 @@ leads to teeming with new file.
 
 
     Usage: ... | teem [OPTIONS] [LABEL]
+    
     Copy standard input to a file named 'LABEL-YYYY-mm-dd-HH-MM-SS.log'.
     If no LABEL is specified, defaults to 'tee'.
     
@@ -215,6 +235,7 @@ leads to teeming with new file.
     	-i	Ignore an interrupt signal
     	-h	Print this help and exit
     
+
 
 # `./timer.sh`
 
@@ -340,6 +361,18 @@ Example:
 This implementation is based on these two brilliant ideas:
 * https://stackoverflow.com/a/10660730
 * https://blog.dnmfarrell.com/post/how-to-split-a-string-in-posix-shell/
+
+# `./vdiff.sh`
+
+A function for using in an interactive shell. It supports `diff`
+options from command line and `less` options via the `LESS` variable.
+
+There three versions:
+
+* a simple wrapper around `diff` and `less`
+* the same supporting the modern `--color` option
+* an `eval`-command constructing one of two above
+  (useful for `.bashrc` as an example)
 
 # `./x11sudo.sh`
 
