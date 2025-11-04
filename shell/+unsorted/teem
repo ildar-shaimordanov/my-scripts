@@ -4,14 +4,15 @@
 #
 # Copy STDIN to a file marked with a label and timestamp
 #
-# Copyright (C) 2023 Ildar Shaimordanov
+# Copyright (C) 2023, 2025 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
 
 print_usage() {
-	echo "\
+	warn "\
 Usage: ... | teem [OPTIONS] [LABEL]
+
 Copy standard input to a file named 'LABEL-YYYY-mm-dd-HH-MM-SS.log'.
 If no LABEL is specified, defaults to 'tee'.
 
@@ -24,12 +25,12 @@ Options
 main() {
 	TEEOPTS=""
 
-	while getopts ":il:h" arg
+	while getopts ":ih" arg
 	do
 		case "$arg" in
-		i )	TEEOPTS="$TEEOPTS -$arg" ;;
-		h )	print_usage ; exit ;;
-		* )	warn "Bad option: [$OPTARG]: Skipping" ;;
+		i ) TEEOPTS="$TEEOPTS -$arg" ;;
+		h ) print_usage ; exit ;;
+		* ) warn "Bad option: [$OPTARG]: Skipping" ;;
 		esac
 	done
 
@@ -40,7 +41,7 @@ main() {
 
 	trap 'rm_empty' EXIT
 
-	warn "Store to file: $TEEFILE"
+	warn "Storing to file: $TEEFILE"
 
 	unbuf="$( command -v stdbuf )"
 
