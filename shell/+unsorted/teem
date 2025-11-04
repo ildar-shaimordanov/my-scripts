@@ -10,7 +10,7 @@
 # =========================================================================
 
 print_usage() {
-	warn "\
+	echo "\
 Usage: ... | teem [OPTIONS] [LABEL]
 
 Copy standard input to a file named 'LABEL-YYYY-mm-dd-HH-MM-SS.log'.
@@ -79,6 +79,7 @@ main "$@"
 # leads to teeming with new file.
 #
 # !!! -h
+#
 # ---
 
 # =========================================================================
