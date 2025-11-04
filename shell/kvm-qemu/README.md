@@ -33,16 +33,29 @@ supporting `@base64d`).
 * https://www.libvirt.org/manpages/virsh.html
 * https://github.com/3hedgehogs/qemu-agent-commands
 
-# `./virt-list-dom-by-net`
+# `./virt-list`
 
-List all VMs ordered by all networks
+List VMs or networks
+
+
+    List VMs or networks
+    
+    Usage: virt-list [-a] [-d|-n]
+    
+    Options
+    	-d	List virtual machines ordered by networks
+    	-n	List virtual networks (similar to `ip addr show`)
+    	-a	List all active and inactive VMs and networks
+    
+
 
 Requirements
 
 * virsh
 * awk
+* sed
 
-Technical details
+Technical details for `virt-list -d [-a]`:
 
 `virsh dumpxml --xpath` outputs results as follows:
 
@@ -53,4 +66,9 @@ Technical details
 
     VM_NETWORK
       VM_NAME
+
+Technical details for `virt-list -n [-a]`:
+
+Because of some limitation of XPath used in `virsh ... --xpath` (at
+least in the version I use), `sed` is used to perform some replacement.
 
