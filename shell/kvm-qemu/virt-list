@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# ==============================================================================
+#
+# virt-list
+#
+# List VMs or networks
+#
+# Copyright (C) 2024, 2025 Ildar Shaimordanov
+# MIT License
+#
+# ==============================================================================
+
+print_usage() {
+	echo "\
+List VMs or networks
+
+Usage: $( basename "$0" ) [-a] [-d|-n]
+
+Options
+	-d	List virtual machines ordered by networks
+	-n	List virtual networks (similar to \`ip addr show\`)
+	-a	List all active and inactive VMs and networks
+"
+}
+
+# ==============================================================================
+
+d_network='/domain/devices/interface[@type="network"]/source/@network'
+d_domname='/domain/name/text()'
+
+list_domains() {
+	virsh list $LISTALL --name \
+	| while read -r n && [ -n "$n" ]
+	do
+		virsh dumpxml "$n" \
+		--xpath "$d_network | $d_domname"
+	done \
+	| awk -v RS='\n\n' -v FS='\n\\s+|=?"' '
+	{ host_list[$3] = host_list[$3] "\n  " $1 }
+	END { for (name in host_list) print name, host_list[name] }
+	'
+}
+
+# ==============================================================================
+
+n_netname='/network/name/text()'
+n_mac='/network/mac'
+n_ipv4='/network/ip/@*[name() = "address" or name() = "netmask"]'
+n_dhcp='/network/ip/dhcp/range/@*[name() = "start" or name() = "end"]'
+n_bridge='/network/bridge/@name'
+
+list_networks() {
+	virsh net-list $LISTALL --name \
+	| while read -r n && [ -n "$n" ]
+	do
+		virsh net-dumpxml "$n" \
+		--xpath "$n_netname | $n_mac | $n_ipv4 | $n_dhcp | $n_bridge"
+	done \
+	| sed 's/^ name/ bridge/; s/^<mac / mac-/; s/\/>$//; s/^ /  /; /^$/d'
+}
+
+# ==============================================================================
+
+ACTION=print_usage
+LISTALL=''
+
+while getopts ':dna' arg
+do
+	case "$arg" in
+	d ) ACTION=list_domains ;;
+	n ) ACTION=list_networks ;;
+	a ) LISTALL='--all' ;;
+	* ) echo "Unknown option: -$OPTARG" >&2 ; exit 1 ;;
+	esac
+done
+
+$ACTION
+
+# ==============================================================================
+
+# +++
+#
+# List VMs or networks
+#
+# !!!
+#
+# Requirements
+#
+# * virsh
+# * awk
+# * sed
+#
+# Technical details for `virt-list -d [-a]`:
+#
+# `virsh dumpxml --xpath` outputs results as follows:
+#
+#     VM_NAME
+#      network="VM_NETWORK"
+#
+# `awk` reorders and groups data accordingly network names:
+#
+#     VM_NETWORK
+#       VM_NAME
+#
+# Technical details for `virt-list -n [-a]`:
+#
+# Because of some limitation of XPath used in `virsh ... --xpath` (at
+# least in the version I use), `sed` is used to perform some replacement.
+#
+# ---
+
+# ==============================================================================
+
+# EOF
