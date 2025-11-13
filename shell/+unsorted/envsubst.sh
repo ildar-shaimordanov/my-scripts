@@ -7,6 +7,5 @@
 # ---
 
 envsubst() {
-	[ $# -gt 0 ] || set -- "$( env | sed 's/=.*//; s/^/$/' )"
-	command envsubst "$@"
+	command envsubst "${@:-$( env | sed 's/=.*//; s/^/$/' )}"
 }
