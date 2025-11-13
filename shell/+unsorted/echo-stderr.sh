@@ -22,23 +22,21 @@
 # basic
 
 warn() {
-	echo "$@" >&2
+	>&2 echo "$@"
 }
 
 die() {
-	warn "$@"
+	>&2 echo "$@"
 	exit "${DIE:-1}"
 }
 
 # bash
 
 warn() {
-	[ $# -gt 0 ] || set -- "Warned at $( caller 0 )"
-	echo "$@" >&2
+	>&2 echo "${@:-Warned at $( caller 0 )}"
 }
 
 die() {
-	[ $# -gt 0 ] || set -- "Died at $( caller 0 )"
-	warn "$@"
+	>&2 echo "${@:-Died at $( caller 0 )}"
 	exit "${DIE:-1}"
 }
