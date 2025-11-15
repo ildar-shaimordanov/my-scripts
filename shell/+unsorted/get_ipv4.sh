@@ -51,7 +51,7 @@ get_ipv4() (
 # and builtin `read` reading data from heredoc. Everything is runing
 # in subshell.
 
-get_ipv4_() (
+get_ipv4() (
 	get_ipv4="$( ip -o -4 addr show dev "$1" )" || return 1
 
 	[ ${#get_ipv4} -gt 0 ] || {
