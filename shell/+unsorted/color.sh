@@ -31,10 +31,12 @@ color() (
 	[ $# -ge 2 ] || return 0
 
 	case "$1" in
-	"\e["* | "\033["* | "\x1b["* | "\x1B["* | "$( printf "\033" )["* )
+	"\e["* | "\033["* | "\x1"[bB]"["* | "\u001"[bB]"["* | "$( printf "\033" )["* )
+	# No any wants for insane support of the strings matching any of
+	# \u0{0,4}1[bB], \U0{0,8}1[bB]
 		color="$1"
 		;;
-	* )
+	[A-Za-z0-9_]* )
 		eval color="\${COLOR_$1:-}"
 		;;
 	esac
