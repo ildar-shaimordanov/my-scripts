@@ -25,15 +25,18 @@
 color() (
 	# run in subshell to keep the caller scope clean
 
-	# suppress debug
+	# suppress debug and immediate exit on error
 	set +o xtrace
+	set +o errexit
 
 	[ $# -ge 2 ] || return 0
+
+	unset color
 
 	case "$1" in
 	"\e["* | "\033["* | "\x1"[bB]"["* | "\u001"[bB]"["* | "$( printf "\033" )["* )
 	# No any wants for insane support of the strings matching any of
-	# \u0{0,4}1[bB], \U0{0,8}1[bB]
+	# \u0{0,2}1[bB], \U0{0,8}1[bB]
 		color="$1"
 		;;
 	[A-Za-z0-9_]* )
@@ -42,14 +45,14 @@ color() (
 	esac
 
 	# shellcheck disable=SC2059
-	if [ -n "$color" ] ; then printf -- "$color" ; fi
+	[ "${#color}" -gt 0 ] && printf -- "$color"
 
 	shift
 	"$@"
 	result=$?
 
 	# shellcheck disable=SC2059
-	if [ -n "$color" ] ; then printf -- "${COLOR_RESET:-\033[0m}" ; fi
+	[ "${#color}" -gt 0 ] && printf -- "${COLOR_RESET:-\033[0m}"
 
 	return $result
 )
