@@ -9,13 +9,16 @@
 #
 # * bash only, full of bashisms
 # * POSIX-compliant
-# * POSIX-compliant, safe and awful
+# * POSIX-compliant, awful
 #
-# Example: print 10 "#"
+# Example:
 #
-#     rep "#" 10
+#     $ rep '#' 5
+#     #####
 #
 # ---
+
+# bash only
 
 rep() {
 	local s
@@ -23,12 +26,16 @@ rep() {
 	printf '%s' "${s// /$1}"
 }
 
+# POSIX-compliant
+
 rep() {
 	printf "%${2}s" \
-	| sed "s/ /${1}/g"
+	| awk -v s="$1" -v RS='' -v ORS='' '{ gsub(" ", s) } 1'
 }
 
-rep(){
+# POSIX-compliant, awful
+
+rep() {
 	printf "%${2}s" \
 	| sed "s/ /$(
 		echo "$1" \
