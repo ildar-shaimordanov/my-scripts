@@ -85,22 +85,32 @@ Usage
 
     color COLOR COMMAND [ARGUMENTS]
 
-Example
+Example 1
 
     # Examples of colors
     COLOR_RED="\e[0;31m"
     COLOR_YELLOW="\e[0;33m"
     COLOR_GREEN="\e[0;32m"
-    ...
-    # Display text in green (using color name)
-    color GREEN echo I am fine
-    ...
-    # display text in green (using color code)
-    color "\e[0;32m" echo I am fine too
+
+    # Display colored texts using color names
+    color RED    echo STOP
+    color YELLOW echo WAIT
+    color GREEN  echo WALK
+
+Example 2
+
+    # Display a colored text using a color code
+    color "\e[0;34m" echo Blue sky
 
 # `./ctrace.bash`
 
-Print the full stack of execution contexts
+Print a stack of execution contexts
+
+Usage:
+    ctrace [EXPR]
+
+Without EXPR, returns a full stacktrace. When EXPR is defined, it
+means how many call frames to skip before printing a stacktrace.
 
 # `./def.sh`
 
@@ -144,25 +154,6 @@ Emulate `dmesg -T` to print human-readable timestamps.
 Answered in this thread
 https://stackoverflow.com/q/27503386/3627676
 
-# `./echo-stderr.sh`
-
-Useful functions for writing to the standard error and exiting with
-non-zero exit code. There are two versions per each function:
-
-* basic, available in the major of shells
-* bash-compatible, supporting the `caller` builtin
-
-Examples:
-
-    # to warn about something
-    warn "Something happened but continue execution."
-
-    # to stop execution when something goes wrong
-    die "Something critical happened. Exiting."
-
-    # stop execution with the exit code = 42
-    DIE=42 die "what a question, what an answer."
-
 # `./envsubst.sh`
 
 This function covers and expands functionality of the original
@@ -177,6 +168,8 @@ Example:
 
     $ get_ipv4 lo
     127.0.0.1
+
+There are three implementations. See for details in source.
 
 # `./prefixtrude.sh`
 
@@ -193,15 +186,17 @@ Repeat the given string the particular number of times
 * `$1` - string
 * `$2` - number or repetition
 
-There are three implementations:
+There are four implementations:
 
 * bash only, full of bashisms
 * POSIX-compliant
-* POSIX-compliant, safe and awful
+* POSIX-compliant, insane use of awk
+* POSIX-compliant, awful
 
-Example: print 10 "#"
+Example:
 
-    rep "#" 10
+    $ rep '#' 5
+    #####
 
 # `./sponge`
 
@@ -364,6 +359,25 @@ There three versions:
 * the same supporting the modern `--color` option
 * an `eval`-command constructing one of two above
   (useful for `.bashrc` as an example)
+
+# `./warn-die.sh`
+
+Useful functions for writing to the standard error and exiting with
+non-zero exit code. There are two versions per each function:
+
+* basic, available in the major of shells
+* bash-compatible, supporting the `caller` builtin
+
+Examples:
+
+    # to warn about something
+    warn "Something happened but continue execution."
+
+    # to stop execution when something goes wrong
+    die "Something critical happened. Exiting."
+
+    # stop execution with the exit code = 42
+    DIE=42 die "what a question, what an answer."
 
 # `./x11sudo.sh`
 
