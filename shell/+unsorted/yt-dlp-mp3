@@ -4,6 +4,6 @@ yt-dlp --extract-audio --audio-format mp3 "$@"
 
 # +++
 #
-# Download and extract mp3 audio only 
+# Download and extract mp3 audio only
 #
 # ---

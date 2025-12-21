@@ -177,6 +177,24 @@ Results
 
     ./zzz: line 5: Y: Empty or unset variable
 
+# `./ffmpeg-rescale`
+
+Rescale video using `ffmpeg`
+
+
+    Usage: ffmpeg-rescale [-W WIDTH] [-H HEIGHT] FILE...
+    
+    Scaling works following these rules:
+    scale=WIDTH:-2		with -W WIDTH only
+    scale=-2:HEIGHT		with -H HEIGHT only
+    scale=WIDTH:HEIGHT	with both -W WIDTH -H HEIGHT
+    scale=640:-2		if no options specified
+    
+    Positive numbers mean video resolution in pixels.
+    -2 means to keep an aspect ratio and parity.
+    
+
+
 # `./get_ipv4.sh`
 
 The function tries to gather an IPv4 address for a specified interface.
@@ -412,4 +430,12 @@ Example
     # Commenting the next line turns debugging off
     xtrace \
     some-command --with --numerous --options and some parameters
+
+# `./yt-dlp-mp3`
+
+Download and extract mp3 audio only
+
+# `./yt-dlp-srt`
+
+Download video with srt subs
 
