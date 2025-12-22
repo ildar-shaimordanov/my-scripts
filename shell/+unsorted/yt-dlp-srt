@@ -1,0 +1,9 @@
+#!/bin/sh
+
+yt-dlp --write-subs --sub-format srt --convert-subs srt "$@"
+
+# +++
+#
+# Download video with srt subs
+#
+# ---

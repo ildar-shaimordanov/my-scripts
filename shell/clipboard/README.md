@@ -3,6 +3,9 @@
 * [Clipboard processing](#clipboard-processing)
 * [Usage](#usage)
 * [History](#history)
+* [Some tips](#some-tips)
+  * [Reason for the `-O` option](#reason-for-the--o-option)
+  * [clp and BusyBox](#clp-and-busybox)
 * [See Also](#see-also)
 <!-- toc-end -->
 
@@ -54,6 +57,27 @@ Later I reworked it and added support for dos2unix and unix2dos.
 Later I revealed for myself BusyBox which is extremely lightweight but powerful and flexible suite despite it has some limitations in the functionality of some of its tools. Of course, I wrote the function with the same functionality for BusyBox.
 
 Both scripts turned out almost similar each other. So I decided to combine them into the single script supposed to be running under both environments. Also I decided to make the script running under both Linux and MacOS and extended it with a set of convenient options for supporting more actions on the content.
+
+# Some tips
+
+## Reason for the `-O` option
+
+Use the `-O` option in a some rare cases of a command substition like:
+
+```shell
+command1 | command <( clp -O )
+```
+
+Because of a pipe the utility assumes that it is invoked in the middle of pipe.
+
+## clp and BusyBox
+
+Under BusyBox to paste data to console or pipe by default `powershell` is used. To process non-Latin texts correctly use `iconv` options. For example for Russian text the following code works fine with the `-f866` option (convert from cp866):
+
+```shell
+echo по-русски | clp
+clp -f866 | sed 's/.*/[[ & ]]/'
+```
 
 # See Also
 
