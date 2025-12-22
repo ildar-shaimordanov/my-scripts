@@ -8,6 +8,7 @@
   * [Restart/reboot/reset VM](#restartrebootreset-vm)
   * [Pause and resume VM](#pause-and-resume-vm)
   * [Save and discard state VM](#save-and-discard-state-vm)
+  * [Execute a command](#execute-a-command)
   * [Connect to VM via SSH](#connect-to-vm-via-ssh)
   * [Show VM network interfaces](#show-vm-network-interfaces)
 * [REQUIREMENTS](#requirements)
@@ -32,7 +33,7 @@ useful commands.
 ## Show the name, uuid and current state per each VM
 
     vboxmanage list --long vms \
-    | grep -E '^(Name|UUID|State)'
+    | grep -E '^(Name|UUID|State):  +'
 
 
 ## Start and stop/shudown/poweroff VM
@@ -55,11 +56,18 @@ useful commands.
     vboxmanage discardstate $VM
 
 
+## Execute a command
+
+Run a command on a guest VM invoking it from a host machine.
+
+Not implemented yet.
+
+
 ## Connect to VM via SSH
 
-It is assumed the command should be executed similar to `kubectl
-exec`. However, it's still experimental and there is no guarantee it
-is going to be left in the future.
+It's assumed a command to be executed similar to `kubectl exec`. It's
+still experimental and there is no guarantee it is going to be left
+in the future.
 
 
 ## Show VM network interfaces
@@ -86,3 +94,4 @@ output into the `ifconfig`-like result.
 
 * https://github.com/stockrt/vboxctl
 * https://github.com/janth/vbox-snippets
+

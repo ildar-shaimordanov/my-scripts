@@ -2,7 +2,7 @@
 
 # =========================================================================
 #
-# Copyright (C) 2024 Ildar Shaimordanov
+# Copyright (C) 2024, 2025 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -18,7 +18,8 @@ Usage:
 	$ME reset|restart|reboot {uuid|name}
 	$ME pause|resume {uuid|name}
 	$ME savestate|discardstate {uuid|name}
-	$ME exec {uuid|name} [ssh options] [-- command]
+	$ME exec {uuid|name} [options]
+	$ME ssh {uuid|name} [ssh options] [-- command]
 	$ME ip {uuid|name}
 "
 }
@@ -49,7 +50,7 @@ main() {
 	| reset | restart | reboot \
 	| pause | resume \
 	| savestate | discardstate \
-	| exec | ip )
+	| exec | ssh | ip )
 		"$@"
 		;;
 	* )
@@ -126,15 +127,33 @@ discardstate() { vboxmanage discardstate "$1" ; }
 
 # +++
 #
-# ## Connect to VM via SSH
+# ## Execute a command
 #
-# It is assumed the command should be executed similar to `kubectl
-# exec`. However, it's still experimental and there is no guarantee it
-# is going to be left in the future.
+# Run a command on a guest VM invoking it from a host machine.
+#
+# Not implemented yet.
 #
 # ---
 
 exec() {
+	die "Not implemented yet"
+#	vboxmanage guestcontrol "$1" run "$@"
+#	vboxmanage guestcontrol "$1" start "$@"
+}
+
+# =========================================================================
+
+# +++
+#
+# ## Connect to VM via SSH
+#
+# It's assumed a command to be executed similar to `kubectl exec`. It's
+# still experimental and there is no guarantee it is going to be left
+# in the future.
+#
+# ---
+
+ssh() {
 	ip=( $(
 		vboxmanage guestproperty enumerate "$1" \
 		--patterns '*/Net/*/V?/IP' \
@@ -260,6 +279,7 @@ main "$@"
 # # SEE ALSO
 #
 # * https://github.com/stockrt/vboxctl
+# * https://github.com/janth/vbox-snippets
 #
 # ---
 
