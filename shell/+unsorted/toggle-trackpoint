@@ -1,0 +1,69 @@
+#!/bin/dash
+
+# ==============================================================================
+
+# Try to match as many as possible but not everything
+# ERE based on naming found by these two links:
+# https://en.wikipedia.org/wiki/Pointing_stick
+# https://ru.wikipedia.org/wiki/Тензометрический_джойстик
+DEV_SEARCH='track|stick|pointing'
+
+# The property name that we are going to toggle
+DEV_PROP_NAME='Device Enabled'
+
+# Turn it on to see what the script does
+#set -x
+
+# ==============================================================================
+
+get_device_property() { xinput list-props "$DEV_ID" | grep "$DEV_PROP_NAME" ; }
+
+die() { printf '%s\n' "$@" >&2 ; exit 1 ; }
+
+# ==============================================================================
+
+# Find a device
+DEV_OUTPUT="$( xinput list | grep -i -E "$DEV_SEARCH" )"
+
+# Validate the output
+[ ${#DEV_OUTPUT} -gt 0 ] \
+|| die "No any devices found matching '$DEV_SEARCH'"
+
+[ "$( echo "$DEV_OUTPUT" | grep -c . )" -eq 1 ] \
+|| die "More than one device found:" "$DEV_OUTPUT"
+
+# Capture the device ID
+DEV_ID="$( echo "$DEV_OUTPUT" | sed 's/.*\bid=\([0-9]*\).*/\1/' )"
+
+# Capture a value of the device property
+DEV_PROP_TEXT="$( get_device_property )"
+DEV_PROP="$( echo "$DEV_PROP_TEXT" | sed 's/.*:\s*//' )"
+
+# Toggle the device property using the trick with XOR
+# to convert 0 -> 1, and 1 -> 0
+xinput set-prop "$DEV_ID" "$DEV_PROP_NAME" "$(( DEV_PROP ^ 1 ))"
+
+# Print the device and its property values before and after
+printf '%s\n' "$DEV_OUTPUT" "$DEV_PROP_TEXT"
+get_device_property
+
+# ==============================================================================
+
+# +++
+#
+# Toggle a trackpoint (pointick stick, nub, clit mouse, nipple mouse) on/off.
+#
+# There is no unified way of nameing this device. Each brand has its own
+# name for this device. So there is no 100% reliability in detection of
+# the device. So I added a few checks to avoid false running.
+#
+# See also:
+#
+# * https://en.wikipedia.org/wiki/Pointing_stick
+# * https://ru.wikipedia.org/wiki/Тензометрический_джойстик
+#
+# ---
+
+# ==============================================================================
+
+# EOF
