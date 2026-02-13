@@ -206,6 +206,16 @@ Example:
 
 There are three implementations. See for details in source.
 
+# `./gpg_value_of.sh`
+
+Extract some gpg values
+
+    # if the gpg key exists, it should return 'John Doe' as the same value
+    gpg_value_of uid 'John Doe'
+
+    # print a fingerprint for this gpg key
+    gpg_value_of fpr 'John Doe'
+
 # `./prefixtrude.sh`
 
 Extract the common leading substring from the input strings
@@ -279,6 +289,19 @@ Any other clients attached to this session will be detached, if the
 Example: run the session "my_work"
 
     tmuxa my_work
+
+# `./toggle-trackpoint`
+
+Toggle a trackpoint (pointick stick, nub, clit mouse, nipple mouse) on/off.
+
+There is no unified way of nameing this device. Each brand has its own
+name for this device. So there is no 100% reliability in detection of
+the device. So I added a few checks to avoid false running.
+
+See also:
+
+* https://en.wikipedia.org/wiki/Pointing_stick
+* https://ru.wikipedia.org/wiki/Тензометрический_джойстик
 
 # `./transpose`
 
