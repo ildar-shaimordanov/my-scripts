@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# CFR (Class File Reader) - Another Java Decompiler
+# https://github.com/leibnitz27/cfr
+#
+# It's implemented entirely in Java 6 and able to decompile modern Java
+# features - including much of Java 9, 12, and 14.
+#
+# This file is wrapper for CFR to simplify its invocation.
+# It looks for the latest Jar file in the same directory.
+
+set -o errexit
+
+MYDIR="$( dirname "$0" )"
+JARFILE="$(
+	find "$MYDIR" -maxdepth 1 -type f -name 'cfr-*.jar' \
+	| sort -rn \
+	| head -1
+)"
+
+[ -n "$JARFILE" ] || {
+	echo "No CFR jarfile found">&2
+	exit 255
+}
+
+# shellcheck disable=SC2039,SC3028
+[ "$OSTYPE" = "cygwin" ] \
+&& JARFILE="$( cygpath -m "$JARFILE" )"
+
+if [ "$1" = "--version" ]
+then
+	java -jar "$JARFILE" 2>&1 | head -1 >&2
+else
+	java -jar "$JARFILE" "$@"
+fi
