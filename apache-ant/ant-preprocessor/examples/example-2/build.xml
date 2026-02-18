@@ -1,0 +1,18 @@
+<project name="conditional-label-usage-example" default="example" basedir=".">
+
+<include file="build-conditional-directive.xml" />
+
+<property name="build.dir" value="${basedir}/build" />
+
+<target name="example">
+	<mkdir dir="${build.dir}" />
+
+	<delete file="${build.dir}/example.txt" />
+	<copy file="example.txt" todir="${build.dir}" verbose="false" />
+
+	<conditional-directive-initialize apply-dir="${build.dir}" />
+	<conditional-directive-apply match-symbol="2" />
+	<conditional-directive-finalize />
+</target>
+
+</project>

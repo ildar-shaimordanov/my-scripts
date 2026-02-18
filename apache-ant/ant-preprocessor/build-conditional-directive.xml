@@ -1,0 +1,217 @@
+<project name="conditional-directive-definitions" basedir=".">
+
+
+<description>
+SYNTAX
+
+<![CDATA[
+%%IF symbol
+%%ENDIF symbol
+]]>
+
+DESCRIPTION
+
+The main purpose of the conditional directives is to take the control
+over building the different versions of the product or tool for different
+systems and environments. Using of the conditional directives allows to
+keep different versions of some code together, within a single file.
+
+The "%%IF" directive will include some code till the corresponding
+"%%ENDIF" directive, if the "symbol" is defined. The symbol can be
+defined in "build.xml", other build and property files or provided via
+the command line.
+
+The "symbol" can match either string exactly or regexp (regexp matching).
+The matching is controlled by the optional attribute "match-mode" to the
+macro "conditional-directive-apply" that accepts one of "string" (the
+default value) or "regexp".
+
+Nested directives are allowed.
+
+Sometimes unbalanced directives could not be detected.
+
+Intersections between directives are not controlled. If some directives
+spread and have the common intersecting parts of code, this can lead to
+unexpected results or raise a build failure.
+
+What will happen depends on how they are intersect and which directives
+are processed.
+
+In rare cases of conflicts of the conditional directives names
+with contents of your files you can redefine them by assigning new
+names for the opening and closing conditional directives setting
+them within "build.xml", "build.properties" or any other way valid
+for Apache Ant. There is the only main rule: you should do this
+before including this file to your project. By default, if the file
+"build-conditional-directive.properties" exists in the project's base
+directory, it is read and applied immediately by this scenario. So you
+don't need to load it explicitly.
+
+
+EXAMPLES
+
+Example are available by the link https://github.com/ildar-shaimordanov/ant-preprocessor.
+
+
+TODO
+
+Try to implement (if it is possible) the conditional directive %%UNLESS
+which is opposite to %%IF:
+
+<![CDATA[
+%%UNLESS symbol
+%%ENDIF symbol
+]]>
+
+SEE ALSO
+
+-- https://javacc.org/
+-- https://github.com/raydac/java-comment-preprocessor
+-- https://github.com/abego/jpp
+-- https://sourceforge.net/projects/epptask/
+-- https://sourceforge.net/projects/prebop/
+
+
+REFERENCES
+
+-- Include a File If a Condition Is Met Inside Apache Ant fileset
+   https://stackoverflow.com/q/25733759/3627676
+
+-- ant replaceregexp, matching with variable/property
+   https://stackoverflow.com/q/24135428/3627676
+
+-- ANT Conditions task with regex match in a file
+   https://stackoverflow.com/q/29953595/3627676
+</description>
+
+
+<property file="${basedir}/build-conditional-directive.properties" />
+
+
+<property name="conditional-directive-opening" value="%%IF" />
+<property name="conditional-directive-closing" value="%%ENDIF" />
+
+
+<macrodef name="conditional-directive" description="Initialize and apply conditional directive with the specified symbol for the specified fileset">
+<attribute name="apply-dir" />
+<attribute name="match-symbol" />
+<attribute name="match-mode" default="string" />
+<element name="custom-fileset-selectors" optional="yes" implicit="true" />
+<sequential>
+	<conditional-directive-initialize apply-dir="@{apply-dir}">
+		<custom-fileset-selectors />
+	</conditional-directive-initialize>
+	<conditional-directive-apply match-symbol="@{match-symbol}" match-mode="@{match-mode}" />
+	<conditional-directive-finalize />
+</sequential>
+</macrodef>
+
+
+<macrodef name="conditional-directive-initialize" description="Initialize conditional directives declaring the apply directory and fileset">
+<attribute name="apply-dir" default="${basedir}/build" />
+<element name="custom-fileset-selectors" optional="yes" implicit="true" />
+<sequential>
+	<echo>Conditional directive: Initialize: @{apply-dir}</echo>
+
+	<fileset id="conditional-directive-fileset" dir="@{apply-dir}" description="Set of files that could contain conditional directives">
+		<include name="**" />
+
+		<exclude name="**/*.so" />
+		<exclude name="**/*.dll" />
+		<exclude name="**/*.exe" />
+
+		<exclude name="**/*.class" />
+		<exclude name="**/*.obj" />
+		<exclude name="**/*.jar" />
+		<exclude name="**/*.war" />
+
+		<exclude name="**/*.7z" />
+		<exclude name="**/*.rar" />
+		<exclude name="**/*.zip" />
+		<exclude name="**/*.tar" />
+
+		<exclude name="**/*.tgz" />
+		<exclude name="**/*.tbz2" />
+		<exclude name="**/*.txz" />
+
+		<exclude name="**/*.gz" />
+		<exclude name="**/*.bz2" />
+		<exclude name="**/*.xz" />
+
+		<custom-fileset-selectors />
+
+		<or>
+		<contains text="${conditional-directive-opening}" />
+		<contains text="${conditional-directive-closing}" />
+		</or>
+	</fileset>
+
+	<echo>Conditional directive: Fileset: ${toString:conditional-directive-fileset}</echo>
+</sequential>
+</macrodef>
+
+
+<macrodef name="conditional-directive-apply" description="Apply conditional directives specified by their names">
+<attribute name="match-symbol" />
+<attribute name="match-mode" default="string" />
+<sequential>
+	<local name="match-regexp" />
+	<condition property="match-regexp" value="\Q@{match-symbol}\E">
+		<equals arg1="@{match-mode}" arg2="string" />
+	</condition>
+	<condition property="match-regexp" value="@{match-symbol}">
+		<equals arg1="@{match-mode}" arg2="regexp" />
+	</condition>
+
+	<fail message="Unable to recognize match-mode: @{match-mode}. 'string' or 'regexp' expected">
+		<condition>
+		<not>
+		<isset property="match-regexp" />
+		</not>
+		</condition>
+	</fail>
+
+	<echo>Conditional directive: Apply match: @{match-symbol} (regexp: ${match-regexp})</echo>
+
+	<replaceregexp
+		match="(?&lt;=\r?\n)[ \t]*\Q${conditional-directive-opening}\E[ \t]+(${match-regexp})\r?\n(.*?\r?\n)?[ \t]*\Q${conditional-directive-closing}\E[ \t]+\1\r?\n"
+		replace="\2"
+		flags="sg"
+		byline="false"
+		>
+		<fileset refid="conditional-directive-fileset" />
+	</replaceregexp>
+</sequential>
+</macrodef>
+
+
+<macrodef name="conditional-directive-finalize" description="Finalize conditional directives removing other conditional directives entirely and verifying the rest of the resulting files and throwing an exception if conditional directives remain in some files">
+<sequential>
+	<echo>Conditional directive: Finalize</echo>
+
+	<replaceregexp
+		match="(?&lt;=\r?\n)[ \t]*\Q${conditional-directive-opening}\E[ \t]+(\S+)\r?\n(.*?\r?\n)?[ \t]*\Q${conditional-directive-closing}\E[ \t]+\1\r?\n"
+		replace=""
+		flags="sg"
+		byline="false"
+		>
+		<fileset refid="conditional-directive-fileset" />
+	</replaceregexp>
+
+	<fail message="Conditional directive: Error: Unresolved conditional directives detected">
+	<condition>
+	<not>
+		<resourcecount count="0">
+		<fileset refid="conditional-directive-fileset" />
+		</resourcecount>
+	</not>
+	</condition>
+	</fail>
+
+	<echo>Conditional directive: Done</echo>
+</sequential>
+</macrodef>
+
+
+</project>
+

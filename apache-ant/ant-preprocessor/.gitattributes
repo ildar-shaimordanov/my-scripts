@@ -1,0 +1,7 @@
+* text=auto
+
+.gitignore	text
+.gitattributes	text
+*.md		text
+*.txt		text
+*.xml		text

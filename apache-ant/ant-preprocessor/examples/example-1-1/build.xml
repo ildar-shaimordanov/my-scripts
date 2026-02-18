@@ -1,0 +1,38 @@
+<project name="Conditional directives example" default="short-help" basedir=".">
+
+<include file="build-conditional-directive.xml" />
+
+<description>
+USAGE:
+	ant build-devel
+	ant build-prod
+</description>
+
+<target name="short-help">
+<echo>${ant.project.name}
+Run "ant -p" for details of usage.
+</echo>
+</target>
+
+<target name="build-devel" description="Build development version">
+	<property name="target-env" value="devel" />
+	<antcall target="build-target-env" />
+</target>
+
+<target name="build-prod" description="Build production version">
+	<property name="target-env" value="prod" />
+	<antcall target="build-target-env" />
+</target>
+
+<target name="build-target-env" if="target-env">
+	<property name="dst-dir" value="${basedir}/build/${target-env}" />
+
+	<mkdir dir="${dst-dir}" />
+
+	<delete file="${dst-dir}/example.txt" />
+	<copy file="example.txt" todir="${dst-dir}" />
+
+	<conditional-directive apply-dir="${dst-dir}" match-symbol="${target-env}" />
+</target>
+
+</project>

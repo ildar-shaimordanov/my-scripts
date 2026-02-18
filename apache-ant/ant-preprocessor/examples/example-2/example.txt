@@ -1,0 +1,15 @@
+default directives
+
+line 1
+	%%IF 2
+	line 2
+	%%ENDIF 2
+line 3
+
+redefined directives
+
+line 1
+	{IF} 2
+	line 2
+	{ENDIF} 2
+line 3

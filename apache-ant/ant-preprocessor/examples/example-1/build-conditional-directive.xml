@@ -1,0 +1,9 @@
+<project name="helper">
+
+<include file="../../build-conditional-directive.xml" />
+
+<description>
+This file is used just to keep time when copying-and-pasting from the original file.
+</description>
+
+</project>

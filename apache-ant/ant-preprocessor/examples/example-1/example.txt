@@ -1,0 +1,17 @@
+This is common part
+	|
+	%%IF devel
+	This is DEVELOPMENT version having
+	some development and diagnostic stuff
+	that is not used in production
+	%%ENDIF devel
+	|
+This is another common part
+	something common
+	|
+	%%IF prod
+	This is PRODUCTION version
+	%%ENDIF prod
+	|
+	another common
+This is third common part
