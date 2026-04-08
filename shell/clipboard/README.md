@@ -68,20 +68,25 @@ Use the `-O` option in a some rare cases of a command substition like:
 command1 | command <( clp -O )
 ```
 
-Because of a pipe the utility assumes that it is invoked in the middle of pipe.
+Because of a pipe the utility assumes that it is invoked in the middle of pipe. To escape this ambiguity two options `-I` and `-O` option were implemented. I have never met cases of the `-I` option usage but I kept it for symmetry purpose.
 
 ## clp and BusyBox
 
-Under BusyBox to paste data to console or pipe by default `powershell` is used. To process non-Latin texts correctly use `iconv` options. For example for Russian text the following code works fine with the `-f866` option (convert from cp866):
+Under BusyBox to paste data to console or pipe by default `powershell` is used. To process non-Latin texts correctly use `iconv` options. For example for Russian text the following code works fine with the `-f866` option (convert from cp866, found experimentally):
 
 ```shell
-echo по-русски | clp
-clp -f866 | sed 's/.*/[[ & ]]/'
+~ $ echo текст по-русски | clp
+
+~ $ clp | grep .
+⥪?? ?-???᪨
+
+~ $ clp -f866 | grep .
+текст по-русски
 ```
 
 # See Also
 
-There are few universal shell implementaions with copy, paste and transformation.
+There are a lot of shell implementations of clipboard handling. Here are few of them with copy, paste and content transformation.
 
 * https://github.com/niedzielski/cb
 * https://github.com/NNBnh/clipb
