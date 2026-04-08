@@ -6,6 +6,7 @@
 * [Some tips](#some-tips)
   * [Reason for the `-O` option](#reason-for-the--o-option)
   * [clp and BusyBox](#clp-and-busybox)
+  * [Monstruos and ugly powershell code to copy to clipboard](#monstruos-and-ugly-powershell-code-to-copy-to-clipboard)
 * [See Also](#see-also)
 <!-- toc-end -->
 
@@ -72,7 +73,7 @@ Because of a pipe the utility assumes that it is invoked in the middle of pipe. 
 
 ## clp and BusyBox
 
-Under BusyBox to paste data to console or pipe by default `powershell` is used. To process non-Latin texts correctly use `iconv` options. For example for Russian text the following code works fine with the `-f866` option (convert from cp866, found experimentally):
+Under BusyBox to paste data to console or pipe by default `powershell` is used. To process non-Latin texts correctly in this case I recommend use `iconv` options. For example for Russian text the following code works fine with the `-f866` option (convert from cp866, found experimentally):
 
 ```shell
 ~ $ echo текст по-русски | clp
@@ -83,6 +84,10 @@ Under BusyBox to paste data to console or pipe by default `powershell` is used. 
 ~ $ clp -f866 | grep .
 текст по-русски
 ```
+
+## Monstruos and ugly powershell code to copy to clipboard
+
+Someone could notice that code saving data to clipboard is extremely large and ugly. I made it intentionally (to keep incoming line ending by reading input as raw bytes) because the minimalistic powershell `$input | Set-Clipboard` breaks unix-like line ending.
 
 # See Also
 
