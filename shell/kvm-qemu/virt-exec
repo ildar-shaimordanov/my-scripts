@@ -2,7 +2,7 @@
 
 # =========================================================================
 #
-# Copyright (C) 2024, 2025 Ildar Shaimordanov
+# Copyright (C) 2024-2026 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -188,8 +188,8 @@ do
 	!
 
 	[ "$VM_CMD_RETURN_EXITED" = "true" ] \
-	&& [ ${#VM_CMD_RETURN_ERR_TRUNCATED} -eq 0 ] \
-	&& [ ${#VM_CMD_RETURN_OUT_TRUNCATED} -eq 0 ] \
+	&& [ "${VM_CMD_RETURN_ERR_TRUNCATED:-false}" = "false" ] \
+	&& [ "${VM_CMD_RETURN_OUT_TRUNCATED:-false}" = "false" ] \
 	&& break
 done
 
