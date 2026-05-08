@@ -1,0 +1,72 @@
+#!//bin/sh
+
+# ==============================================================================
+
+print_usage() {
+	echo "\
+Print full cache policies or brief install states
+for all the packages a specified package depends.
+
+Usage: $( basename "$0" ) [OPTIONS] PACKAGE...
+
+Options:
+-v	Print full cache policies (default)
+-s	Print brief install states
+-p	Include information about PreDepends packages also
+-P	Assume PreDepends packages only
+"
+}
+
+# ==============================================================================
+
+# unset - for full cache policies
+# empty - for brief install states
+unset print_brief_install_states
+unset predepends
+
+while getopts 'svpP' arg
+do
+	case "$arg" in
+	s ) print_brief_install_states='' ;;
+	v ) unset print_brief_install_states ;;
+	p ) predepends='(Pre)?' ;;
+	P ) predepends='Pre' ;;
+	* ) exit 1 ;;
+	esac
+done
+
+shift $(( OPTIND-1 ))
+
+[ $# -gt 0 ] || {
+	print_usage
+	exit 1
+}
+
+# ==============================================================================
+
+extract_cache_policy() {
+	LANG=C apt depends "$@" 2>/dev/null \
+	| awk -v pre="$predepends" '$1 ~ "^" pre "Depends:$" { print $2 }' \
+	| xargs --no-run-if-empty apt-cache policy
+}
+
+eval "extract_cache_policy \"\$@\" \
+${print_brief_install_states+| grep -x -E '[^[:space:]]+:' -A 1}"
+
+# ==============================================================================
+
+# +++
+#
+# !!! 2>&1
+#
+# Example:
+#
+# Print brief information about all depends and pre-depends packages
+#
+#     apt-deps-info -s -p grep
+#
+# ---
+
+# ==============================================================================
+
+# EOF
