@@ -1,3 +1,25 @@
+# `./apt-deps-info`
+
+
+    Print full cache policies or brief install states
+    for all the packages a specified package depends.
+    
+    Usage: apt-deps-info [OPTIONS] PACKAGE...
+    
+    Options:
+    -v	Print full cache policies (default)
+    -s	Print brief install states
+    -p	Include information about PreDepends packages also
+    -P	Assume PreDepends packages only
+    
+
+
+Example:
+
+Print brief information about all depends and pre-depends packages
+
+    apt-deps-info -s -p grep
+
 # `./body.sh`
 
 Print the first line of STDIN as an output header and continue executing
