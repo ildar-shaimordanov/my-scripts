@@ -1,4 +1,4 @@
-#!//bin/sh
+#!/bin/sh
 
 # ==============================================================================
 
@@ -22,6 +22,8 @@ Options:
 # unset - for full cache policies
 # empty - for brief install states
 unset print_brief_install_states
+
+# for processing PreDepends packages
 unset predepends
 
 while getopts 'svpP' arg
