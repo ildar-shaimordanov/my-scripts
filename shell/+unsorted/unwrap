@@ -12,7 +12,7 @@
 Unwrap lines beginning with a single space
 Usage:
 ... | unwrap
-unwrap FILE"
+unwrap < FILE"
 	exit 1
 }
 
