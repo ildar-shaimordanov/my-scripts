@@ -2,9 +2,9 @@
 
 # =========================================================================
 #
-# Stop printing the rest of each line that lengths exceed a terminal width
+# Stop printing the rest of each line that length exceeds a terminal width
 #
-# Copyright (C) 2024 Ildar Shaimordanov
+# Copyright (C) 2024, 2026 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -19,26 +19,34 @@ Usage: ... | cap
 
 # =========================================================================
 
+# Bypass truncation if running without a TTY (cron, nohup)
+[ -c /dev/tty ] || { cat - ; exit ; }
+
 cut -c 1-$(
-	command -v stty >/dev/null \
-	&& stty size </dev/tty | ( read -r l c ; echo "$c" ) \
+	exec 2>/dev/null
+
+	command -v tput >/dev/null \
+	&& tput cols \
 	&& exit
 
-	command -v tput >/dev/null && tput cols && exit
-	command -v ttysize >/dev/null && ttysize w && exit
+	command -v stty >/dev/null \
+	&& stty size </dev/tty | { read -r l c ; echo "$c" ; } \
+	&& exit
+
+	command -v ttysize >/dev/null \
+	&& ttysize w \
+	&& exit
+
+	echo "${COLUMNS:-80}"
 )
 
 # =========================================================================
 
 # +++
 #
-# *cap* and *tee* are plumbing fitting. If the last one is used to change
-# direction of pipes, the first one is used to stop flows and seal end
-# of a pipe.
-#
-# Here *cap* is used to stop flowing long lines out of a terminal
-# width. In the other words, everything wider will be cropped by the
-# terminal width.
+# *tee* and *cap* are plumbing fittings. If the first one is used to
+# change direction of pipes, the second one is used to stop flowing
+# long lines out of a terminal width.
 #
 # ---
 
