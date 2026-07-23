@@ -90,13 +90,9 @@ https://www.cyberforum.ru/shell/thread3153320.html
 
 # `./cap`
 
-*cap* and *tee* are plumbing fitting. If the last one is used to change
-direction of pipes, the first one is used to stop flows and seal end
-of a pipe.
-
-Here *cap* is used to stop flowing long lines out of a terminal
-width. In the other words, everything wider will be cropped by the
-terminal width.
+*tee* and *cap* are plumbing fittings. If the first one is used to
+change direction of pipes, the second one is used to stop flowing
+long lines out of a terminal width.
 
 # `./color.sh`
 
@@ -123,6 +119,27 @@ Example 2
 
     # Display a colored text using a color code
     color "\e[0;34m" echo Blue sky
+
+# `./count_bits.sh`
+
+Count bits in an integer value.
+
+Examples
+
+    # result to 3
+    count_bits_u8 11
+
+    # result to 7, 15, 31 and 63, respectively
+    count_bits_u8  -2
+    count_bits_u16 -2
+    count_bits_u32 -2
+    count_bits_u64 -2
+
+    # result to 0 due to out of 8 bits
+    count_bits_u8  256
+
+    # result to 1
+    count_bits_u16 256
 
 # `./ctrace.bash`
 
@@ -237,6 +254,29 @@ Extract some gpg values
 
     # print a fingerprint for this gpg key
     gpg_value_of fpr 'John Doe'
+
+# `./net-lib.sh`
+
+Convert a pre-validated netmask to a network prefix
+
+Examples
+
+    # result to 24
+    netmask_to_prefix 255.255.255.0
+
+
+Convert a network prefix to a netmask
+
+Examples
+
+    # result to 255.255.255.0
+    prefix_to_netmask 24
+
+    # result to 0.0.0.0
+    prefix_to_netmask 0
+
+    # result to 255.255.255.355
+    prefix_to_netmask 32
 
 # `./prefixtrude.sh`
 
@@ -414,6 +454,16 @@ https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
 
 Remove all styles, scripts and html comments totally, strip html tags
 and leave a naked text only.
+
+# `./unwrap`
+
+Unwrap lines beginning with a single space.
+Useful for unwrapping LDIF files.
+
+Example
+
+    ldapsearch ... > FILE
+    unwrap < FILE
 
 # `./urlencode.sh`
 
