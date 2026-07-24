@@ -122,23 +122,23 @@ Example 2
 
 # `./count_bits.sh`
 
-Count bits in an integer value.
+Count bits in integer values of various widths.
 
 Examples
 
-    # result to 3
-    count_bits_u8 11
+    # returns 3 (42 = binary 0010 1010)
+    count_bits_u8 42
 
-    # result to 7, 15, 31 and 63, respectively
-    count_bits_u8  -2
-    count_bits_u16 -2
-    count_bits_u32 -2
-    count_bits_u64 -2
+    # negative number returns 5, 13, 29, 61 (binary 1101 0110 and so on)
+    count_bits_u8  -42
+    count_bits_u16 -42
+    count_bits_u32 -42
+    count_bits_u64 -42
 
-    # result to 0 due to out of 8 bits
+    # returns 0 due to 8-bit truncation (256 becomes 0)
     count_bits_u8  256
 
-    # result to 1
+    # returns 1 (256 in 16-bit range)
     count_bits_u16 256
 
 # `./ctrace.bash`
