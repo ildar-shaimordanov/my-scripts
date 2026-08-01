@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# ==============================================================================
+#
+# Copyright (C) 2026 Ildar Shaimordanov
+# MIT License
+#
+# ==============================================================================
+
+print_usage() {
+	me="$( basename "$0" )"
+	echo "\
+Unwrap and decode LDIF data streams
+
+Usage:
+	ldapsearch ... | $me [OPTIONS]
+	$me [OPTIONS] < FILE
+	$me [OPTIONS] FILE...
+
+Options:
+	-b	Decode base64-encoded values
+	-j	Pretty-print JSON data
+"
+}
+
+# ==============================================================================
+
+main() {
+	set -o pipefail
+
+	unset DECODE
+	unset DECODE_BASE64
+	unset DECODE_JSON
+
+	while getopts 'bj' arg
+	do
+		case "$arg" in
+		b ) DECODE=1 ; DECODE_BASE64=1 ;;
+		j ) DECODE=1 ; DECODE_JSON=1 ;;
+		* ) echo "Bad option provided" >&2 ; exit 1 ;;
+		esac
+	done
+
+	shift $(( OPTIND-1 ))
+
+	[ -t 0 ] && [ $# -eq 0 ] && {
+		print_usage >&2
+		exit 1
+	}
+
+	cat "$@" | eval "ldif_unwrap${DECODE:+ | ldif_decode}"
+}
+
+# ==============================================================================
+
+ldif_unwrap() {
+	awk -v RS='' '
+	NR > 1 { print "" }
+	{
+		gsub(/\r/,  "")
+		gsub(/\n /, "")
+		sub(/\n$/,  "")
+		print
+	}'
+}
+
+# ==============================================================================
+
+ldif_decode() {
+	while read -r key val || [ -n "$key" ]
+	do
+		# An elegant piece of code catching the essence of the script
+		unset skip raw out
+
+		raw=( "$val" )
+		out="$val"
+
+		case "$key" in
+		*'::' )
+			[ -n "$DECODE_BASE64" ] \
+			&& mapfile -d '' raw < <( base64 -di <<<"$val" )
+			;;
+		*':' )
+			# Do nothing
+			;;
+		* )
+			skip=1
+			;;
+		esac
+
+		[ -z "$skip" ] \
+		&& case "${raw[*]}" in
+		'['*']' | '{'*'}' )
+			[ -n "$DECODE_JSON" ] \
+			&& out=$':decoded\n:json\n'"$(
+				jq . <<<"${raw[*]}"
+			)"$'\n:end'
+			;;
+		*[![:print:]]* )
+			[ ${#raw[@]} -gt 1 ] \
+			&& out=$':decoded\n:dump\n'"$(
+				printf '%s\0' "${raw[@]}" \
+				| LC_ALL=C sed '$ s/.$//' \
+				| hexdump -C
+			)"$'\n:end'
+			;;
+		esac
+
+		echo "$key${out:+ $out}"
+	done
+}
+
+# ==============================================================================
+
+main "$@"
+
+# ==============================================================================
+
+# +++
+#
+# !!! 2>&1
+#
+# ---
+
+# ==============================================================================
+
+# EOF
