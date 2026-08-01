@@ -255,6 +255,22 @@ Extract some gpg values
     # print a fingerprint for this gpg key
     gpg_value_of fpr 'John Doe'
 
+# `./ldif-decode`
+
+
+    Unwrap and decode LDIF data streams
+    
+    Usage:
+    	ldapsearch ... | ldif-decode [OPTIONS]
+    	ldif-decode [OPTIONS] < FILE
+    	ldif-decode [OPTIONS] FILE...
+    
+    Options:
+    	-b	Decode base64-encoded values
+    	-j	Pretty-print JSON data
+    
+
+
 # `./net-lib.sh`
 
 Convert a pre-validated netmask to a network prefix
@@ -454,16 +470,6 @@ https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
 
 Remove all styles, scripts and html comments totally, strip html tags
 and leave a naked text only.
-
-# `./unwrap`
-
-Unwrap lines beginning with a single space.
-Useful for unwrapping LDIF files.
-
-Example
-
-    ldapsearch ... > FILE
-    unwrap < FILE
 
 # `./urlencode.sh`
 
