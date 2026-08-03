@@ -70,7 +70,7 @@ ldif_decode() {
 	while read -r key val || [ -n "$key" ]
 	do
 		# An elegant piece of code catching the essence of the script
-		unset skip raw out
+		unset decoded skip raw out
 
 		raw=( "$val" )
 		out="$val"
@@ -78,6 +78,7 @@ ldif_decode() {
 		case "$key" in
 		*'::' )
 			[ -n "$DECODE_BASE64" ] \
+			&& decoded+=( 'base64' ) \
 			&& mapfile -d '' raw < <( base64 -di <<<"$val" )
 			;;
 		*':' )
@@ -91,20 +92,26 @@ ldif_decode() {
 		[ -z "$skip" ] \
 		&& case "${raw[*]}" in
 		'['*']' | '{'*'}' )
+			out="${raw[*]}"
 			[ -n "$DECODE_JSON" ] \
-			&& out=$':decoded\n:json\n'"$(
-				jq . <<<"${raw[*]}"
-			)"$'\n:end'
+			&& decoded+=( 'json' ) \
+			&& out="$( jq . <<<"${raw[*]}" )"
 			;;
 		*[![:print:]]* )
-			[ ${#raw[@]} -gt 1 ] \
-			&& out=$':decoded\n:dump\n'"$(
+			decoded+=( 'dump' )
+			out="$(
 				printf '%s\0' "${raw[@]}" \
 				| LC_ALL=C sed '$ s/.$//' \
 				| hexdump -C
-			)"$'\n:end'
+			)"
+			;;
+		* )
+			out="${raw[*]}"
 			;;
 		esac
+
+		[ ${#decoded[@]} -gt 0 ] \
+		&& out=":decoded ${decoded[*]}"$'\n'"$out"$'\n:end'
 
 		echo "$key${out:+ $out}"
 	done
