@@ -257,6 +257,8 @@ Extract some gpg values
 
 # `./ldif-decode`
 
+Unwrap and decode LDIF data streams
+
 
     Unwrap and decode LDIF data streams
     
@@ -270,6 +272,15 @@ Extract some gpg values
     	-j	Pretty-print JSON data
     
 
+
+Requirements
+
+- bash 4.4+
+- awk
+- base64
+- jq
+- sed
+- hexdump
 
 # `./net-lib.sh`
 
