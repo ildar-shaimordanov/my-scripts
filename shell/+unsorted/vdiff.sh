@@ -21,6 +21,6 @@ vdiff() {
 }
 
 eval 'vdiff() { diff '"$(
-	diff --color=lways /dev/null /dev/null 2>/dev/null \
+	diff --color=always /dev/null /dev/null 2>/dev/null \
 	&& echo '--color=always'
 )"' "$@" | less "${LESS:--SR}" ; }'
