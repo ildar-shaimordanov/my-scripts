@@ -4,7 +4,7 @@
 #
 # Copy data from and/or to the clipboard
 #
-# Copyright (C) 2020-2025 Ildar Shaimordanov
+# Copyright (C) 2020-2026 Ildar Shaimordanov
 # MIT License
 #
 # =========================================================================
@@ -87,18 +87,27 @@ warn() {
 
 # shellcheck disable=SC2016
 getclip_posh() {
-	posh \
-	'Get-Clipboard -Raw | Write-Host -NoNewLine'
+	posh '
+	[Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
+	$text = Get-Clipboard -Raw;
+	if ( $text ) {
+		$bytes = [System.Text.Encoding]::UTF8.GetBytes($text);
+		[Console]::OpenStandardOutput().Write($bytes, 0, $bytes.Length);
+	}
+	'
 }
 
 # shellcheck disable=SC2016
 putclip_posh() {
-	posh \
-	'$b = @(); $i = [Console]::OpenStandardInput();' \
-	'do { $b += @{ c = 0; d = [byte[]]::new(1048576) } }' \
-	'while ( $b[-1].c = $i.Read($b[-1].d, 0, $b[-1].d.count) )' \
-	'$a = $b | ForEach-Object { $_.d[0..($_.c - 1)] };' \
-	'[System.Text.Encoding]::UTF8.GetString($a) | Set-Clipboard'
+	posh '
+	$b = @();
+	$i = [Console]::OpenStandardInput();
+	do {
+		$b += @{ c = 0; d = [byte[]]::new(1048576) }
+	} while ( $b[-1].c = $i.Read($b[-1].d, 0, $b[-1].d.count) )
+	$a = $b | ForEach-Object { $_.d[0..($_.c - 1)] };
+	[System.Text.Encoding]::UTF8.GetString($a) | Set-Clipboard
+	'
 }
 
 posh() {

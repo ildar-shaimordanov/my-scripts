@@ -73,21 +73,11 @@ Because of a pipe the utility assumes that it is invoked in the middle of pipe. 
 
 ## clp and BusyBox
 
-Under BusyBox to paste data to console or pipe by default `powershell` is used. To process non-Latin texts correctly in this case I recommend use `iconv` options. For example for Russian text the following code works fine with the `-f866` option (convert from cp866, found experimentally):
-
-```shell
-~ $ echo текст по-русски | clp
-
-~ $ clp | grep .
-⥪?? ?-???᪨
-
-~ $ clp -f866 | grep .
-текст по-русски
-```
+Earlier I noticed that the script was not fully reliable when copying and pasting non-Latin texts, such as Cyrillic. It looks like this issue was fixed in August 2026, so there is no longer a need for a workaround involving the `-f866` flag (used internally by `iconv`).
 
 ## Monstruos and ugly powershell code to copy to clipboard
 
-Someone could notice that code saving data to clipboard is extremely large and ugly. I made it intentionally (to keep incoming line ending by reading input as raw bytes) because the minimalistic powershell `$input | Set-Clipboard` breaks unix-like line ending.
+Someone could notice that code saving data to clipboard is extremely huge and ugly. I made it intentionally (to keep incoming line endings by reading the input as raw bytes) because the minimalistic powershell `$input | Set-Clipboard` breaks Unix-style line endings.
 
 # See Also
 
