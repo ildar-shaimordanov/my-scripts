@@ -6,7 +6,7 @@
 #
 # List VMs or networks
 #
-# Copyright (C) 2024, 2025 Ildar Shaimordanov
+# Copyright (C) 2024, 2025, 2026 Ildar Shaimordanov
 # MIT License
 #
 # ==============================================================================
@@ -46,8 +46,7 @@ list_domains() {
 
 n_netname='/network/name/text()'
 n_mac='/network/mac'
-n_ipv4='/network/ip/@*[name() = "address" or name() = "netmask"]'
-n_dhcp='/network/ip/dhcp/range/@*[name() = "start" or name() = "end"]'
+n_ipaddr='/network/ip/@*[name() = "address"]'
 n_bridge='/network/bridge/@name'
 
 list_networks() {
@@ -55,7 +54,7 @@ list_networks() {
 	| while read -r n && [ -n "$n" ]
 	do
 		virsh net-dumpxml "$n" \
-		--xpath "$n_netname | $n_mac | $n_ipv4 | $n_dhcp | $n_bridge"
+		--xpath "$n_netname | $n_mac | $n_ipaddr | $n_bridge"
 	done \
 	| sed 's/^ name/ bridge/; s/^<mac / mac-/; s/\/>$//; s/^ /  /; /^$/d'
 }
