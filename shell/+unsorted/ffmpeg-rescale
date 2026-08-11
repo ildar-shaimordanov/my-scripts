@@ -45,7 +45,7 @@ scale="${width:--2}:${height:--2}"
 
 for f in "$@"
 do
-	g="${f%.*}.scale.${f##*.}"
+	g="${f%.*} (rescaled).${f##*.}"
 	ffmpeg -i "$f" -vf "scale=$scale" -y "$g"
 done
 
