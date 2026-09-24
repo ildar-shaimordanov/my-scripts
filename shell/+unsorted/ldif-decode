@@ -13,13 +13,15 @@ print_usage() {
 Unwrap and decode LDIF data streams
 
 Usage:
-	ldapsearch ... | $me [OPTIONS]
-	$me [OPTIONS] < FILE
-	$me [OPTIONS] FILE...
+	... | $me [OPTIONS] [LDAP-ATTR-PATTERNS...]
 
 Options:
 	-b	Decode base64-encoded values
 	-j	Pretty-print JSON data
+
+Example:
+	# Decode and extract specific attributes from LDIF files
+	cat *.ldif | $me -bj dn mail 'krb*'
 "
 }
 
@@ -43,12 +45,16 @@ main() {
 
 	shift $(( OPTIND-1 ))
 
-	[ -t 0 ] && [ $# -eq 0 ] && {
+	[ -t 0 ] && {
 		print_usage >&2
 		exit 1
 	}
 
-	cat "$@" | eval "ldif_unwrap${DECODE:+ | ldif_decode}"
+	# Dynamically assemble the pipeline to cover all 4 execution paths:
+	# unwrap, unwrap+decode, unwrap+filter, or unwrap+filter+decode
+	eval "ldif_unwrap \
+	$( [ $# -gt 0 ]     && echo '| ldif_filter_attrs "$@"' ) \
+	$( [ -n "$DECODE" ] && echo '| ldif_decode' )"
 }
 
 # ==============================================================================
@@ -62,6 +68,27 @@ ldif_unwrap() {
 		sub(/\n$/,  "")
 		print
 	}'
+}
+
+# ==============================================================================
+
+ldif_filter_attrs() {
+	while read -r key val || [ -n "$key" ]
+	do
+		unset matched
+
+		for pattern in "$@"
+		do
+			# shellcheck disable=SC2254
+			case "$key" in
+			$pattern: | $pattern:: ) matched=1 ; break ;;
+			esac
+		done
+
+		[ $# -gt 0 ] && [ -z "$matched" ] && continue
+
+		echo "$key $val"
+	done
 }
 
 # ==============================================================================
