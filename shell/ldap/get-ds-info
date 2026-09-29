@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# ==============================================================================
+#
+# Copyright (C) 2026 Ildar Shaimordanov
+# MIT License
+#
+# ==============================================================================
+
+me="${0##*/}"
+
+print_usage() {
+	echo "\
+Transform a domain name into an LDAP DN or a Directory Server instance ID.
+If DOMAIN is omitted, the current local domain is used.
+
+Usage:
+	$me [OPTIONS] [DOMAIN]
+
+Options:
+	-d	Print domain DN (e.g., dc=example,dc=com)
+	-i	Print instance ID (e.g., EXAMPLE-COM)
+	-h	Print this help"
+}
+
+# ==============================================================================
+
+unset PRINT_DN
+unset PRINT_ID
+
+while getopts 'hdi' arg
+do
+	case "$arg" in
+	h ) print_usage ; exit ;;
+	d ) PRINT_DN=1 ;;
+	i ) PRINT_ID=1 ;;
+	* ) exit 1 ;;
+	esac
+done
+
+shift $(( OPTIND-1 ))
+
+# ==============================================================================
+
+[ $# -gt 0 ] || set -- "$( hostname -d )"
+
+[ -n "$1" ] || {
+	echo "$me: Empty domain not allowed" >&2
+	exit 1
+}
+
+[ -z "$PRINT_DN" ] && [ -z "$PRINT_ID" ] && {
+	PRINT_DN=1
+	PRINT_ID=1
+}
+
+# ==============================================================================
+
+if [ -n "$PRINT_DN" ]
+then
+	printf '%s\n' "$1" \
+	| sed 's/[.]$//; s/[.]/,dc=/g; s/^/dc=/'
+fi
+
+if [ -n "$PRINT_ID" ]
+then
+	printf '%s\n' "$1" \
+	| sed 's/[.]$//; s/[.]/-/g' | tr '[:lower:]' '[:upper:]'
+fi
+
+# ==============================================================================
+
+# +++
+#
+# Transform a domain name into an LDAP DN or a Directory Server instance ID.
+# If DOMAIN is omitted, the current local domain is used.
+#
+# Scope of Applicability:
+#
+# * Domain DN generation (-d) formats the input to RFC 2247 layout.
+#   Compatible with FreeIPA, ALD Pro, Active Directory, and OpenLDAP.
+# * Instance ID generation (-i) generates uppercase hyphen-separated identifiers.
+#   Matches 389 Directory Server instance names in FreeIPA/ALD Pro environments.
+# * Without a DOMAIN argument, the script relies on a correctly
+#   configured system local domain via `hostname -d`.
+#
+# Limitations:
+#
+# * The script acts as a fast translation tool and does not validate DNS.
+#   compliance Invalid input characters are passed directly to `sed` and `tr`.
+# * Suffix generation assumes the LDAP directory tree is strictly mapped to the
+#   DNS structure. Custom directory roots (e.g., `o=company`) are out of scope.
+# * The instance name format (-i) is inherently tailored to Red Hat, FreeIPA,
+#   and ALD Pro conventions, where instances are named after the Kerberos Realm.
+#
+# Requirements:
+#
+# * POSIX-compliant shell
+# * hostname
+# * sed
+# * tr
+#
+# ---
+
+# ==============================================================================
+
+# EOF
