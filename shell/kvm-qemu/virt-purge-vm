@@ -1,0 +1,80 @@
+#!/bin/sh
+
+# ==============================================================================
+#
+# Copyright (C) 2026 Ildar Shaimordanov
+# MIT License
+#
+# ==============================================================================
+
+ME="${0##*/}"
+
+print_usage() {
+	echo "\
+Delete VM and clean all its artifacts
+
+Usage:
+	$ME VM
+"
+}
+
+# ==============================================================================
+
+[ $# -eq 1 ] || {
+	print_usage >&2
+	exit 1
+}
+
+DOMAIN="$1"
+
+# ==============================================================================
+
+DOMAIN_STATE='shut off'
+CURRENT_STATE="$( LANG=C virsh domstate "$DOMAIN" )"
+
+[ "$CURRENT_STATE" = "$DOMAIN_STATE" ] || {
+	echo "$ME: $DOMAIN state is $CURRENT_STATE, $DOMAIN_STATE expected" >&2
+	exit 1
+}
+
+# ==============================================================================
+
+read -p "$ME: Purging $DOMAIN. Confirm [yes/no]: " CONFIRM </dev/tty
+
+case "$CONFIRM" in
+[Yy] | [Yy][Ee][Ss] ) ;;
+* ) echo "$ME: Cancelled purging $DOMAIN" >&2 ; exit 1 ;;
+esac
+
+# ==============================================================================
+
+virsh undefine "$DOMAIN" \
+--remove-all-storage \
+--snapshots-metadata \
+--nvram \
+--managed-save
+
+# ==============================================================================
+
+# +++
+#
+# Delete VM and clean all its artifacts
+#
+# Behavior:
+#
+# - Validates VM state before prompting for confirmation
+# - Inherits and preserves native virsh stderr messages
+# - Exits with non-zero code on any failure or cancellation
+#
+# !!! 2>&1
+#
+# Requirements
+#
+# - virsh
+# - POSIX-compliant shell (dash, ash, bash, etc.)
+#
+# ---
+
+# ==============================================================================
+
+# EOF
