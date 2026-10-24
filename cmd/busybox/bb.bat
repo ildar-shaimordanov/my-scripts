@@ -44,6 +44,7 @@ if not defined BB_EXE for /f "tokens=*" %%f in ( '
 for %%f in (
 	busybox.exe
 	busybox64.exe
+	busybox64u.exe
 ) do if not defined BB_EXE if not "%%~$PATH:f" == "" set "BB_EXE=%%~$PATH:f"
 
 :: Fail, if BusyBox not found and download not required
@@ -127,7 +128,8 @@ ____CMD____
 
 case "$1" in
 '' )
-	# It's never reachable part - learn why at the top of the script
+	# It's never reachable part - learn why at the top of the script.
+	# However, we keep it here for safety reason.
 	exit
 	;;
 --help | --list | --list-full )
@@ -140,20 +142,15 @@ case "$1" in
 	;;
 esac
 
-# Add the BusyBox location to the $PATH
-[[ ";$PATH;" =~ ";$( dirname "$0" );" ]] \
-|| PATH="$( dirname "$0" );$PATH"
-
 [ -z "$BB_DEBUG" ] || set -x
 
 case "$1" in
 -* | +* )
-	sh "$@"
-	;;
-* )
-	eval '"$@"'
+	set -- sh "$@"
 	;;
 esac
+
+"$@"
 
 # =========================================================================
 
