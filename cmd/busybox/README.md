@@ -12,7 +12,7 @@ _Or..._
 
 * Download from this repository the script `bb.bat`.
 * Place it in your operating system to be visible via `$PATH`.
-* Run one of the command `bb --download win32` or `bb --download win64` to download the latest 32-bit or 64-bit build of BusyBox, respectively. The downloaded executable will be stored next to this script. This step requires PowerShell is available in your system.
+* Run one of the command `bb --download win32`, or `bb --download win64`, or `bb --download win64u` to download the latest 32-bit, or 64-bit, or 64-bit with Unicode build of BusyBox, respectively. The downloaded executable will be stored next to this script. This step requires PowerShell is available in your system.
 
 That's it. Everything is ready. You can enjoy with the cool set of Unix tools and cute envelope for running them.
 
@@ -39,6 +39,7 @@ USAGE
   Download the latest 32-bit or 64-bit build of BusyBox
     bb --download win32
     bb --download win64
+    bb --download win64u
 
 SEE ALSO
   Learn more about BusyBox following these links:
