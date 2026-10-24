@@ -14,13 +14,27 @@ print_usage() {
 Delete VM and clean all its artifacts
 
 Usage:
-	$ME VM
-"
+	$ME [OPTIONS] VM
+
+Options:
+	-y	Confirm purging"
 }
 
 # ==============================================================================
 
-[ $# -eq 1 ] || {
+unset CONFIRM
+
+while getopts 'y' opt
+do
+	case "$opt" in
+	y ) CONFIRM=y ;;
+	* ) exit 1 ;;
+	esac
+done
+
+shift $(( OPTIND-1 ))
+
+[ $# -gt 0 ] || {
 	print_usage >&2
 	exit 1
 }
@@ -30,7 +44,7 @@ DOMAIN="$1"
 # ==============================================================================
 
 DOMAIN_STATE='shut off'
-CURRENT_STATE="$( LANG=C virsh domstate "$DOMAIN" )"
+CURRENT_STATE="$( LANG=C virsh domstate "$DOMAIN" )" || exit 1
 
 [ "$CURRENT_STATE" = "$DOMAIN_STATE" ] || {
 	echo "$ME: $DOMAIN state is $CURRENT_STATE, $DOMAIN_STATE expected" >&2
@@ -39,6 +53,7 @@ CURRENT_STATE="$( LANG=C virsh domstate "$DOMAIN" )"
 
 # ==============================================================================
 
+[ -n "$CONFIRM" ] || \
 read -p "$ME: Purging $DOMAIN. Confirm [yes/no]: " CONFIRM </dev/tty
 
 case "$CONFIRM" in
